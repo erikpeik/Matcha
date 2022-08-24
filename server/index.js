@@ -14,7 +14,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 var mysql = require('mysql');
 
 var con = mysql.createConnection({
-  host: "localhost",
+  host: "mysql-db",
   user: "matcha",
   password: "root",
   database: "matcha"
@@ -23,7 +23,7 @@ var con = mysql.createConnection({
 con.connect(function(err) {
   if (err) throw err;
   console.log("Connected!");
-});
+})
 
 let persons = [
 	{
@@ -100,8 +100,8 @@ app.post('/api/persons', (request, response) => {
 		number: body.number
 	}
 
-	var sql = "INSERT INTO sample (name) VALUES (?)";
-	con.query(sql, [body.name], function (err, result) {
+	var sql = "INSERT INTO sample (id, name) VALUES (?,?)";
+	con.query(sql, [1, body.name], function (err, result) {
 		if (err) throw err;
 		console.log("Result: " + result);
 	});

@@ -21,7 +21,7 @@ services:
       - /app/node_modules
       - ./server:/app
     links:
-    - mysql-db
+      - mysql-db
     command: npm start
 
   client:
@@ -40,6 +40,7 @@ services:
 
   mysql-db:
     image: mysql
+    command: --default-authentication-plugin=mysql_native_password
     container_name: mysql_container
     restart: unless-stopped
     volumes:
@@ -63,3 +64,14 @@ services:
     ports:
       - 8080:80
     restart: always
+
+  nginx:
+    depends_on:
+      - server
+      - client
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
+    ports:
+      - "3050:80"
