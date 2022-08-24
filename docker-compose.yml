@@ -64,14 +64,3 @@ services:
     ports:
       - 8080:80
     restart: always
-
-  nginx:
-    depends_on:
-      - server
-      - client
-    restart: always
-    build:
-      dockerfile: Dockerfile
-      context: ./nginx
-    ports:
-      - "3050:80"
