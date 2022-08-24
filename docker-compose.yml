@@ -16,7 +16,7 @@ services:
       <<: *common-variables
       MYSQL_HOST_IP: mysql-db
     ports:
-      - 8000:8000
+      - 3001:3001
     volumes:
       - /app/node_modules
       - ./server:/app
