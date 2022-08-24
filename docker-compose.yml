@@ -23,6 +23,7 @@ services:
     links:
     - mysql-db
     command: npm start
+
   client:
     build: ./client
     container_name: client_container
@@ -36,6 +37,7 @@ services:
     links:
       - server
     command: npm start
+
   mysql-db:
     image: mysql
     container_name: mysql_container
@@ -48,6 +50,7 @@ services:
        MYSQL_ROOT_PASSWORD: root
     ports:
       - 3306:3306
+
   phpmyadmin:
     depends_on:
       - mysql-db
