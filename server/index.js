@@ -11,6 +11,20 @@ morgan.token('body', request => {
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
+var mysql = require('mysql');
+
+var con = mysql.createConnection({
+  host: "localhost",
+  user: "matcha",
+  password: "root",
+  database: "matcha"
+});
+
+con.connect(function(err) {
+  if (err) throw err;
+  console.log("Connected!");
+});
+
 let persons = [
 	{
 		"id": 1,
@@ -86,8 +100,13 @@ app.post('/api/persons', (request, response) => {
 		number: body.number
 	}
 
-	persons = persons.concat(person)
+	var sql = "INSERT INTO sample (name) VALUES (?)";
+	con.query(sql, [body.name], function (err, result) {
+		if (err) throw err;
+		console.log("Result: " + result);
+	});
 
+	persons = persons.concat(person)
 	response.json(person)
 })
 
