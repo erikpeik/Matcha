@@ -9,3 +9,16 @@ CREATE TABLE `sample` (
 	`id` int(255) NOT NULL,
 	`name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/* DOESN'T WORK YET! */
+CREATE TABLE IF NOT EXISTS `users` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`username` VARCHAR(255) NOT NULL,
+	`firstname` VARCHAR(255) NOT NULL,
+	`lastname` VARCHAR(255) NOT NULL,
+	`email` VARCHAR(255) NOT NULL,
+	`password` VARCHAR(255) NOT NULL,
+	`verified` ENUM('YES','NO') DEFAULT 'NO',
+	`online` ENUM('YES','NO') DEFAULT 'NO',
+	`last_connection` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

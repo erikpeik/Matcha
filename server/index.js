@@ -14,15 +14,15 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 var mysql = require('mysql');
 
 var con = mysql.createConnection({
-  host: "mysql-db",
-  user: "matcha",
-  password: "root",
-  database: "matcha"
+	host: "mysql-db",
+	user: "matcha",
+	password: "root",
+	database: "matcha"
 });
 
-con.connect(function(err) {
-//   if (err) throw err;
-  console.log("Connected!");
+con.connect(function (err) {
+	//   if (err) throw err;
+	console.log("Connected!");
 })
 
 let persons = [
@@ -108,6 +108,46 @@ app.post('/api/persons', (request, response) => {
 
 	persons = persons.concat(person)
 	response.json(person)
+})
+
+app.post('/api/signup/checkname', (request, response) => {
+	const body = request.body
+
+	console.log("Username: " + body.username)
+	var sql = "SELECT * FROM users WHERE username = ?";
+	con.query(sql, [body.username], function (err, result) {
+		if (err) throw err;
+		// console.log(result);
+		if (!result.length) {
+			response.send(true)
+		} else {
+			response.send(false)
+		}
+	});
+})
+
+app.post('/api/signup', (request, response) => {
+	const body = request.body
+
+	var sql = `CREATE TABLE IF NOT EXISTS users (
+		id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		username VARCHAR(255) NOT NULL,
+		firstname VARCHAR(255) NOT NULL,
+		lastname VARCHAR(255) NOT NULL,
+		email VARCHAR(255) NOT NULL,
+		password VARCHAR(255) NOT NULL,
+		verified ENUM('YES','NO') DEFAULT 'NO',
+		online ENUM('YES','NO') DEFAULT 'NO',
+		last_connection TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	)`;
+	con.query(sql);
+	var sql = "INSERT INTO users (username, firstname, lastname, email, password) VALUES (?,?,?,?,?)";
+	con.query(sql, [body.username, body.firstname, body.lastname, body.email, body.password], function (err, result) {
+		if (err) throw err;
+		// console.log("Result: " + result);
+		response.json(result)
+	});
+
 })
 
 const PORT = process.env.PORT || 3001

@@ -1,57 +1,56 @@
 import { useState } from 'react'
+import signUpService from './services/signUpService'
 import Phonebook from './components/Phonebook'
 
 const MainContainer = ({ windowState }) => {
+	const [message, setMessage] = useState("User will soon be created!")
 
 	const submitUser = (event) => {
 		event.preventDefault()
 		console.log("Sending user data! Or not really...")
 
-		// const oldNumber = persons.find(person => person.name === newName)
-		// if (oldNumber) {
-		// 	if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
-		// 		const changedNumber = { ...oldNumber, number: newNumber }
-		// 		nameService
-		// 			.update(oldNumber.id, changedNumber)
-		// 			.then(returnedName => {
-		// 				setPersons(persons.map(person => person.name !== newName ? person : returnedName))
-		// 			})
-		// 			.catch(error => {
-		// 				showMessage(`Information of '${newName}' has already been removed from server`, 'error')
-		// 				setPersons(persons.filter(person => person.name !== newName))
-		// 			})
-		// 		showMessage(`Changed ${newName}'s number`, 'success')
-		// 	}
-		// } else {
-		// 	const nameObject = { name: newName, number: newNumber }
-		// 	nameService
-		// 		.create(nameObject)
-		// 		.then(returnedName => {
-		// 			setPersons(persons.concat(returnedName))
-		// 		})
-		// 	showMessage(`Added ${newName}`, 'success')
-		// }
-	}
+		const signedUpUser = {
+			username: event.target.username.value,
+			firstname: event.target.firstname.value,
+			lastname: event.target.lastname.value,
+			email: event.target.email.value,
+			password: event.target.password.value,
+			confirmPassword: event.target.confirm_password.value,
+		}
 
-	if (windowState === 'signup') {
-		return (
-			<>
-				<h2>{windowState}</h2>
-				<form onSubmit={submitUser}>
-					<br></br>
-					<div><input type="text" name="username" defaultValue="Username"></input></div>
-					<div><input type="text" name="firstname" defaultValue="First name"></input></div>
-					<div><input type="text" name="lastname" defaultValue="Last name"></input></div>
-					<div><input type="text" name="password" defaultValue="Password"></input></div>
-					<div><input type="text" name="confirm_password" defaultValue="Confirm password"></input></div>
-					<button type="submit">Submit</button>
-				</form>
-			</>
-		)
-	}
+		signUpService.checkUniqueName(signedUpUser).then((result) => {
+			if (result === true) {
+				signUpService
+					.createUser(signedUpUser)
+					.then(responseData => {
+						setMessage("User created!")
+						console.log(responseData)
+					})
+			}
+		})
+}
+
+if (windowState === 'signup') {
 	return (
-		<h2>{windowState}</h2>
+		<>
+			<h2>{windowState}</h2>
+			<form onSubmit={submitUser}>
+				<br></br>
+				<div><input type="text" name="username" placeholder="Username" autoComplete="off"></input></div>
+				<div><input type="text" name="firstname" placeholder="First name" autoComplete="off"></input></div>
+				<div><input type="text" name="lastname" placeholder="Last name" autoComplete="off"></input></div>
+				<div><input type="email" name="email" placeholder="E-mail" autoComplete="off"></input></div>
+				<div><input type="password" name="password" placeholder="Password" autoComplete="off"></input></div>
+				<div><input type="password" name="confirm_password" placeholder="Confirm password" autoComplete="off"></input></div>
+				<button type="submit">Submit</button>
+			</form>
+			<p>{message}</p>
+		</>
 	)
+}
+return (
+	<h2>{windowState}</h2>
+)
 }
 
 const Buttons = ({ setWindowState }) => {
@@ -72,8 +71,8 @@ const App = () => {
 
 	if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(position => {
-		  console.log(position.coords.latitude);
-		  console.log(position.coords.longitude);
+			console.log(position.coords.latitude);
+			console.log(position.coords.longitude);
 		});
 	}
 
