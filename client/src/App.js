@@ -7,7 +7,7 @@ const MainContainer = ({ windowState }) => {
 
 	const submitUser = (event) => {
 		event.preventDefault()
-		console.log("Sending user data! Or not really...")
+		console.log("Sending user data!")
 
 		const signedUpUser = {
 			username: event.target.username.value,
@@ -18,7 +18,7 @@ const MainContainer = ({ windowState }) => {
 			confirmPassword: event.target.confirm_password.value,
 		}
 
-		signUpService.checkUniqueName(signedUpUser).then((result) => {
+		signUpService.checkUniqueUser(signedUpUser).then((result) => {
 			if (result === true) {
 				signUpService
 					.createUser(signedUpUser)
@@ -26,6 +26,9 @@ const MainContainer = ({ windowState }) => {
 						setMessage("User created!")
 						console.log(responseData)
 					})
+			} else {
+				setMessage(result)
+				// console.log(result)
 			}
 		})
 }
@@ -36,12 +39,12 @@ if (windowState === 'signup') {
 			<h2>{windowState}</h2>
 			<form onSubmit={submitUser}>
 				<br></br>
-				<div><input type="text" name="username" placeholder="Username" autoComplete="off"></input></div>
-				<div><input type="text" name="firstname" placeholder="First name" autoComplete="off"></input></div>
-				<div><input type="text" name="lastname" placeholder="Last name" autoComplete="off"></input></div>
-				<div><input type="email" name="email" placeholder="E-mail" autoComplete="off"></input></div>
-				<div><input type="password" name="password" placeholder="Password" autoComplete="off"></input></div>
-				<div><input type="password" name="confirm_password" placeholder="Confirm password" autoComplete="off"></input></div>
+				<div><input type="text" name="username" placeholder="Username" autoComplete="off" required></input></div>
+				<div><input type="text" name="firstname" placeholder="First name" autoComplete="off" required></input></div>
+				<div><input type="text" name="lastname" placeholder="Last name" autoComplete="off" required></input></div>
+				<div><input type="email" name="email" placeholder="E-mail" autoComplete="off" required></input></div>
+				<div><input type="password" name="password" placeholder="Password" autoComplete="off" required></input></div>
+				<div><input type="password" name="confirm_password" placeholder="Confirm password" autoComplete="off" required></input></div>
 				<button type="submit">Submit</button>
 			</form>
 			<p>{message}</p>

@@ -110,24 +110,38 @@ app.post('/api/persons', (request, response) => {
 	response.json(person)
 })
 
-app.post('/api/signup/checkname', (request, response) => {
+app.post('/api/signup/checkuser', (request, response) => {
 	const body = request.body
 
 	console.log("Username: " + body.username)
+	if (body.username.length > 25) {
+		return response.send("Username is too long. Maximum length is 25 characters.")
+	}
+	if (!body.username.match(/^[a-z0-9]+$/i)) {
+		return response.send("Username should only include characters (a-z or A-Z) and numbers (0-9).")
+	}
 	var sql = "SELECT * FROM users WHERE username = ?";
 	con.query(sql, [body.username], function (err, result) {
 		if (err) throw err;
 		// console.log(result);
-		if (!result.length) {
-			response.send(true)
-		} else {
-			response.send(false)
+		if (result.length) {
+			return response.send("Username already exists!")
 		}
 	});
+	var sql = "SELECT * FROM users WHERE email = ?";
+	con.query(sql, [body.email], function (err, result) {
+		if (err) throw err;
+		// console.log(result);
+		if (result.length) {
+			return response.send("User with this e-mail already exists!")
+		}
+	});
+	response.send(true)
 })
 
 app.post('/api/signup', (request, response) => {
 	const body = request.body
+	console.log("Signup username: " + body.username)
 
 	var sql = `CREATE TABLE IF NOT EXISTS users (
 		id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -147,7 +161,6 @@ app.post('/api/signup', (request, response) => {
 		// console.log("Result: " + result);
 		response.json(result)
 	});
-
 })
 
 const PORT = process.env.PORT || 3001

@@ -1,8 +1,8 @@
 import axios from 'axios'
 const baseUrl = '/api/signup'
 
-const checkUniqueName = signedUpUser => {
-	const request = axios.post(`${baseUrl}/checkname`, signedUpUser)
+const checkUniqueUser = signedUpUser => {
+	const request = axios.post(`${baseUrl}/checkuser`, signedUpUser)
 	return request.then(response => response.data)
 }
 
@@ -11,6 +11,6 @@ const createUser = signedUpUser => {
 	return request.then(response => response.data)
 }
 
-const signUpService = { checkUniqueName, createUser }
+const signUpService = { checkUniqueUser, createUser }
 
 export default signUpService
