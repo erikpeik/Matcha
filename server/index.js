@@ -111,32 +111,42 @@ app.post('/api/persons', (request, response) => {
 })
 
 app.post('/api/signup/checkuser', (request, response) => {
-	const body = request.body
 
-	console.log("Username: " + body.username)
-	if (body.username.length > 25) {
-		return response.send("Username is too long. Maximum length is 25 characters.")
-	}
-	if (!body.username.match(/^[a-z0-9]+$/i)) {
-		return response.send("Username should only include characters (a-z or A-Z) and numbers (0-9).")
-	}
-	var sql = "SELECT * FROM users WHERE username = ?";
-	con.query(sql, [body.username], function (err, result) {
-		if (err) throw err;
-		// console.log(result);
-		if (result.length) {
-			return response.send("Username already exists!")
+	var checkUser = new Promise(async function (resolve, reject) {
+		const body = request.body
+
+		console.log("Username: " + body.username)
+		if (body.username.length > 25) {
+			reject("Username is too long. Maximum length is 25 characters.")
 		}
-	});
-	var sql = "SELECT * FROM users WHERE email = ?";
-	con.query(sql, [body.email], function (err, result) {
-		if (err) throw err;
-		// console.log(result);
-		if (result.length) {
-			return response.send("User with this e-mail already exists!")
+		if (!body.username.match(/^[a-z0-9]+$/i)) {
+			reject("Username should only include characters (a-z or A-Z) and numbers (0-9).")
 		}
-	});
-	response.send(true)
+		var sql = "SELECT * FROM users WHERE username = ?";
+		await con.query(sql, [body.username], function (err, result) {
+			if (err) throw err;
+			// console.log(result);
+			if (result.length) {
+				reject("Username already exists!")
+			}
+		});
+		var sql = "SELECT * FROM users WHERE email = ?";
+		await con.query(sql, [body.email], function (err, result) {
+			if (err) throw err;
+			// console.log(result);
+			if (result.length) {
+				reject("User with this e-mail already exists!")
+			}
+		})
+		resolve();
+	})
+
+	checkUser
+		.then(() => {
+			response.send(true)
+		}).catch((error) => {
+			response.send(error)
+		})
 })
 
 app.post('/api/signup', (request, response) => {
