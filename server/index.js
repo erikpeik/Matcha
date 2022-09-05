@@ -111,37 +111,51 @@ app.post('/api/persons', (request, response) => {
 })
 
 app.post('/api/signup/checkuser', (request, response) => {
+	const body = request.body
 
-	var checkUser = new Promise(async function (resolve, reject) {
-		const body = request.body
+	console.log("Username: " + body.username)
+	if (body.username.length < 4 || body.username.length > 25)
+		return response.send("Username has to be between 4 and 25 characters.")
+	if (!body.username.match(/^[a-z0-9]+$/i))
+		return response.send("Username should only include characters (a-z or A-Z) and numbers (0-9).")
+	if (!body.firstname.match(/^[a-zåäö]+$/i) || !body.lastname.match(/^[a-zåäö]+$/i))
+		return response.send("First name and last name can only include characters a-z and å, ä, ö.")
+	if (!body.email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/))
+		return response.send("Please enter a valid e-mail address.")
+	if (!body.password.match(/(?=^.{8,30}$)(?=.*\d)(?=.*[!.@#$%^&*]+)(?=.*[A-Z])(?=.*[a-z]).*$/)) {
+		response.setHeader('Content-type','text/html')
+		return response.send("PLEASE ENTER A PASSWORD WITH: </p><p> - a length between 8 and 30 characters </p><p> - at least one lowercase character (a-z) </p><p> - at least one uppercase character (A-Z) </p><p> - at least one numeric character (0-9) <br> at least one special character (!.@#$%^&*)")
+	}
+	if (body.password !== body.confirmPassword)
+		return response.send("The entered passwords are not the same!")
 
-		console.log("Username: " + body.username)
-		if (body.username.length > 25) {
-			reject("Username is too long. Maximum length is 25 characters.")
-		}
-		if (!body.username.match(/^[a-z0-9]+$/i)) {
-			reject("Username should only include characters (a-z or A-Z) and numbers (0-9).")
-		}
+	const checkUsername = new Promise((resolve, reject) => {
 		var sql = "SELECT * FROM users WHERE username = ?";
-		await con.query(sql, [body.username], function (err, result) {
+		con.query(sql, [body.username], function (err, result) {
 			if (err) throw err;
 			// console.log(result);
 			if (result.length) {
 				reject("Username already exists!")
+			} else {
+				resolve()
 			}
 		});
+	})
+
+	const checkEmail = new Promise((resolve, reject) => {
 		var sql = "SELECT * FROM users WHERE email = ?";
-		await con.query(sql, [body.email], function (err, result) {
+		con.query(sql, [body.email], function (err, result) {
 			if (err) throw err;
 			// console.log(result);
 			if (result.length) {
 				reject("User with this e-mail already exists!")
+			} else {
+				resolve()
 			}
 		})
-		resolve();
 	})
 
-	checkUser
+	Promise.all([checkUsername, checkEmail])
 		.then(() => {
 			response.send(true)
 		}).catch((error) => {
@@ -168,7 +182,7 @@ app.post('/api/signup', (request, response) => {
 	var sql = "INSERT INTO users (username, firstname, lastname, email, password) VALUES (?,?,?,?,?)";
 	con.query(sql, [body.username, body.firstname, body.lastname, body.email, body.password], function (err, result) {
 		if (err) throw err;
-		// console.log("Result: " + result);
+		console.log("New user created!");
 		response.json(result)
 	});
 })
