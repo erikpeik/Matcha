@@ -3,7 +3,53 @@ import signUpService from './services/signUpService'
 import Phonebook from './components/Phonebook'
 
 const MainContainer = ({ windowState }) => {
-	const [message, setMessage] = useState("User will soon be created!")
+	const [message, setMessage] = useState("")
+
+	const submitUser = (event) => {
+		event.preventDefault()
+		console.log("Logging user data!")
+
+		const signedUpUser = {
+			username: event.target.username.value,
+			password: event.target.password.value,
+		}
+
+		signUpService.logInUser(signedUpUser).then((result) => {
+			if (result === true) {
+				// signUpService
+				// 	.createUser(signedUpUser)
+				// 	.then(responseData => {
+						setMessage("User found!")
+						console.log(result)
+					// })
+			} else {
+				setMessage(result)
+				// console.log(result)
+			}
+		})
+	}
+
+	if (windowState === 'login') {
+		return (
+			<>
+				<h2>Login</h2>
+				<form onSubmit={submitUser}>
+					<br></br>
+					<div><input type="text" name="username" placeholder="Username" autoComplete="off" required></input></div>
+					<div><input type="password" name="password" placeholder="Password" autoComplete="off" required></input></div>
+					<button type="submit">Submit</button>
+				</form>
+				<p>{message}</p>
+			</>
+		)
+	}
+	return (
+		<h2>{windowState}</h2>
+	)
+}
+
+const Signup = () => {
+	const [message, setMessage] = useState("")
 
 	const submitUser = (event) => {
 		event.preventDefault()
@@ -18,7 +64,7 @@ const MainContainer = ({ windowState }) => {
 			confirmPassword: event.target.confirm_password.value,
 		}
 
-		signUpService.checkUniqueUser(signedUpUser).then((result) => {
+		signUpService.checkUserForm(signedUpUser).then((result) => {
 			if (result === true) {
 				signUpService
 					.createUser(signedUpUser)
@@ -31,12 +77,11 @@ const MainContainer = ({ windowState }) => {
 				// console.log(result)
 			}
 		})
-}
+	}
 
-if (windowState === 'signup') {
 	return (
 		<>
-			<h2>{windowState}</h2>
+			<h2>Signup</h2>
 			<form onSubmit={submitUser}>
 				<br></br>
 				<div><input type="text" name="username" placeholder="Username" autoComplete="off" required></input></div>
@@ -50,10 +95,7 @@ if (windowState === 'signup') {
 			<p>{message}</p>
 		</>
 	)
-}
-return (
-	<h2>{windowState}</h2>
-)
+
 }
 
 const Buttons = ({ setWindowState }) => {
@@ -84,6 +126,15 @@ const App = () => {
 			<div>
 				<Buttons setWindowState={setWindowState} />
 				<Phonebook />
+			</div>
+		)
+	}
+
+	if (windowState === 'signup') {
+		return (
+			<div>
+				<Buttons setWindowState={setWindowState} />
+				<Signup />
 			</div>
 		)
 	}

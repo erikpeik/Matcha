@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/SeanTroy/FullStackOpen_part3#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "express": "^4.18.1",
     "mongoose": "^6.5.2",

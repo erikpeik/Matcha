@@ -3,6 +3,7 @@ const app = express()
 app.use(express.json()) // needed to attach JSON data to POST body property
 var morgan = require('morgan') // Middleware to log requests
 const cors = require('cors') // Cross-origin resource sharing (CORS) middleware is required to allow requests from other origins
+const bcrypt = require("bcrypt") // For password hashing and comparing
 app.use(cors())
 app.use(express.static('build')) // express checks if the 'build' directory contains the requested file
 
@@ -178,12 +179,53 @@ app.post('/api/signup', (request, response) => {
 		last_connection TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	)`;
 	con.query(sql);
-	var sql = "INSERT INTO users (username, firstname, lastname, email, password) VALUES (?,?,?,?,?)";
-	con.query(sql, [body.username, body.firstname, body.lastname, body.email, body.password], function (err, result) {
-		if (err) throw err;
-		console.log("New user created!");
-		response.json(result)
-	});
+
+	async function saveHashedUser() {
+		const hash = await bcrypt.hash(body.password, 10);
+		console.log("Hashed password: " + hash)
+		var sql = "INSERT INTO users (username, firstname, lastname, email, password) VALUES (?,?,?,?,?)";
+		con.query(sql, [body.username, body.firstname, body.lastname, body.email, hash], function (err, result) {
+			if (err) throw err;
+			console.log("New user created!");
+			response.json("New user created! " + JSON.stringify(result))
+		})
+	}
+
+	saveHashedUser()
+})
+
+app.post('/api/login', (request, response) => {
+	const body = request.body
+
+	const verifyUser = new Promise((resolve, reject) => {
+		var sql = "SELECT password FROM users WHERE username = ?";
+		con.query(sql, [body.username], function (err, result) {
+			if (err) throw err;
+			if (!result.length) {
+				reject("User not found!")
+			} else {
+				// console.log(result[0]['password']);
+				bcrypt.compare(body.password, result[0]['password'])
+					.then((compareResult) => {
+						// console.log(compareResult);
+						if (compareResult)
+							resolve("Correct password!")
+						else
+							reject("Wrong password!")
+					}).catch(err => {
+						reject(err)
+					})
+			}
+		})
+	})
+
+	verifyUser
+		.then((result) => {
+			response.send(result)
+		}).catch(error => {
+			response.send(error)
+		})
+
 })
 
 const PORT = process.env.PORT || 3001
