@@ -16,6 +16,16 @@ const logInUser = signedUpUser => {
 	return request.then(response => response.data)
 }
 
-const signUpService = { checkUserForm, createUser, logInUser }
+const logOutUser = () => {
+	const request = axios.get(`${baseUrl}/logout`)
+	return request.then(response => response.data)
+}
+
+const sessionUser = () => {
+	const request = axios.get(`${baseUrl}/login`)
+	return request.then(response => response.data)
+}
+
+const signUpService = { checkUserForm, createUser, logInUser, logOutUser, sessionUser }
 
 export default signUpService
