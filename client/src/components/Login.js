@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import signUpService from '../services/signUpService'
 
-const Login = ({ windowState, setUser }) => {
+const Login = ({ setUser }) => {
 	const [message, setMessage] = useState("")
 
 	const submitUser = (event) => {

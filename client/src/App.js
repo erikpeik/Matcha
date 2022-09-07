@@ -1,29 +1,34 @@
 import { useState, useEffect } from 'react'
+import {
+	BrowserRouter as Router,
+	Routes, Route, Link,
+	// useParams, useNavigate
+} from 'react-router-dom'
 import signUpService from './services/signUpService'
 import Login from './components/Login'
 import Signup from './components/Signup'
 import Phonebook from './components/Phonebook'
 
-const MainContainer = ({ windowState, setUser }) => {
+const MainContainer = ({ setUser }) => {
 	return (
-		<h2>{windowState}</h2>
+		<h2>page coming soon...</h2>
 	)
 }
 
-const Buttons = ({ setWindowState }) => {
+const Buttons = () => {
 	return (
-		<>
-			<button onClick={() => setWindowState('login')}>Log in</button>
-			<button onClick={() => setWindowState('signup')}>Sign up</button>
-			<button onClick={() => setWindowState('profile')}>Profile</button>
-			<button onClick={() => setWindowState('browse_users')}>Browse users</button>
-			<button onClick={() => setWindowState('chat')}>Chat</button>
-			<button onClick={() => setWindowState('phonebook')}>Phonebook</button>
-		</>
+		<div>
+			<Link to="/login"><button>login</button></Link>
+			<Link to="/signup"><button>signup</button></Link>
+			<Link to="/profile"><button>profile</button></Link>
+			<Link to="/browse_users"><button>browse users</button></Link>
+			<Link to="/chat"><button>chat</button></Link>
+			<Link to="/phonebook"><button>phonebook</button></Link>
+		</div>
 	)
 }
 
-const NavBar = ({ user, setUser, setWindowState }) => {
+const NavBar = ({ user, setUser }) => {
 	const logOut = () => {
 		signUpService.logOutUser()
 		setUser("")
@@ -32,13 +37,12 @@ const NavBar = ({ user, setUser, setWindowState }) => {
 	return (
 		<>
 			<p>User: {user} <button onClick={() => logOut()}>logout</button></p>
-			<Buttons setWindowState={setWindowState} />
+			<Buttons />
 		</>
 	)
 }
 
 const App = () => {
-	const [windowState, setWindowState] = useState('phonebook')
 	const [user, setUser] = useState("")
 
 	useEffect(() => {
@@ -56,38 +60,19 @@ const App = () => {
 		});
 	}
 
-	if (windowState === 'phonebook') {
-		return (
-			<div>
-				<NavBar user={user} setUser={setUser} setWindowState={setWindowState} />
-				<Phonebook />
-			</div>
-		)
-	}
-
-	if (windowState === 'login') {
-		return (
-			<div>
-				<NavBar user={user} setUser={setUser} setWindowState={setWindowState} />
-				<Login setUser={setUser}/>
-			</div>
-		)
-	}
-
-	if (windowState === 'signup') {
-		return (
-			<div>
-				<NavBar user={user} setUser={setUser} setWindowState={setWindowState} />
-				<Signup />
-			</div>
-		)
-	}
-
 	return (
-		<div>
-			<NavBar user={user} setUser={setUser} setWindowState={setWindowState} />
-			<MainContainer windowState={windowState} setUser={setUser} />
-		</div>
+		<Router>
+			<NavBar user={user} setUser={setUser} />
+			<Routes>
+				<Route path="/" element={<Login setUser={setUser} />} />
+				<Route path="/login" element={<Login setUser={setUser} />} />
+				<Route path="/signup" element={<Signup setUser={setUser} />} />
+				<Route path="/profile" element={<MainContainer setUser={setUser} />} />
+				<Route path="/browse_users" element={<MainContainer setUser={setUser} />} />
+				<Route path="/chat" element={<MainContainer setUser={setUser} />} />
+				<Route path="/phonebook" element={<Phonebook />} />
+			</Routes>
+		</Router>
 	)
 }
 
