@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
 	BrowserRouter as Router,
-	Routes, Route, Link,
+	Routes, Route
 	// useParams, useNavigate
 } from 'react-router-dom'
 import signUpService from './services/signUpService'
