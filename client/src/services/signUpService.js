@@ -21,11 +21,11 @@ const logOutUser = () => {
 	return request.then(response => response.data)
 }
 
-const sessionUser = () => {
+const getSessionUser = () => {
 	const request = axios.get(`${baseUrl}/login`)
 	return request.then(response => response.data)
 }
 
-const signUpService = { checkUserForm, createUser, logInUser, logOutUser, sessionUser }
+const signUpService = { checkUserForm, createUser, logInUser, logOutUser, getSessionUser }
 
 export default signUpService

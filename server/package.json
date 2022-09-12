@@ -1,16 +1,12 @@
 {
-  "name": "phonebook_backend",
+  "name": "matcha_backend",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build:ui": "rm -rf build && cd phonebook_frontend && npm run build && cp -r build ../ && cd ..",
-    "deploy": "git push heroku master",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && npm run deploy",
-    "logs:prod": "heroku logs --tail"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",

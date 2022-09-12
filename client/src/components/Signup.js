@@ -1,8 +1,11 @@
-import { useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { setNotification } from '../reducers/notificationReducer'
 import signUpService from '../services/signUpService'
 
 const Signup = () => {
-	const [message, setMessage] = useState("")
+	const dispatch = useDispatch()
+
+	const notification = useSelector(state => state.notification)
 
 	const submitUser = (event) => {
 		event.preventDefault()
@@ -22,11 +25,11 @@ const Signup = () => {
 				signUpService
 					.createUser(signedUpUser)
 					.then(responseData => {
-						setMessage("User created!")
+						dispatch(setNotification("User created!", 5))
 						console.log(responseData)
 					})
 			} else {
-				setMessage(result)
+				dispatch(setNotification(result, 5))
 				// console.log(result)
 			}
 		})
@@ -45,7 +48,7 @@ const Signup = () => {
 				<div><input type="password" name="confirm_password" placeholder="Confirm password" autoComplete="off" required></input></div>
 				<button type="submit">Submit</button>
 			</form>
-			<p>{message}</p>
+			<p>{notification}</p>
 		</>
 	)
 

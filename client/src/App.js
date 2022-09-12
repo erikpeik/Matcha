@@ -1,31 +1,32 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 import {
 	BrowserRouter as Router,
-	Routes, Route, Link,
-	// useParams, useNavigate
+	Routes, Route,
+	// Link, useParams, useNavigate
 } from 'react-router-dom'
 import signUpService from './services/signUpService'
+import { setUser } from './reducers/userReducer'
 import Login from './components/Login'
 import Signup from './components/Signup'
-import Phonebook from './components/Phonebook'
 import NavBar from './components/Navbar'
 
-const MainContainer = ({ setUser }) => {
+const MainContainer = () => {
 	return (
 		<h2>page coming soon...</h2>
 	)
 }
 
 const App = () => {
-	const [user, setUser] = useState("")
+	const dispatch = useDispatch()
 
 	useEffect(() => {
 		signUpService
-			.sessionUser()
+			.getSessionUser()
 			.then(result => {
-				setUser(result)
+				dispatch(setUser(result))
 			})
-	}, [user])
+	}, [dispatch])
 
 	if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(position => {
@@ -36,15 +37,14 @@ const App = () => {
 
 	return (
 		<Router>
-			<NavBar user={user} setUser={setUser} />
+			<NavBar />
 			<Routes>
-				<Route path="/" element={<Login setUser={setUser} />} />
-				<Route path="/login" element={<Login setUser={setUser} />} />
-				<Route path="/signup" element={<Signup setUser={setUser} />} />
-				<Route path="/profile" element={<MainContainer setUser={setUser} />} />
-				<Route path="/browse_users" element={<MainContainer setUser={setUser} />} />
-				<Route path="/chat" element={<MainContainer setUser={setUser} />} />
-				<Route path="/phonebook" element={<Phonebook />} />
+				<Route path="/" element={<Login />} />
+				<Route path="/login" element={<Login />} />
+				<Route path="/signup" element={<Signup />} />
+				<Route path="/profile" element={<MainContainer />} />
+				<Route path="/browse_users" element={<MainContainer />} />
+				<Route path="/chat" element={<MainContainer />} />
 			</Routes>
 		</Router>
 	)

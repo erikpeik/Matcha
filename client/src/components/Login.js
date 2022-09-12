@@ -1,8 +1,12 @@
-import { useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import signUpService from '../services/signUpService'
+import { setUser } from '../reducers/userReducer'
+import { setNotification } from '../reducers/notificationReducer'
 
-const Login = ({ setUser }) => {
-	const [message, setMessage] = useState("")
+const Login = () => {
+	const dispatch = useDispatch()
+
+	const notification = useSelector(state => state.notification)
 
 	const submitUser = (event) => {
 		event.preventDefault()
@@ -15,10 +19,10 @@ const Login = ({ setUser }) => {
 
 		signUpService.logInUser(signedUpUser).then((result) => {
 			if (result === true) {
-				setUser(result)
-				setMessage("Correct password!")
+				dispatch(setUser(event.target.username.value))
+				dispatch(setNotification("Correct password!", 5))
 			} else {
-				setMessage(result)
+				dispatch(setNotification(result, 5))
 				// console.log(result)
 			}
 		})
@@ -33,7 +37,7 @@ const Login = ({ setUser }) => {
 				<div><input type="password" name="password" placeholder="Password" autoComplete="off" required></input></div>
 				<button type="submit">Submit</button>
 			</form>
-			<p>{message}</p>
+			<p>{notification}</p>
 		</>
 	)
 

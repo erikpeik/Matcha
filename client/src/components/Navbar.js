@@ -1,4 +1,7 @@
+import { useSelector, useDispatch } from 'react-redux'
 import signUpService from '../services/signUpService'
+import { setUser } from '../reducers/userReducer'
+
 import { Link } from 'react-router-dom'
 
 const Buttons = () => {
@@ -9,15 +12,18 @@ const Buttons = () => {
 			<Link to="/profile"><button>profile</button></Link>
 			<Link to="/browse_users"><button>browse users</button></Link>
 			<Link to="/chat"><button>chat</button></Link>
-			<Link to="/phonebook"><button>phonebook</button></Link>
 		</div>
 	)
 }
 
-const NavBar = ({ user, setUser }) => {
+const NavBar = () => {
+	const dispatch = useDispatch()
+
+	const user = useSelector(state => state.user)
+
 	const logOut = () => {
 		signUpService.logOutUser()
-		setUser("")
+		dispatch(setUser("Please login first"))
 	}
 
 	return (
