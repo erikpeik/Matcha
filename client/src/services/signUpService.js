@@ -11,6 +11,11 @@ const createUser = signedUpUser => {
 	return request.then(response => response.data)
 }
 
+const verifyUser = userToVerify => {
+	const request = axios.post(`${baseUrl}/signup/verifyuser`, userToVerify)
+	return request.then(response => response.data)
+}
+
 const logInUser = signedUpUser => {
 	const request = axios.post(`${baseUrl}/login`, signedUpUser)
 	return request.then(response => response.data)
@@ -26,6 +31,6 @@ const getSessionUser = () => {
 	return request.then(response => response.data)
 }
 
-const signUpService = { checkUserForm, createUser, logInUser, logOutUser, getSessionUser }
+const signUpService = { checkUserForm, createUser, verifyUser, logInUser, logOutUser, getSessionUser }
 
 export default signUpService

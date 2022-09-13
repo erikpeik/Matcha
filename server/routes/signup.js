@@ -43,7 +43,8 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 			})
 		})
 
-		Promise.all([checkUsername, checkEmail])
+		checkUsername
+			.then(() => checkEmail)
 			.then(() => {
 				console.log("User details checked!")
 				response.send(true)
@@ -69,16 +70,18 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 		)`;
 		con.query(sql);
 
-		async function saveHashedUser(callback) {
+		const saveHashedUser = new Promise(async (resolve) => {
 			const hash = await bcrypt.hash(body.password, 10);
 			console.log("Hashed password: " + hash)
 			var sql = "INSERT INTO users (username, firstname, lastname, email, password) VALUES (?,?,?,?,?)";
-			var result = await con.query(sql, [body.username, body.firstname, body.lastname, body.email, hash])
-			// console.log("SQL query result: ", result)
-			return result
-		}
+			con.query(sql, [body.username, body.firstname, body.lastname, body.email, hash], function (err, result) {
+				if (err) throw err;
+				resolve(JSON.stringify(result))
+				// console.log("SQL query result: ", result)
+			})
+		})
 
-		async function createVerifyCode() {
+		const createVerifyCode = async () => {
 			var sql = `CREATE TABLE IF NOT EXISTS email_verify (
 				running_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				user_id INT(11) NOT NULL,
@@ -119,7 +122,7 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 			return (code)
 		}
 
-		function sendConfirmationMail(useremail, code) {
+		const sendConfirmationMail = (useremail, code) => {
 			var transporter = nodemailer.createTransport({
 				service: 'gmail',
 				auth: {
@@ -148,27 +151,51 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 			});
 		}
 
-		// async function verifyUser() {
-		// 	const user_created = await saveHashedUser((result) => {
-		// 		console.log("Result from saveHashedUser 1: " + result)
-		// 		return result
-		// 	})
-		// 	console.log("Result from saveHashedUser 2: " + user_created)
-		// 	const code = await createVerifyCode()
-		// 	const mail = sendConfirmationMail(body.email, code)
-		// 	response.json("New user created!" + user_created)
-		// }
-
-		function verifyUser() {
-			saveHashedUser().then((res) => {
-				const code = createVerifyCode()
-				const mail = sendConfirmationMail(body.email, code)
-				console.log("Result from saveHashedUser 2: ", res)
-				response.json("New user created!" + res)
+		saveHashedUser
+			.then((result) => {
+				console.log("Result from saveHashedUser: ", result)
+				return createVerifyCode()
 			})
+			.then((code) => sendConfirmationMail(body.email, code))
+			.then(() => {
+				response.send("New user created!")
+			}).catch((error) => {
+				response.send(error)
+			})
+	})
+
+	app.post('/api/signup/verifyuser', (request, response) => {
+		const body = request.body
+
+		const checkCode = new Promise((resolve, reject) => {
+			var sql = `SELECT * FROM email_verify
+						INNER JOIN users ON email_verify.user_id = users.id
+						WHERE email_verify.verify_code = ?`;
+			con.query(sql, [body.code], function (err, result) {
+				if (err) throw err;
+				console.log(result);
+				if (!result.length) {
+					reject("No code found!")
+				} else {
+					resolve("Code matches!")
+				}
+			})
+		})
+
+		const setAccountVerified = () => {
+			var sql = `UPDATE users SET verified = 'YES' WHERE username = ?`;
+			con.query(sql, [body.username])
+
+			var sql = `DELETE FROM email_verify WHERE verify_code = ?`;
+			con.query(sql, [body.code])
 		}
 
-		verifyUser()
-
+		checkCode.then(() => {
+			setAccountVerified()
+			console.log("User code verified!")
+			response.send(true)
+		}).catch((error) => {
+			response.send(error)
+		})
 	})
 }

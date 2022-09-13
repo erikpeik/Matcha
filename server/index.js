@@ -33,7 +33,6 @@ con.connect(function (err) {
 })
 
 require('./routes/signup.js')(app, con, bcrypt, nodemailer);
-require('./routes/phonebook.js')(app, con);
 
 app.post('/api/login', (request, response) => {
 	const body = request.body
@@ -66,7 +65,7 @@ app.post('/api/login', (request, response) => {
 	})
 
 	verifyUser
-		.then((result) => {
+		.then(() => {
 			response.send(true)
 		}).catch(error => {
 			response.send(error)
