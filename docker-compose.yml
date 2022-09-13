@@ -13,6 +13,8 @@ services:
     container_name: node_server_container
     depends_on:
       - mysql-db
+    env_file:
+      - .env
     environment:
       <<: *common-variables
       MYSQL_HOST_IP: mysql-db
