@@ -1,7 +1,9 @@
+require('dotenv').config() // to use .env variables
 const express = require('express')
 const app = express()
 app.use(express.json()) // needed to attach JSON data to POST body property
-var morgan = require('morgan') // Middleware to log requests
+var morgan = require('morgan') // middleware to log requests
+var nodemailer = require('nodemailer'); // middleware to send e-mails
 const cors = require('cors') // Cross-origin resource sharing (CORS) middleware is required to allow requests from other origins
 const bcrypt = require("bcrypt") // For password hashing and comparing
 const session = require('express-session'); // for session management
@@ -30,7 +32,7 @@ con.connect(function (err) {
 	console.log("Connected!");
 })
 
-require('./routes/signup.js')(app, con, bcrypt);
+require('./routes/signup.js')(app, con, bcrypt, nodemailer);
 require('./routes/phonebook.js')(app, con);
 
 app.post('/api/login', (request, response) => {

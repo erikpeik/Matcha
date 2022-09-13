@@ -1,4 +1,4 @@
-module.exports = function (app, con, bcrypt) {
+module.exports = function (app, con, bcrypt, nodemailer) {
 	app.post('/api/signup/checkuser', (request, response) => {
 		const body = request.body
 
@@ -45,6 +45,7 @@ module.exports = function (app, con, bcrypt) {
 
 		Promise.all([checkUsername, checkEmail])
 			.then(() => {
+				console.log("User details checked!")
 				response.send(true)
 			}).catch((error) => {
 				response.send(error)
@@ -68,17 +69,106 @@ module.exports = function (app, con, bcrypt) {
 		)`;
 		con.query(sql);
 
-		async function saveHashedUser() {
+		async function saveHashedUser(callback) {
 			const hash = await bcrypt.hash(body.password, 10);
 			console.log("Hashed password: " + hash)
 			var sql = "INSERT INTO users (username, firstname, lastname, email, password) VALUES (?,?,?,?,?)";
-			con.query(sql, [body.username, body.firstname, body.lastname, body.email, hash], function (err, result) {
-				if (err) throw err;
-				console.log("New user created!");
-				response.json("New user created! " + JSON.stringify(result))
+			var result = await con.query(sql, [body.username, body.firstname, body.lastname, body.email, hash])
+			// console.log("SQL query result: ", result)
+			return result
+		}
+
+		async function createVerifyCode() {
+			var sql = `CREATE TABLE IF NOT EXISTS email_verify (
+				running_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+				user_id INT(11) NOT NULL,
+				email VARCHAR(255) NOT NULL,
+				verify_code INT(11) NOT NULL,
+				expire_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+				)`;
+			// ONLY CURRENT TIMESTAMP ON EXPIRE_TIME!!!
+			await con.query(sql);
+
+			const getUserId = new Promise((resolve, reject) => {
+				var sql = "SELECT id FROM users WHERE username = ?";
+				con.query(sql, [body.username], function (err, result) {
+					if (err) throw err;
+					if (!result.length) {
+						reject("No code found!")
+					} else {
+						console.log("Id SQL result: " + result[0]['id']);
+						resolve(result[0]['id'])
+					}
+				})
+			})
+
+			var code = await Math.floor(Math.random() * (900000) + 100000)
+
+			getUserId
+				.then(user_id => {
+					var sql = "INSERT INTO email_verify (user_id, email, verify_code) VALUES (?,?,?)";
+					con.query(sql, [user_id, body.email, code], function (err, result) {
+						if (err) throw err;
+						console.log("Email verify created!");
+					})
+				}).catch(error => {
+					console.log(error)
+				})
+
+			return (code)
+		}
+
+		function sendConfirmationMail(useremail, code) {
+			var transporter = nodemailer.createTransport({
+				service: 'gmail',
+				auth: {
+					user: process.env.MAIL_ADDRESS,
+					pass: process.env.MAIL_PASSWORD
+				}
+			});
+
+			var mailOptions = {
+				from: process.env.MAIL_ADDRESS,
+				to: useremail,
+				subject: 'Matcha account confirmation',
+				html: `<h1>Welcome</h1><p>You have just signed up for Matcha, well done!</p>
+						<p>To fully access the world of Matcha and find the one that was meant for you,
+						you just need to confirm your account with a single click. Yes, it's that easy!</p>
+						<a href="http://localhost:3000/confirm/${body.username}/${code}">Click here to start finding perfect Matches!</a>
+						<p>Love, Matcha Mail</p>`
+			};
+
+			transporter.sendMail(mailOptions, function (error, info) {
+				if (error) {
+					console.log(error);
+				} else {
+					console.log('Email sent: ' + info.response);
+				}
+			});
+		}
+
+		// async function verifyUser() {
+		// 	const user_created = await saveHashedUser((result) => {
+		// 		console.log("Result from saveHashedUser 1: " + result)
+		// 		return result
+		// 	})
+		// 	console.log("Result from saveHashedUser 2: " + user_created)
+		// 	const code = await createVerifyCode()
+		// 	const mail = sendConfirmationMail(body.email, code)
+		// 	response.json("New user created!" + user_created)
+		// }
+
+		function verifyUser() {
+			saveHashedUser().then((res) => {
+				const code = createVerifyCode()
+				const mail = sendConfirmationMail(body.email, code)
+				console.log("Result from saveHashedUser 2: ", res)
+				response.json("New user created!" + res)
 			})
 		}
 
-		saveHashedUser()
+		verifyUser()
+
 	})
 }

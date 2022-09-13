@@ -9,6 +9,7 @@ import signUpService from './services/signUpService'
 import { setUser } from './reducers/userReducer'
 import Login from './components/Login'
 import Signup from './components/Signup'
+import ConfirmMail from './components/ConfirmMail'
 import NavBar from './components/Navbar'
 
 const MainContainer = () => {
@@ -49,6 +50,7 @@ const App = () => {
 				<Route path="/" element={<Login />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/signup" element={<Signup />} />
+				<Route path="/confirm/:user/:code" element={<ConfirmMail />} />
 				<Route path="/profile" element={<MainContainer />} />
 				<Route path="/browse_users" element={<MainContainer />} />
 				<Route path="/chat" element={<MainContainer />} />
