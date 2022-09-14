@@ -1,0 +1,13 @@
+{
+	"Servers": {
+	  "1": {
+		"Name": "matcha",
+		"Group": "Server Group 1",
+		"Port": 5432,
+		"Username": "matcha",
+		"Host": "postgres-db",
+		"SSLMode": "prefer",
+		"MaintenanceDB": "matcha"
+	  }
+	}
+  }

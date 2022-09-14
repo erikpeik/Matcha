@@ -11,6 +11,49 @@ app.use(cors())
 app.use(express.static('build')) // express checks if the 'build' directory contains the requested file
 app.use(session({ secret: 'matchac2r2p6', saveUninitialized: true, resave: true }));
 
+const { Client } = require('pg')
+const con = new Client({
+	user: 'matcha',
+	host: 'postgres-db',
+	database: 'matcha',
+	password: 'root',
+	port: 5432,
+})
+con.connect()
+con.query('SELECT $1::text as message', ['Hello world!'], (err, res) => {
+	console.log(err ? err.stack : res.rows[0].message) // Hello World!
+	//   con.end()
+})
+const values = ['1', 'testiname']
+con.query('INSERT INTO sample(id, name) VALUES($1, $2) RETURNING *', values, (err, res) => {
+	console.log(res) // Hello World!
+	// con.end()
+})
+con.query(`CREATE TABLE IF NOT EXISTS users (
+	id SERIAL NOT NULL PRIMARY KEY,
+	username VARCHAR(255) NOT NULL,
+	firstname VARCHAR(255) NOT NULL,
+	lastname VARCHAR(255) NOT NULL,
+	email VARCHAR(255) NOT NULL,
+	password VARCHAR(255) NOT NULL,
+	verified enum_yesno DEFAULT 'NO',
+	online enum_yesno DEFAULT 'NO',
+	last_connection TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	)`, (err, res) => {
+	console.log(res) // Hello World!
+	// con.end()
+})
+con.query(`INSERT INTO users (username, firstname, lastname, email, password) VALUES ($1,$2,$3,$4,$5)`,
+['testuser', 'ekanimi', 'tokanimi', 'testi@testi.fi', 'jsflkjfslkj'], (err, res) => {
+	console.log(res) // Hello World!
+	// con.end()
+})
+const testSelect = async () => {
+	var result = await con.query('SELECT * FROM users')
+	console.log("Select query result: " + JSON.stringify(result.rows))
+}
+testSelect()
+
 morgan.token('body', request => {
 	return JSON.stringify(request.body)
 })
@@ -18,19 +61,19 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 
 var sess;
 
-var mysql = require('mysql');
+// var mysql = require('mysql');
 
-var con = mysql.createConnection({
-	host: "mysql-db",
-	user: "matcha",
-	password: "root",
-	database: "matcha"
-});
+// var con = mysql.createConnection({
+// 	host: "mysql-db",
+// 	user: "matcha",
+// 	password: "root",
+// 	database: "matcha"
+// });
 
-con.connect(function (err) {
-	//   if (err) throw err;
-	console.log("Connected!");
-})
+// con.connect(function (err) {
+// 	//   if (err) throw err;
+// 	console.log("Connected!");
+// })
 
 require('./routes/signup.js')(app, con, bcrypt, nodemailer);
 
