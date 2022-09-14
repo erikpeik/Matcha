@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux'
 import {
 	BrowserRouter as Router,
 	Routes, Route
-	// useParams, useNavigate
 } from 'react-router-dom'
 import signUpService from './services/signUpService'
 import { setUser } from './reducers/userReducer'
@@ -11,6 +10,8 @@ import Login from './components/Login'
 import Signup from './components/Signup'
 import ConfirmMail from './components/ConfirmMail'
 import NavBar from './components/Navbar'
+import Footer from './components/Footer'
+import "./css/App.css"
 
 const MainContainer = () => {
 	return (
@@ -43,7 +44,7 @@ const App = () => {
 		});
 	}
 
-	return (
+	return <div className='content-wrap'>
 		<Router>
 			<NavBar />
 			<Routes>
@@ -54,10 +55,11 @@ const App = () => {
 				<Route path="/profile" element={<MainContainer />} />
 				<Route path="/browse_users" element={<MainContainer />} />
 				<Route path="/chat" element={<MainContainer />} />
-				<Route path="/logout" element={<Logout /> } />
+				<Route path="/logout" element={<Logout />} />
 			</Routes>
 		</Router>
-	)
+		<Footer />
+	</div>
 }
 
 export default App

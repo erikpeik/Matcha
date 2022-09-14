@@ -1,6 +1,3 @@
-// import signUpService from '../services/signUpService'
-// import { useSelector, useDispatch } from 'react-redux'
-// import { setUser } from '../reducers/userReducer'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { createTheme } from '@mui/material/styles'
