@@ -70,22 +70,16 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 
 		const createVerifyCode = async () => {
 
-			const getUserId = new Promise((resolve, reject) => {
+			const getUserId = async () => {
 				var sql = "SELECT id FROM users WHERE username = $1";
-				con.query(sql, [body.username], function (err, result) {
-					if (err) throw err;
-					if (!result.length) {
-						reject("No code found!")
-					} else {
-						console.log("Id SQL result: " + result[0]['id']);
-						resolve(result[0]['id'])
-					}
-				})
-			})
+				const result = await con.query(sql, [body.username])
+				console.log("Id SQL result: " + result.rows[0]['id']);
+				return (result.rows[0]['id'])
+			}
 
 			var code = await Math.floor(Math.random() * (900000) + 100000)
 
-			getUserId
+			getUserId()
 				.then(user_id => {
 					var sql = "INSERT INTO email_verify (user_id, email, verify_code) VALUES ($1,$2,$3)";
 					con.query(sql, [user_id, body.email, code], function (err, result) {
@@ -135,7 +129,7 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 				console.log("Result from saveHashedUser: ", result)
 				return createVerifyCode()
 			})
-			// .then((code) => sendConfirmationMail(body.email, code))
+			.then((code) => sendConfirmationMail(body.email, code))
 			.then(() => {
 				response.send("New user created!")
 			}).catch((error) => {
