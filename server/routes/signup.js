@@ -18,7 +18,7 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 			return response.send("The entered passwords are not the same!")
 
 		const checkUsername = new Promise((resolve, reject) => {
-			var sql = "SELECT * FROM users WHERE username = ?";
+			var sql = "SELECT * FROM users WHERE username = $1";
 			con.query(sql, [body.username], function (err, result) {
 				if (err) throw err;
 				console.log(result);
@@ -31,7 +31,7 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 		})
 
 		const checkEmail = new Promise((resolve, reject) => {
-			var sql = "SELECT * FROM users WHERE email = ?";
+			var sql = "SELECT * FROM users WHERE email = $1";
 			con.query(sql, [body.email], function (err, result) {
 				if (err) throw err;
 				console.log(result);
@@ -57,23 +57,10 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 		const body = request.body
 		console.log("Signup username: " + body.username)
 
-		var sql = `CREATE TABLE IF NOT EXISTS users (
-		id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-		username VARCHAR(255) NOT NULL,
-		firstname VARCHAR(255) NOT NULL,
-		lastname VARCHAR(255) NOT NULL,
-		email VARCHAR(255) NOT NULL,
-		password VARCHAR(255) NOT NULL,
-		verified ENUM('YES','NO') DEFAULT 'NO',
-		online ENUM('YES','NO') DEFAULT 'NO',
-		last_connection TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-		)`;
-		con.query(sql);
-
 		const saveHashedUser = new Promise(async (resolve) => {
 			const hash = await bcrypt.hash(body.password, 10);
 			console.log("Hashed password: " + hash)
-			var sql = "INSERT INTO users (username, firstname, lastname, email, password) VALUES (?,?,?,?,?)";
+			var sql = "INSERT INTO users (username, firstname, lastname, email, password) VALUES ($1,$2,$3,$4,$5)";
 			con.query(sql, [body.username, body.firstname, body.lastname, body.email, hash], function (err, result) {
 				if (err) throw err;
 				resolve(JSON.stringify(result))
@@ -82,19 +69,9 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 		})
 
 		const createVerifyCode = async () => {
-			var sql = `CREATE TABLE IF NOT EXISTS email_verify (
-				running_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-				user_id INT(11) NOT NULL,
-				email VARCHAR(255) NOT NULL,
-				verify_code INT(11) NOT NULL,
-				expire_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-				FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-				)`;
-			// ONLY CURRENT TIMESTAMP ON EXPIRE_TIME!!!
-			await con.query(sql);
 
 			const getUserId = new Promise((resolve, reject) => {
-				var sql = "SELECT id FROM users WHERE username = ?";
+				var sql = "SELECT id FROM users WHERE username = $1";
 				con.query(sql, [body.username], function (err, result) {
 					if (err) throw err;
 					if (!result.length) {
@@ -110,7 +87,7 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 
 			getUserId
 				.then(user_id => {
-					var sql = "INSERT INTO email_verify (user_id, email, verify_code) VALUES (?,?,?)";
+					var sql = "INSERT INTO email_verify (user_id, email, verify_code) VALUES ($1,$2,$3)";
 					con.query(sql, [user_id, body.email, code], function (err, result) {
 						if (err) throw err;
 						console.log("Email verify created!");
@@ -123,16 +100,18 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 		}
 
 		const sendConfirmationMail = (useremail, code) => {
+			console.log("Mail address and password:", process.env)
+
 			var transporter = nodemailer.createTransport({
 				service: 'gmail',
 				auth: {
-					user: process.env.MAIL_ADDRESS,
-					pass: process.env.MAIL_PASSWORD
+					user: process.env.EMAIL_ADDRESS,
+					pass: process.env.EMAIL_PASSWORD
 				}
 			});
 
 			var mailOptions = {
-				from: process.env.MAIL_ADDRESS,
+				from: process.env.EMAIL_ADDRESS,
 				to: useremail,
 				subject: 'Matcha account confirmation',
 				html: `<h1>Welcome</h1><p>You have just signed up for Matcha, well done!</p>
@@ -156,7 +135,7 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 				console.log("Result from saveHashedUser: ", result)
 				return createVerifyCode()
 			})
-			.then((code) => sendConfirmationMail(body.email, code))
+			// .then((code) => sendConfirmationMail(body.email, code))
 			.then(() => {
 				response.send("New user created!")
 			}).catch((error) => {
@@ -170,7 +149,7 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 		const checkCode = new Promise((resolve, reject) => {
 			var sql = `SELECT * FROM email_verify
 						INNER JOIN users ON email_verify.user_id = users.id
-						WHERE email_verify.verify_code = ?`;
+						WHERE email_verify.verify_code = $1`;
 			con.query(sql, [body.code], function (err, result) {
 				if (err) throw err;
 				console.log(result);
@@ -183,10 +162,10 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 		})
 
 		const setAccountVerified = () => {
-			var sql = `UPDATE users SET verified = 'YES' WHERE username = ?`;
+			var sql = `UPDATE users SET verified = 'YES' WHERE username = $1`;
 			con.query(sql, [body.username])
 
-			var sql = `DELETE FROM email_verify WHERE verify_code = ?`;
+			var sql = `DELETE FROM email_verify WHERE verify_code = $1`;
 			con.query(sql, [body.code])
 		}
 

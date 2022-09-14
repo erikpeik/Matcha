@@ -1,4 +1,25 @@
-CREATE TABLE sample (
-	id int NOT NULL,
-	name varchar(100) NOT NULL
+CREATE TABLE sample (id int NOT NULL, name varchar(100) NOT NULL);
+
+CREATE TYPE enum_yesno AS ENUM ('YES', 'NO');
+
+CREATE TABLE IF NOT EXISTS users (
+	id SERIAL NOT NULL PRIMARY KEY,
+	username VARCHAR(255) NOT NULL,
+	firstname VARCHAR(255) NOT NULL,
+	lastname VARCHAR(255) NOT NULL,
+	email VARCHAR(255) NOT NULL,
+	password VARCHAR(255) NOT NULL,
+	verified enum_yesno DEFAULT 'NO',
+	online enum_yesno DEFAULT 'NO',
+	last_connection TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS email_verify (
+	running_id SERIAL NOT NULL PRIMARY KEY,
+	user_id INT NOT NULL,
+	email VARCHAR(255) NOT NULL,
+	verify_code INT NOT NULL,
+	expire_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+

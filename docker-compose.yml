@@ -1,12 +1,5 @@
 version: '3.8'
 
-x-common-variables:
-  &common-variables
-  MYSQL_DATABASE: 'matcha'
-  MYSQL_USER: 'matcha'
-  MYSQL_PASSWORD: 'root'
-  REACT_APP_SERVER_PORT: 8000
-
 services:
   server:
     build: ./server
@@ -15,9 +8,6 @@ services:
       - postgres-db
     env_file:
       - .env
-    environment:
-      <<: *common-variables
-      MYSQL_HOST_IP: mysql-db
     ports:
       - 3001:3001
     volumes:
@@ -29,7 +19,6 @@ services:
     build: ./client
     container_name: client_container
     environment:
-      <<: *common-variables
       NODE_PATH: src
     ports:
       - 3000:3000
