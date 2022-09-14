@@ -18,8 +18,9 @@ const Login = () => {
 		}
 
 		signUpService.logInUser(signedUpUser).then((result) => {
-			if (result === true) {
-				dispatch(setUser(event.target.username.value))
+			if (result.userid) {
+				const sessionUser = {user: result.username, id: result.userid}
+				dispatch(setUser(sessionUser))
 				dispatch(setNotification("Correct password!", 5))
 			} else {
 				dispatch(setNotification(result, 5))

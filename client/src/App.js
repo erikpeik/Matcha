@@ -2,8 +2,8 @@ import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import {
 	BrowserRouter as Router,
-	Routes, Route
-	// useParams, useNavigate
+	Routes, Route, useNavigate
+	// useParams
 } from 'react-router-dom'
 import signUpService from './services/signUpService'
 import { setUser } from './reducers/userReducer'
@@ -19,11 +19,16 @@ const MainContainer = () => {
 }
 
 const Logout = () => {
-	signUpService.logOutUser()
-	setUser("")
-	console.log("logged out")
-}
+	const dispatch = useDispatch()
+	const navigate = useNavigate()
 
+	useEffect(() => {
+		signUpService.logOutUser()
+		dispatch(setUser(""))
+		console.log("logged out")
+		navigate('/login')
+	}, [dispatch, navigate])
+}
 
 const App = () => {
 	const dispatch = useDispatch()
@@ -54,7 +59,7 @@ const App = () => {
 				<Route path="/profile" element={<MainContainer />} />
 				<Route path="/browse_users" element={<MainContainer />} />
 				<Route path="/chat" element={<MainContainer />} />
-				<Route path="/logout" element={<Logout /> } />
+				<Route path="/logout" element={<Logout />} />
 			</Routes>
 		</Router>
 	)

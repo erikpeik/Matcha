@@ -20,25 +20,6 @@ const con = new Client({
 	port: 5432,
 })
 con.connect()
-// con.query('SELECT $1::text as message', ['Hello world!'], (err, res) => {
-// 	console.log(err ? err.stack : res.rows[0].message) // Hello World!
-// 	//   con.end()
-// })
-// const values = ['1', 'testiname']
-// con.query('INSERT INTO sample(id, name) VALUES($1, $2) RETURNING *', values, (err, res) => {
-// 	console.log(res) // Hello World!
-// 	// con.end()
-// })
-// con.query(`INSERT INTO users (username, firstname, lastname, email, password) VALUES ($1,$2,$3,$4,$5)`,
-// ['testuser', 'ekanimi', 'tokanimi', 'testi@testi.fi', 'jsflkjfslkj'], (err, res) => {
-// 	console.log(res) // Hello World!
-// 	// con.end()
-// })
-// const testSelect = async () => {
-// 	var result = await con.query('SELECT * FROM users')
-// 	console.log("Select query result: " + JSON.stringify(result.rows))
-// }
-// testSelect()
 
 morgan.token('body', request => {
 	return JSON.stringify(request.body)
@@ -47,55 +28,33 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 
 var sess;
 
-// var mysql = require('mysql');
-
-// var con = mysql.createConnection({
-// 	host: "mysql-db",
-// 	user: "matcha",
-// 	password: "root",
-// 	database: "matcha"
-// });
-
-// con.connect(function (err) {
-// 	//   if (err) throw err;
-// 	console.log("Connected!");
-// })
-
 require('./routes/signup.js')(app, con, bcrypt, nodemailer);
 
 app.post('/api/login', (request, response) => {
 	const body = request.body
 
-	const verifyUser = new Promise((resolve, reject) => {
+	const verifyUser = async () => {
 		var sql = "SELECT * FROM users WHERE username = $1";
-		con.query(sql, [body.username], function (err, result) {
-			if (err) throw err;
-			if (!result.length) {
-				reject("User not found!")
-			} else {
-				console.log(result);
-				bcrypt.compare(body.password, result[0]['password'])
-					.then((compareResult) => {
-						// console.log(compareResult);
-						if (compareResult) {
-							sess = request.session
-							sess.userid = result[0]['id']
-							sess.username = result[0]['username']
-							// console.log(sess)
-							resolve("Correct password!")
-						}
-						else
-							reject("Wrong password!")
-					}).catch(err => {
-						reject(err)
-					})
-			}
-		})
-	})
+		const result = await con.query(sql, [body.username])
+		if (result.rows.length === 0) {
+			console.log("User not found!")
+			throw ("User not found!")
+		} else {
+			// console.log(result);
+			const compareResult = await bcrypt.compare(body.password, result.rows[0]['password'])
+			if (compareResult) {
+				sess = request.session
+				sess.userid = result.rows[0]['id']
+				sess.username = result.rows[0]['username']
+				return (sess)
+			} else
+				throw ("Wrong password!")
+		}
+	}
 
-	verifyUser
-		.then(() => {
-			response.send(true)
+	verifyUser()
+		.then((sess) => {
+			response.send(sess)
 		}).catch(error => {
 			response.send(error)
 		})
@@ -108,7 +67,7 @@ app.get('/api/login', (request, response) => {
 		response.send(sess.username);
 	}
 	else {
-		response.send('Please login first');
+		response.send('');
 	}
 });
 
