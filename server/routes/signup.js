@@ -19,8 +19,8 @@ module.exports = function (app, pool, bcrypt, transporter) {
 
 		const checkUsername = async () => {
 			var sql = "SELECT * FROM users WHERE username = $1";
-			const result = await pool.query(sql, [body.username])
-			if (result.rows.length) {
+			const { rows } = await pool.query(sql, [body.username])
+			if (rows.length) {
 				throw ("Username already exists!")
 			} else
 				return
@@ -28,8 +28,8 @@ module.exports = function (app, pool, bcrypt, transporter) {
 
 		const checkEmail = async () => {
 			var sql = "SELECT * FROM users WHERE email = $1";
-			const result = await pool.query(sql, [body.email])
-			if (result.rows.length) {
+			const { rows } = await pool.query(sql, [body.email])
+			if (rows.length) {
 				throw ("User with this e-mail already exists!")
 			} else
 				return
@@ -46,15 +46,15 @@ module.exports = function (app, pool, bcrypt, transporter) {
 	})
 
 	app.post('/api/signup', (request, response) => {
-		const body = request.body
-		console.log("Signup username: " + body.username)
+		const { username, firstname, lastname, email, password } = request.body
+		console.log("Signup username: " + username)
 
 		const saveHashedUser = async () => {
-			const hash = await bcrypt.hash(body.password, 10);
+			const hash = await bcrypt.hash(password, 10);
 			console.log("Hashed password: " + hash)
 			try {
 				var sql = "INSERT INTO users (username, firstname, lastname, email, password) VALUES ($1,$2,$3,$4,$5) RETURNING *";
-				const result = await pool.query(sql, [body.username, body.firstname, body.lastname, body.email, hash])
+				await pool.query(sql, [username, firstname, lastname, email, hash])
 				return
 			} catch (error) {
 				console.log("ERROR :", error)
@@ -66,9 +66,9 @@ module.exports = function (app, pool, bcrypt, transporter) {
 
 			const getUserId = async () => {
 				var sql = "SELECT id FROM users WHERE username = $1";
-				const result = await pool.query(sql, [body.username])
-				console.log("Id SQL result: " + result.rows[0]['id']);
-				return (result.rows[0]['id'])
+				const { rows } = await pool.query(sql, [body.username])
+				console.log("Id SQL result: " + rows[0]['id']);
+				return (rows[0]['id'])
 			}
 
 			var code = await Math.floor(Math.random() * (900000) + 100000)
@@ -117,15 +117,15 @@ module.exports = function (app, pool, bcrypt, transporter) {
 	})
 
 	app.post('/api/signup/verifyuser', (request, response) => {
-		const body = request.body
+		const { username, code } = request.body
 
 		const checkCode = async () => {
 			var sql = `SELECT * FROM email_verify
 						INNER JOIN users ON email_verify.user_id = users.id
 						WHERE email_verify.verify_code = $1`;
-			const result = await pool.query(sql, [body.code])
+			const { rows } = await pool.query(sql, [code])
 			console.log(result);
-			if (result.rows.length === 0) {
+			if (rows.length === 0) {
 				throw ("No code found!")
 			} else {
 				return ("Code matches!")
@@ -134,10 +134,10 @@ module.exports = function (app, pool, bcrypt, transporter) {
 
 		const setAccountVerified = () => {
 			var sql = `UPDATE users SET verified = 'YES' WHERE username = $1`;
-			pool.query(sql, [body.username])
+			pool.query(sql, [username])
 
 			var sql = `DELETE FROM email_verify WHERE verify_code = $1`;
-			pool.query(sql, [body.code])
+			pool.query(sql, [code])
 		}
 
 		checkCode().then(() => {

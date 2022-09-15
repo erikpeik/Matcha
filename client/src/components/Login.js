@@ -1,12 +1,22 @@
+import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import signUpService from '../services/signUpService'
 import { setUser } from '../reducers/userReducer'
 import { setNotification } from '../reducers/notificationReducer'
 
 const Login = () => {
 	const dispatch = useDispatch()
+	const navigate = useNavigate()
 
+	const user = useSelector(state => state.user)
 	const notification = useSelector(state => state.notification)
+
+	useEffect(() => {
+		if (user !== '') {
+			navigate('/profile')
+		}
+	}, [user, navigate])
 
 	const submitUser = (event) => {
 		event.preventDefault()
@@ -22,6 +32,7 @@ const Login = () => {
 				const sessionUser = {user: result.username, id: result.userid}
 				dispatch(setUser(sessionUser))
 				dispatch(setNotification("User logged in!", 5))
+				navigate('/profile')
 			} else {
 				dispatch(setNotification(result, 5))
 				// console.log(result)
