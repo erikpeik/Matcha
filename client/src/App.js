@@ -3,15 +3,15 @@ import { useDispatch } from 'react-redux'
 import {
 	BrowserRouter as Router,
 	Routes, Route, useNavigate
-	// useParams
 } from 'react-router-dom'
 import signUpService from './services/signUpService'
 import { setUser } from './reducers/userReducer'
 import Login from './components/Login'
 import Signup from './components/Signup'
-import ConfirmMail from './components/login/ConfirmMail'
+import Profile from './components/Profile'
 import NavBar from './components/Navbar'
 import Footer from './components/Footer'
+import ConfirmMail from './components/login/ConfirmMail'
 import ResetPassword, {SetNewPassword} from './components/login/ResetPassword'
 import "./css/App.css"
 
@@ -61,7 +61,7 @@ const App = () => {
 				<Route path="/resetpassword/:user/:code" element={<SetNewPassword />} />
 				<Route path="/signup" element={<Signup />} />
 				<Route path="/confirm/:user/:code" element={<ConfirmMail />} />
-				<Route path="/profile" element={<MainContainer />} />
+				<Route path="/profile" element={<Profile />} />
 				<Route path="/browse_users" element={<MainContainer />} />
 				<Route path="/chat" element={<MainContainer />} />
 				<Route path="/logout" element={<Logout />} />

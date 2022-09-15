@@ -66,7 +66,7 @@ module.exports = function (app, pool, bcrypt, transporter) {
 
 			const getUserId = async () => {
 				var sql = "SELECT id FROM users WHERE username = $1";
-				const { rows } = await pool.query(sql, [body.username])
+				const { rows } = await pool.query(sql, [username])
 				console.log("Id SQL result: " + rows[0]['id']);
 				return (rows[0]['id'])
 			}
@@ -76,7 +76,7 @@ module.exports = function (app, pool, bcrypt, transporter) {
 			getUserId()
 				.then(user_id => {
 					var sql = "INSERT INTO email_verify (user_id, email, verify_code) VALUES ($1,$2,$3)";
-					pool.query(sql, [user_id, body.email, code])
+					pool.query(sql, [user_id, email, code])
 					console.log("Email verify created!");
 				}).catch(error => {
 					console.log(error)
@@ -94,7 +94,7 @@ module.exports = function (app, pool, bcrypt, transporter) {
 				html: `<h1>Welcome</h1><p>You have just signed up for Matcha, well done!</p>
 						<p>To fully access the world of Matcha and find the one that was meant for you,
 						you just need to confirm your account with a single click. Yes, it's that easy!</p>
-						<a href="http://localhost:3000/confirm/${body.username}/${code}">Click here to start finding perfect Matches!</a>
+						<a href="http://localhost:3000/confirm/${username}/${code}">Click here to start finding perfect Matches!</a>
 						<p>Love, Matcha Mail</p>`
 			};
 
@@ -108,7 +108,7 @@ module.exports = function (app, pool, bcrypt, transporter) {
 		}
 
 		saveHashedUser().then(() => createVerifyCode())
-			.then((code) => sendConfirmationMail(body.email, code))
+			.then((code) => sendConfirmationMail(email, code))
 			.then(() => {
 				response.send("New user created!")
 			}).catch((error) => {

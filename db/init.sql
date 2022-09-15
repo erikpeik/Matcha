@@ -1,4 +1,5 @@
 CREATE TYPE enum_yesno AS ENUM ('YES', 'NO');
+SET TIME ZONE 'Europe/Helsinki';
 
 CREATE TABLE IF NOT EXISTS users (
 	id SERIAL NOT NULL PRIMARY KEY,
@@ -17,7 +18,7 @@ CREATE TABLE IF NOT EXISTS email_verify (
 	user_id INT NOT NULL,
 	email VARCHAR(255) NOT NULL,
 	verify_code INT NOT NULL,
-	expire_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	expire_time TIMESTAMP DEFAULT (CURRENT_TIMESTAMP + interval '30 minutes'),
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
