@@ -1,5 +1,6 @@
-import React from "react"
-import { useDispatch } from 'react-redux'
+import { useEffect } from "react"
+import { useSelector, useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { changeNotification } from '../reducers/notificationReducer'
 import { changeSeverity } from '../reducers/severityReducer'
 import signUpService from '../services/signUpService'
@@ -30,6 +31,15 @@ const imageStyle = {
 
 const Signup = () => {
 	const dispatch = useDispatch()
+	const navigate = useNavigate()
+
+	const user = useSelector(state => state.user)
+
+	useEffect(() => {
+		if (user !== undefined && user !== '') {
+			navigate('/profile')
+		}
+	}, [user, navigate])
 
 	const submitUser = (event) => {
 		event.preventDefault()
