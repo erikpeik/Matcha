@@ -8,8 +8,6 @@ const Notification = () => {
 
 	const notification = useSelector(state => state.notification)
 	const severity = useSelector(state => state.severity)
-	console.log("Notification:", notification)
-	console.log("Severity:", severity)
 
 	if (notification === '') {
 		return null

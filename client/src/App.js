@@ -29,7 +29,6 @@ const Logout = () => {
 	useEffect(() => {
 		signUpService.logOutUser()
 		dispatch(setUser(""))
-		console.log("logged out")
 		navigate('/login')
 	}, [dispatch, navigate])
 }

@@ -43,7 +43,6 @@ const Signup = () => {
 
 	const submitUser = (event) => {
 		event.preventDefault()
-		console.log("Sending user data!")
 
 		const signedUpUser = {
 			username: event.target.username.value,
@@ -72,7 +71,7 @@ const Signup = () => {
 	return (
 		<Container maxWidth='sm' sx={{ pt: 5, pb: 5 }}>
 			<Paper elevation={10} sx={{ padding: 3 }}>
-				<HeartIcon width='100px' style={imageStyle} />
+				<HeartIcon style={imageStyle} />
 				<Typography variant='h5' align='center'
 					sx={{ fontWeight: 550 }}>Sign up</Typography>
 				<Typography align='center'>Make the first move and create your account</Typography>

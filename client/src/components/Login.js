@@ -68,7 +68,7 @@ const Login = () => {
 	return (
 		<Container maxWidth='sm' sx={{ pt: 5, pb: 5 }}>
 			<Paper elevation={10} sx={{ padding: 3 }}>
-				<HeartIcon width='100px' style={imageStyle} />
+				<HeartIcon style={imageStyle} />
 				<Typography variant='h5' align='center'
 					sx={{ fontWeight: 550 }}>Login</Typography>
 				<Typography align='center' xs={{ mb: 4 }}>Login and start dating now!</Typography>
