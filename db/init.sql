@@ -1,5 +1,3 @@
-CREATE TABLE sample (id int NOT NULL, name varchar(100) NOT NULL);
-
 CREATE TYPE enum_yesno AS ENUM ('YES', 'NO');
 
 CREATE TABLE IF NOT EXISTS users (
