@@ -1,6 +1,31 @@
+import React from "react"
 import { useSelector, useDispatch } from 'react-redux'
 import { setNotification } from '../reducers/notificationReducer'
 import signUpService from '../services/signUpService'
+import { Button, Paper, TextField, Typography } from "@mui/material";
+import { Container } from '@mui/system';
+import { createTheme } from '@mui/material/styles'
+import { ReactComponent as HeartIcon } from '../images/matcha_icon_with_heart.svg'
+
+const theme = createTheme({
+	palette: {
+		primary: {
+			main: '#FF1E56',
+		},
+		secondary: {
+			main: '#F5F5F5',
+		},
+	}
+})
+
+const imageStyle = {
+	width: '100px',
+	paddingTop: '10px',
+	display: 'relative',
+	marginLeft: '50%',
+	transform: 'translate(-50%)',
+	filter: 'drop-shadow(0px 0px 3px rgb(241 25 38 / 0.8))',
+}
 
 const Signup = () => {
 	const dispatch = useDispatch()
@@ -30,26 +55,29 @@ const Signup = () => {
 					})
 			} else {
 				dispatch(setNotification(result, 5))
-				// console.log(result)
 			}
 		})
 	}
 
 	return (
-		<>
-			<h2>Signup</h2>
-			<form onSubmit={submitUser}>
-				<br></br>
-				<div><input type="text" name="username" placeholder="Username" autoComplete="off" required></input></div>
-				<div><input type="text" name="firstname" placeholder="First name" autoComplete="off" required></input></div>
-				<div><input type="text" name="lastname" placeholder="Last name" autoComplete="off" required></input></div>
-				<div><input type="email" name="email" placeholder="E-mail" autoComplete="off" required></input></div>
-				<div><input type="password" name="password" placeholder="Password" autoComplete="off" required></input></div>
-				<div><input type="password" name="confirm_password" placeholder="Confirm password" autoComplete="off" required></input></div>
-				<button type="submit">Submit</button>
-			</form>
-			<p>{notification}</p>
-		</>
+		<Container maxWidth='sm' sx={{ pt: 5 }}>
+			<Paper elevation={10} sx={{ padding: 3 }}>
+				<HeartIcon width='100px' style={imageStyle} />
+				<Typography variant='h5' align='center'
+					sx={{ fontWeight: 550 }}>Sign up</Typography>
+				<Typography align='center'>Make the first move and create your account</Typography>
+				<form onSubmit={submitUser}>
+					<TextField fullWidth margin='normal' name="username" label='Username' placeholder="Username" autoComplete="nickname" required></TextField>
+					<TextField sx={{width: '49%', mr: '1%'}} margin='dense' name="firstname" label='First name' placeholder="First name" autoComplete="given-name" required></TextField>
+					<TextField sx={{width: '49%', ml: '1%'}} margin='dense' name="lastname" label='Last name' placeholder="Last name" autoComplete="family-name" required></TextField>
+					<TextField fullWidth margin='dense' name="email" label='E-mail' placeholder="E-mail" autoComplete="email" required></TextField>
+					<TextField type='password' fullWidth margin='dense' name="password" label='Password'placeholder="Password" autoComplete="new-password" required></TextField>
+					<TextField type='password' fullWidth margin='dense' name="confirm_password" label='Confirm password' placeholder="Confirm password" autoComplete="new-password" required></TextField>
+					<Button type="submit" variant='contained' theme={theme} size='large' sx={{mt: 1}}>Submit</Button>
+				</form>
+				<p>{notification}</p>
+			</Paper>
+		</Container>
 	)
 
 }

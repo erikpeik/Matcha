@@ -9,6 +9,8 @@ html {
 body {
 	min-height: 100%;
 	position: relative;
+	background-color: #F11926;
+	background-image: linear-gradient(43deg, #fd297b 0%, #ff5864 46%, #ff655b 100%);
 }
 
 .content-wrap {
@@ -23,7 +25,9 @@ body {
 	height: 80px; /* Height of the footer */
 	width: 100%;
 	background-color: rgb(245, 245, 245);
-	box-shadow: 0px -2px 4px -1px rgb(0 0 0 / 20%), 0px -4px 5px 0px rgb(0 0 0 / 14%), 0px -1px 10px 0px rgb(0 0 0 / 12%)
+	box-shadow: 0px -2px 6px -1px rgb(0 0 0 / 20%),
+		0px -4px 8px 0px rgb(0 0 0 / 14%),
+		0px -1px 15px 0px rgb(0 0 0 / 12%)
 }
 
 .footerText {
