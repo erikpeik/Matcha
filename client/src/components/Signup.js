@@ -2,7 +2,7 @@ import React from "react"
 import { useSelector, useDispatch } from 'react-redux'
 import { setNotification } from '../reducers/notificationReducer'
 import signUpService from '../services/signUpService'
-import { Button, Paper, TextField, Typography } from "@mui/material";
+import { Button, Paper, TextField, Typography, Alert } from "@mui/material";
 import { Container } from '@mui/system';
 import { createTheme } from '@mui/material/styles'
 import { ReactComponent as HeartIcon } from '../images/matcha_icon_with_heart.svg'
@@ -20,11 +20,16 @@ const theme = createTheme({
 
 const imageStyle = {
 	width: '100px',
-	paddingTop: '10px',
 	display: 'relative',
-	marginLeft: '50%',
+	marginLeft: 'calc(50% + 5px)',
 	transform: 'translate(-50%)',
 	filter: 'drop-shadow(0px 0px 3px rgb(241 25 38 / 0.8))',
+}
+
+const sendAlert = (message, type) => {
+	return (
+		<Alert severity={type} sx={{ mt: 2 }}>{message}</Alert>
+	)
 }
 
 const Signup = () => {
@@ -50,17 +55,16 @@ const Signup = () => {
 				signUpService
 					.createUser(signedUpUser)
 					.then(responseData => {
-						dispatch(setNotification("User created!", 5))
-						console.log(responseData)
+						dispatch(setNotification(sendAlert("User created successfully!", "success"), 5))
 					})
 			} else {
-				dispatch(setNotification(result, 5))
+				dispatch(setNotification(sendAlert(result, "error"), 5))
 			}
 		})
 	}
 
 	return (
-		<Container maxWidth='sm' sx={{ pt: 5 }}>
+		<Container maxWidth='sm' sx={{ pt: 5, pb: 5 }}>
 			<Paper elevation={10} sx={{ padding: 3 }}>
 				<HeartIcon width='100px' style={imageStyle} />
 				<Typography variant='h5' align='center'
@@ -75,11 +79,10 @@ const Signup = () => {
 					<TextField type='password' fullWidth margin='dense' name="confirm_password" label='Confirm password' placeholder="Confirm password" autoComplete="new-password" required></TextField>
 					<Button type="submit" variant='contained' theme={theme} size='large' sx={{mt: 1}}>Submit</Button>
 				</form>
-				<p>{notification}</p>
+				{notification}
 			</Paper>
 		</Container>
 	)
-
 }
 
 export default Signup
