@@ -29,15 +29,18 @@ const Login = () => {
 
 		signUpService.logInUser(signedUpUser).then((result) => {
 			if (result.userid) {
-				const sessionUser = {user: result.username, id: result.userid}
+				const sessionUser = { user: result.username, id: result.userid }
 				dispatch(setUser(sessionUser))
 				dispatch(setNotification("User logged in!", 5))
 				navigate('/profile')
 			} else {
 				dispatch(setNotification(result, 5))
-				// console.log(result)
 			}
 		})
+	}
+
+	const navigateToReset = () => {
+		navigate('/login/resetpassword')
 	}
 
 	return (
@@ -49,6 +52,7 @@ const Login = () => {
 				<div><input type="password" name="password" placeholder="Password" autoComplete="off" required></input></div>
 				<button type="submit">Submit</button>
 			</form>
+			<button onClick={navigateToReset}>Forgot password?</button>
 			<p>{notification}</p>
 		</>
 	)

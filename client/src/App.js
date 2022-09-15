@@ -9,9 +9,10 @@ import signUpService from './services/signUpService'
 import { setUser } from './reducers/userReducer'
 import Login from './components/Login'
 import Signup from './components/Signup'
-import ConfirmMail from './components/ConfirmMail'
+import ConfirmMail from './components/login/ConfirmMail'
 import NavBar from './components/Navbar'
 import Footer from './components/Footer'
+import ResetPassword, {SetNewPassword} from './components/login/ResetPassword'
 import "./css/App.css"
 
 const MainContainer = () => {
@@ -56,6 +57,8 @@ const App = () => {
 			<Routes>
 				<Route path="/" element={<Login />} />
 				<Route path="/login" element={<Login />} />
+				<Route path="/login/resetpassword" element={<ResetPassword />} />
+				<Route path="/resetpassword/:user/:code" element={<SetNewPassword />} />
 				<Route path="/signup" element={<Signup />} />
 				<Route path="/confirm/:user/:code" element={<ConfirmMail />} />
 				<Route path="/profile" element={<MainContainer />} />

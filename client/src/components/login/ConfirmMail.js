@@ -1,7 +1,7 @@
-import { setNotification } from '../reducers/notificationReducer'
+import { setNotification } from '../../reducers/notificationReducer'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import signUpService from '../services/signUpService'
+import signUpService from '../../services/signUpService'
 
 const ConfirmMail = () => {
 	const dispatch = useDispatch()
