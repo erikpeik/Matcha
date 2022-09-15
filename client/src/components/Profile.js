@@ -1,85 +1,115 @@
-// import { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
-import signUpService from '../services/signUpService'
-import { setUser } from '../reducers/userReducer'
-import { setNotification } from '../reducers/notificationReducer'
+import { useState } from 'react'
+import { changeNotification } from '../reducers/notificationReducer'
+import { useDispatch } from 'react-redux'
+import {
+	Typography, Button, Paper, TextField, FormControl, FormLabel, createTheme,
+	RadioGroup, FormControlLabel, Radio, InputLabel, Select, MenuItem, TextareaAutosize,
+} from '@mui/material'
+import { Container } from '@mui/system';
+import { IconUserCircle } from '@tabler/icons';
+import Notification from './Notification'
+
 
 const Profile = () => {
 	const dispatch = useDispatch()
-	const navigate = useNavigate()
 
-	// const user = useSelector(state => state.user)
-	const notification = useSelector(state => state.notification)
-
-	// useEffect(() => {
-	// 	if (user !== '') {
-	// 		navigate('/profile')
-	// 	}
-	// }, [user, navigate])
+	const theme = createTheme({
+		palette: {
+			primary: {
+				main: '#FF1E56',
+			},
+			secondary: {
+				main: '#F5F5F5',
+			},
+		}
+	})
 
 	const submitUserInfo = (event) => {
 		event.preventDefault()
-		console.log("Logging in user!")
 
-		const signedUpUser = {
+		const ProfileSettings = {
 			gender: event.target.gender.value,
-			age: event.target.gender.value,
-			location: event.target.gender.value,
+			age: event.target.age.value,
+			location: event.target.location.value,
 			sexual_pref: event.target.sexual_pref.value,
-			username: event.target.username.value,
-			password: event.target.password.value,
+			biography: event.target.biography.value,
 		}
 
-		signUpService.logInUser(signedUpUser).then((result) => {
-			if (result.userid) {
-				const sessionUser = { user: result.username, id: result.userid }
-				dispatch(setUser(sessionUser))
-				dispatch(setNotification("User logged in!", 5))
-				navigate('/profile')
-			} else {
-				dispatch(setNotification(result, 5))
-			}
-		})
+		console.log("Profile Settings: ", ProfileSettings)
+		dispatch(changeNotification("Profile Settings Updated"))
 	}
 
-	// const navigateToReset = () => {
-	// 	navigate('/login/resetpassword')
-	// }
+	const imageStyle = {
+		display: 'relative',
+		marginLeft: 'calc(50% + 5px)',
+		transform: 'translate(-50%)',
+		filter: 'drop-shadow(0px 0px 3px rgb(241 25 38 / 0.8))',
+	}
+
+	const [age, setAge] = useState('');
+	const [sexual_pref, setSexpref] = useState('bisexual');
+
+	const handleAge = (event) => {
+		setAge(event.target.value);
+	}
+
+	const handleSexpref = (event) => {
+		setSexpref(event.target.value);
+	}
 
 	return (
-		<>
-			<h2>Profile</h2>
-			<form onSubmit={submitUserInfo}>
-				<p>Please enter some details about you!</p>
-				<br></br>
-				<div>Gender:
-					<select name="gender">
-						<option value="Male">Male</option>
-						<option value="Female">Female</option>
-						<option value="Other">Other</option>
-					</select>
-				</div>
-				<div>Age:
-					<input type="number" name="age" placeholder="Age" autoComplete="off" min="18" max="120" required></input>
-				</div>
-				<div>Location:
-					<input type="text" name="location" placeholder="Helsinki, Finland" autoComplete="off" required></input>
-				</div>
-				<div>
-					Sexual preference:
-					<select name="sexual_pref">
-						<option value="Bisexual" selected="selected">Bisexual</option>
-						<option value="Male">Male</option>
-						<option value="Female">Female</option>
-					</select>
-				</div>
-				Biography:
-				<div><textarea name="biography" placeholder="Short description of you here..." autoComplete="off" required></textarea></div>
-				<button type="submit">Save settings</button>
-			</form>
-			<p>{notification}</p>
-		</>
+		<Container maxWidth='md' sx={{ pt: 5, pb: 5 }}>
+			<Paper elevation={10} sx={{ padding: 3 }}>
+				<IconUserCircle size={100} color="#F11926" style={imageStyle} />
+				<Typography variant='h5' align='center'
+					sx={{ fontWeight: 550 }}>Profile</Typography>
+				<Typography align='center' xs={{ mb: 4 }}>
+					Please enter some details about yourself
+				</Typography>
+				<form onSubmit={submitUserInfo}>
+					<FormControl sx={{ mb: 2 }}>
+						<FormLabel id='gender'>Gender</FormLabel>
+						<RadioGroup row aria-labelledby='gender' name='gender'>
+							<FormControlLabel value='female' control={<Radio />} label='Female' />
+							<FormControlLabel value='male' control={<Radio />} label='Male' />
+							<FormControlLabel value='other' control={<Radio />} label='Other' />
+						</RadioGroup>
+					</FormControl>
+					<FormControl fullWidth sx={{ mb: 2 }}>
+						<InputLabel id='age'>Age</InputLabel>
+						<Select labelId='age' id='age' name='age' value={age} onChange={handleAge} required>
+							{[...Array(83).keys()].map((i) => (
+								<MenuItem value={i + 18} key={i + 18}>{i + 18}</MenuItem>
+							))}
+						</Select>
+					</FormControl>
+					<TextField fullWidth margin='normal' name="location" label='Location'
+						placeholder="Location" sx={{ mb: 2 }} required></TextField>
+					<FormControl sx={{ mb: 2 }}>
+						<FormLabel id='sexual_pref'>Sexual Preference</FormLabel>
+						<RadioGroup row aria-labelledby='sexual_pref' name='sexual_pref' value={sexual_pref} onChange={handleSexpref} >
+							<FormControlLabel value='bisexual' control={<Radio />} label='Bisexual' />
+							<FormControlLabel value='male' control={<Radio />} label='Male' />
+							<FormControlLabel value='female' control={<Radio />} label='Female' />
+						</RadioGroup>
+					</FormControl>
+					<br />
+					<FormLabel id='biography' >Biography</FormLabel>
+					<TextareaAutosize
+						name='biography'
+						style={{ width: '100%', marginTop: '10px' }}
+						maxLength={500}
+						minRows={5}
+						placeholder='Short description of you here...'
+					/>
+					<Button type="submit" variant='contained' theme={theme}
+						size='large' sx={{ mt: 1 }}>
+						Save settings
+					</Button>
+				</form>
+				<Notification />
+			</Paper>
+		</Container>
 	)
 
 }
