@@ -4,11 +4,13 @@ module.exports = function (app, pool, bcrypt) {
 		const { username, password } = request.body
 
 		const verifyUser = async () => {
-			var sql = "SELECT * FROM users WHERE username = $1 AND verified = 'YES'";
+			var sql = "SELECT * FROM users WHERE username = $1";
 			const { rows } = await pool.query(sql, [username])
 			if (rows.length === 0) {
 				console.log("User not found!")
 				throw ("User not found!")
+			} else if (rows[0]['verified'] === 'NO') {
+				throw ("User account not yeat activated! Please check your inbox for confirmation email.")
 			} else {
 				const compareResult = await bcrypt.compare(password, rows[0]['password'])
 				if (compareResult) {
