@@ -13,6 +13,7 @@ import NavBar from './components/Navbar'
 import Footer from './components/Footer'
 import ConfirmMail from './components/login/ConfirmMail'
 import ResetPassword, {SetNewPassword} from './components/login/ResetPassword'
+import CheckLocation from './components/CheckLocation'
 import "./css/App.css"
 
 const MainContainer = () => {
@@ -53,6 +54,7 @@ const App = () => {
 
 	return <div className='content-wrap'>
 		<Router>
+			<CheckLocation />
 			<NavBar />
 			<Routes>
 				<Route path="/" element={<Login />} />
