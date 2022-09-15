@@ -11,31 +11,39 @@ app.use(cors())
 app.use(express.static('build')) // express checks if the 'build' directory contains the requested file
 app.use(session({ secret: 'matchac2r2p6', saveUninitialized: true, resave: true }));
 
-const { Client } = require('pg')
-const con = new Client({
+morgan.token('body', request => {
+	return JSON.stringify(request.body)
+})
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
+
+const { Pool } = require('pg')
+const pool = new Pool({
 	user: 'matcha',
 	host: 'postgres-db',
 	database: 'matcha',
 	password: 'root',
 	port: 5432,
 })
-con.connect()
+pool.connect()
 
-morgan.token('body', request => {
-	return JSON.stringify(request.body)
-})
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
+var transporter = nodemailer.createTransport({
+	service: 'gmail',
+	auth: {
+		user: process.env.EMAIL_ADDRESS,
+		pass: process.env.EMAIL_PASSWORD
+	}
+});
 
 var sess;
 
-require('./routes/signup.js')(app, con, bcrypt, nodemailer);
+require('./routes/signup.js')(app, pool, bcrypt, transporter);
 
 app.post('/api/login', (request, response) => {
 	const body = request.body
 
 	const verifyUser = async () => {
 		var sql = "SELECT * FROM users WHERE username = $1";
-		const result = await con.query(sql, [body.username])
+		const result = await pool.query(sql, [body.username])
 		if (result.rows.length === 0) {
 			console.log("User not found!")
 			throw ("User not found!")

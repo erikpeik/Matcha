@@ -1,4 +1,4 @@
-module.exports = function (app, con, bcrypt, nodemailer) {
+module.exports = function (app, pool, bcrypt, transporter) {
 	app.post('/api/signup/checkuser', (request, response) => {
 		const body = request.body
 
@@ -19,7 +19,7 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 
 		const checkUsername = async () => {
 			var sql = "SELECT * FROM users WHERE username = $1";
-			const result = await con.query(sql, [body.username])
+			const result = await pool.query(sql, [body.username])
 			if (result.rows.length) {
 				throw ("Username already exists!")
 			} else
@@ -28,7 +28,7 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 
 		const checkEmail = async () => {
 			var sql = "SELECT * FROM users WHERE email = $1";
-			const result = await con.query(sql, [body.email])
+			const result = await pool.query(sql, [body.email])
 			if (result.rows.length) {
 				throw ("User with this e-mail already exists!")
 			} else
@@ -54,7 +54,7 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 			console.log("Hashed password: " + hash)
 			try {
 				var sql = "INSERT INTO users (username, firstname, lastname, email, password) VALUES ($1,$2,$3,$4,$5) RETURNING *";
-				const result = await con.query(sql, [body.username, body.firstname, body.lastname, body.email, hash])
+				const result = await pool.query(sql, [body.username, body.firstname, body.lastname, body.email, hash])
 				return
 			} catch (error) {
 				console.log("ERROR :", error)
@@ -66,7 +66,7 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 
 			const getUserId = async () => {
 				var sql = "SELECT id FROM users WHERE username = $1";
-				const result = await con.query(sql, [body.username])
+				const result = await pool.query(sql, [body.username])
 				console.log("Id SQL result: " + result.rows[0]['id']);
 				return (result.rows[0]['id'])
 			}
@@ -76,7 +76,7 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 			getUserId()
 				.then(user_id => {
 					var sql = "INSERT INTO email_verify (user_id, email, verify_code) VALUES ($1,$2,$3)";
-					con.query(sql, [user_id, body.email, code])
+					pool.query(sql, [user_id, body.email, code])
 					console.log("Email verify created!");
 				}).catch(error => {
 					console.log(error)
@@ -86,14 +86,6 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 		}
 
 		const sendConfirmationMail = (useremail, code) => {
-
-			var transporter = nodemailer.createTransport({
-				service: 'gmail',
-				auth: {
-					user: process.env.EMAIL_ADDRESS,
-					pass: process.env.EMAIL_PASSWORD
-				}
-			});
 
 			var mailOptions = {
 				from: process.env.EMAIL_ADDRESS,
@@ -131,7 +123,7 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 			var sql = `SELECT * FROM email_verify
 						INNER JOIN users ON email_verify.user_id = users.id
 						WHERE email_verify.verify_code = $1`;
-			const result = await con.query(sql, [body.code])
+			const result = await pool.query(sql, [body.code])
 			console.log(result);
 			if (result.rows.length === 0) {
 				throw ("No code found!")
@@ -142,10 +134,10 @@ module.exports = function (app, con, bcrypt, nodemailer) {
 
 		const setAccountVerified = () => {
 			var sql = `UPDATE users SET verified = 'YES' WHERE username = $1`;
-			con.query(sql, [body.username])
+			pool.query(sql, [body.username])
 
 			var sql = `DELETE FROM email_verify WHERE verify_code = $1`;
-			con.query(sql, [body.code])
+			pool.query(sql, [body.code])
 		}
 
 		checkCode().then(() => {
