@@ -87,7 +87,8 @@ const NavBar = () => {
 		pages = {
 			'Profile': '/profile',
 			'Browse Users': '/browse_users',
-			'Chat': '/chat'
+			'Chat': '/chat',
+			'Log Out': '/logout'
 		}
 	}
 
