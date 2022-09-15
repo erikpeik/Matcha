@@ -34,8 +34,8 @@ module.exports = function (app, pool, bcrypt) {
 
 	app.get('/api/login', (request, response) => {
 		sess = request.session;
-		if (sess.username) {
-			response.send(sess.username);
+		if (sess.username && sess.userid) {
+			response.send({ user: sess.username, id: sess.userid });
 		}
 		else {
 			response.send('');
