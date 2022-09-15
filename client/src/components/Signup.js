@@ -1,8 +1,10 @@
 import React from "react"
-import { useSelector, useDispatch } from 'react-redux'
-import { setNotification } from '../reducers/notificationReducer'
+import { useDispatch } from 'react-redux'
+import { changeNotification } from '../reducers/notificationReducer'
+import { changeSeverity } from '../reducers/severityReducer'
 import signUpService from '../services/signUpService'
-import { Button, Paper, TextField, Typography, Alert } from "@mui/material";
+import Notification from './Notification'
+import { Button, Paper, TextField, Typography } from "@mui/material";
 import { Container } from '@mui/system';
 import { createTheme } from '@mui/material/styles'
 import { ReactComponent as HeartIcon } from '../images/matcha_icon_with_heart.svg'
@@ -26,16 +28,8 @@ const imageStyle = {
 	filter: 'drop-shadow(0px 0px 3px rgb(241 25 38 / 0.8))',
 }
 
-const sendAlert = (message, type) => {
-	return (
-		<Alert severity={type} sx={{ mt: 2 }}>{message}</Alert>
-	)
-}
-
 const Signup = () => {
 	const dispatch = useDispatch()
-
-	const notification = useSelector(state => state.notification)
 
 	const submitUser = (event) => {
 		event.preventDefault()
@@ -55,10 +49,12 @@ const Signup = () => {
 				signUpService
 					.createUser(signedUpUser)
 					.then(responseData => {
-						dispatch(setNotification(sendAlert("User created successfully!", "success"), 5))
+						dispatch(changeSeverity('success'))
+						dispatch(changeNotification("User created successfully!"))
 					})
 			} else {
-				dispatch(setNotification(sendAlert(result, "error"), 5))
+				dispatch(changeSeverity('error'))
+				dispatch(changeNotification(result))
 			}
 		})
 	}
@@ -72,14 +68,14 @@ const Signup = () => {
 				<Typography align='center'>Make the first move and create your account</Typography>
 				<form onSubmit={submitUser}>
 					<TextField fullWidth margin='normal' name="username" label='Username' placeholder="Username" autoComplete="nickname" required></TextField>
-					<TextField sx={{width: '49%', mr: '1%'}} margin='dense' name="firstname" label='First name' placeholder="First name" autoComplete="given-name" required></TextField>
-					<TextField sx={{width: '49%', ml: '1%'}} margin='dense' name="lastname" label='Last name' placeholder="Last name" autoComplete="family-name" required></TextField>
+					<TextField sx={{ width: '49%', mr: '1%' }} margin='dense' name="firstname" label='First name' placeholder="First name" autoComplete="given-name" required></TextField>
+					<TextField sx={{ width: '49%', ml: '1%' }} margin='dense' name="lastname" label='Last name' placeholder="Last name" autoComplete="family-name" required></TextField>
 					<TextField fullWidth margin='dense' name="email" label='E-mail' placeholder="E-mail" autoComplete="email" required></TextField>
-					<TextField type='password' fullWidth margin='dense' name="password" label='Password'placeholder="Password" autoComplete="new-password" required></TextField>
+					<TextField type='password' fullWidth margin='dense' name="password" label='Password' placeholder="Password" autoComplete="new-password" required></TextField>
 					<TextField type='password' fullWidth margin='dense' name="confirm_password" label='Confirm password' placeholder="Confirm password" autoComplete="new-password" required></TextField>
-					<Button type="submit" variant='contained' theme={theme} size='large' sx={{mt: 1}}>Submit</Button>
+					<Button type="submit" variant='contained' theme={theme} size='large' sx={{ mt: 1 }}>Submit</Button>
 				</form>
-				{notification}
+				<Notification />
 			</Paper>
 		</Container>
 	)
