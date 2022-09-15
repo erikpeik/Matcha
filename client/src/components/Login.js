@@ -3,24 +3,28 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import signUpService from '../services/signUpService'
 import { setUser } from '../reducers/userReducer'
-import { setNotification } from '../reducers/notificationReducer'
+import { changeNotification } from '../reducers/notificationReducer'
+import { changeSeverity } from '../reducers/severityReducer'
+import { Typography, Button, Paper, TextField } from '@mui/material'
+import { Container } from '@mui/system';
+import { createTheme } from '@mui/material/styles'
+import { ReactComponent as HeartIcon } from '../images/matcha_icon_with_heart.svg'
+import Notification from './Notification'
 
 const Login = () => {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 
 	const user = useSelector(state => state.user)
-	const notification = useSelector(state => state.notification)
 
 	useEffect(() => {
-		if (user !== '') {
+		if (user !== undefined && user !== '') {
 			navigate('/profile')
 		}
 	}, [user, navigate])
 
 	const submitUser = (event) => {
 		event.preventDefault()
-		console.log("Logging in user!")
 
 		const signedUpUser = {
 			username: event.target.username.value,
@@ -31,10 +35,9 @@ const Login = () => {
 			if (result.userid) {
 				const sessionUser = { user: result.username, id: result.userid }
 				dispatch(setUser(sessionUser))
-				dispatch(setNotification("User logged in!", 5))
-				navigate('/profile')
 			} else {
-				dispatch(setNotification(result, 5))
+				dispatch(changeSeverity('error'))
+				dispatch(changeNotification(result))
 			}
 		})
 	}
@@ -43,18 +46,43 @@ const Login = () => {
 		navigate('/login/resetpassword')
 	}
 
+	const theme = createTheme({
+		palette: {
+			primary: {
+				main: '#FF1E56',
+			},
+			secondary: {
+				main: '#F5F5F5',
+			},
+		}
+	})
+
+	const imageStyle = {
+		width: '100px',
+		display: 'relative',
+		marginLeft: 'calc(50% + 5px)',
+		transform: 'translate(-50%)',
+		filter: 'drop-shadow(0px 0px 3px rgb(241 25 38 / 0.8))',
+	}
+
 	return (
-		<>
-			<h2>Login</h2>
-			<form onSubmit={submitUser}>
-				<br></br>
-				<div><input type="text" name="username" placeholder="Username" autoComplete="off" required></input></div>
-				<div><input type="password" name="password" placeholder="Password" autoComplete="off" required></input></div>
-				<button type="submit">Submit</button>
-			</form>
-			<button onClick={navigateToReset}>Forgot password?</button>
-			<p>{notification}</p>
-		</>
+		<Container maxWidth='sm' sx={{ pt: 5, pb: 5 }}>
+			<Paper elevation={10} sx={{ padding: 3 }}>
+				<HeartIcon width='100px' style={imageStyle} />
+				<Typography variant='h5' align='center'
+					sx={{ fontWeight: 550 }}>Login</Typography>
+				<Typography align='center' xs={{ mb: 4 }}>Login and start dating now!</Typography>
+				<form onSubmit={submitUser}>
+					<TextField fullWidth margin='normal' name="username" label='Username'
+						placeholder="Username" autoComplete="username" required></TextField>
+					<TextField fullWidth margin='dense' type="password" name="password"
+						label='Password' placeholder="Password" autoComplete="password" required></TextField>
+					<Button type='submit' variant='contained' theme={theme} size='large' sx={{ mt: 1 }}>Submit</Button>
+				</form>
+				<Button onClick={navigateToReset} sx={{ mt: 1 }}>Forgot password?</Button>
+				<Notification />
+			</Paper>
+		</Container>
 	)
 
 }
