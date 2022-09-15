@@ -8,6 +8,7 @@ import {
 import MenuIcon from '@mui/icons-material/Menu'
 import { ReactComponent as Logo } from '../images/matcha_logo.svg'
 import avatar from '../images/random_picture.jpeg'
+import { useSelector } from 'react-redux'
 
 const navbar_theme = createTheme({
 	palette: {
@@ -20,35 +21,82 @@ const navbar_theme = createTheme({
 	}
 })
 
-const NavBar = () => {
-	const pages = {
-		'Login': '/login',
-		'Signup': '/signup',
-		'Browse Users': '/browse_users',
-		'Chat': '/chat'
-	}
+const UserMenu = ({ user }) => {
+	const [anchorElUser, setAnchorElUser] = useState(null);
+
+	const handleOpenUserMenu = (event) => {
+		setAnchorElUser(event.currentTarget);
+	};
+
+	const handleCloseUserMenu = () => {
+		setAnchorElUser(null);
+	};
+
 	const settings = {
 		'Profile': '/profile',
 		'Settings': '/settings',
 		'Log Out': '/logout'
 	}
 
+	if (user !== undefined && user !== '') {
+
+		return <Box sx={{ flexGrow: 0 }}>
+			<Menu
+				sx={{ mt: '45px' }}
+				id="menu-appbar"
+				anchorEl={anchorElUser}
+				anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+				keepMounted
+				transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+				open={Boolean(anchorElUser)}
+				onClose={handleCloseUserMenu}
+			>
+				{
+					Object.keys(settings).map((setting) => {
+						return (
+							<MenuItem key={setting} onClick={handleCloseUserMenu}
+								component={Link} to={settings[setting]}>
+								{setting}
+							</MenuItem>
+						)
+					})
+				}
+			</Menu>
+			<Tooltip title="Open settings">
+				<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+					<Avatar
+						src={avatar} />
+				</IconButton>
+			</Tooltip>
+		</Box>
+	}
+}
+
+
+const NavBar = () => {
 	const [anchorElNav, setAnchorElNav] = useState(null);
-	const [anchorElUser, setAnchorElUser] = useState(null);
+
+	const user = useSelector(state => state.user)
+	let pages = {}
+	if (user === undefined || user === '') {
+		pages = {
+			'Login': '/login',
+			'Signup': '/signup',
+		}
+	} else {
+		pages = {
+			'Profile': '/profile',
+			'Browse Users': '/browse_users',
+			'Chat': '/chat'
+		}
+	}
 
 	const handleOpenNavMenu = (event) => {
 		setAnchorElNav(event.currentTarget);
 	};
-	const handleOpenUserMenu = (event) => {
-		setAnchorElUser(event.currentTarget);
-	};
 
 	const handleCloseNavMenu = () => {
 		setAnchorElNav(null);
-	};
-
-	const handleCloseUserMenu = () => {
-		setAnchorElUser(null);
 	};
 
 	return (
@@ -126,35 +174,7 @@ const NavBar = () => {
 							})
 						}
 					</Box>
-
-					<Box sx={{ flexGrow: 0 }}>
-						<Menu
-							sx={{ mt: '45px' }}
-							id="menu-appbar"
-							anchorEl={anchorElUser}
-							anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-							keepMounted
-							transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-							open={Boolean(anchorElUser)}
-							onClose={handleCloseUserMenu}
-						>
-							{
-								Object.keys(settings).map((setting) => {
-									return (
-										<MenuItem key={setting} onClick={handleCloseNavMenu} component={Link} to={settings[setting]}>
-											{setting}
-										</MenuItem>
-									)
-								})
-							}
-						</Menu>
-						<Tooltip title="Open settings">
-							<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-								<Avatar
-									src={avatar} />
-							</IconButton>
-						</Tooltip>
-					</Box>
+					<UserMenu user={user} />
 				</Toolbar>
 			</Container>
 		</AppBar >
