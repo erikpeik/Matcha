@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux'
 import {
 	BrowserRouter as Router,
 	Routes, Route, useNavigate
-	// useParams
 } from 'react-router-dom'
 import signUpService from './services/signUpService'
 import { setUser } from './reducers/userReducer'
@@ -13,6 +12,7 @@ import ConfirmMail from './components/login/ConfirmMail'
 import NavBar from './components/Navbar'
 import Footer from './components/Footer'
 import ResetPassword, {SetNewPassword} from './components/login/ResetPassword'
+import CheckLocation from './components/CheckLocation'
 import "./css/App.css"
 
 const MainContainer = () => {
@@ -53,6 +53,7 @@ const App = () => {
 
 	return <div className='content-wrap'>
 		<Router>
+			<CheckLocation />
 			<NavBar />
 			<Routes>
 				<Route path="/" element={<Login />} />
