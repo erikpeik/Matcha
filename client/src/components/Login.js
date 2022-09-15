@@ -21,7 +21,7 @@ const Login = () => {
 			if (result.userid) {
 				const sessionUser = {user: result.username, id: result.userid}
 				dispatch(setUser(sessionUser))
-				dispatch(setNotification("Correct password!", 5))
+				dispatch(setNotification("User logged in!", 5))
 			} else {
 				dispatch(setNotification(result, 5))
 				// console.log(result)

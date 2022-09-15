@@ -42,7 +42,7 @@ app.post('/api/login', (request, response) => {
 	const body = request.body
 
 	const verifyUser = async () => {
-		var sql = "SELECT * FROM users WHERE username = $1";
+		var sql = "SELECT * FROM users WHERE username = $1 AND verified = 'YES'";
 		const result = await pool.query(sql, [body.username])
 		if (result.rows.length === 0) {
 			console.log("User not found!")
