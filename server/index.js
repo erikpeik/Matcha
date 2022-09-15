@@ -39,21 +39,20 @@ var sess;
 require('./routes/signup.js')(app, pool, bcrypt, transporter);
 
 app.post('/api/login', (request, response) => {
-	const body = request.body
+	const { username, password } = request.body
 
 	const verifyUser = async () => {
 		var sql = "SELECT * FROM users WHERE username = $1 AND verified = 'YES'";
-		const result = await pool.query(sql, [body.username])
-		if (result.rows.length === 0) {
+		const { rows } = await pool.query(sql, [username])
+		if (rows.length === 0) {
 			console.log("User not found!")
 			throw ("User not found!")
 		} else {
-			// console.log(result);
-			const compareResult = await bcrypt.compare(body.password, result.rows[0]['password'])
+			const compareResult = await bcrypt.compare(password, rows[0]['password'])
 			if (compareResult) {
 				sess = request.session
-				sess.userid = result.rows[0]['id']
-				sess.username = result.rows[0]['username']
+				sess.userid = rows[0]['id']
+				sess.username = rows[0]['username']
 				return (sess)
 			} else
 				throw ("Wrong password!")
