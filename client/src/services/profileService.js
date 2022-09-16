@@ -6,6 +6,11 @@ const setUpProfile = ProfileSettings => {
 	return request.then(response => response.data)
 }
 
-const profileService = { setUpProfile }
+const getProfileData = () => {
+	const request = axios.get(`${baseUrl}`)
+	return request.then(response => response.data)
+}
+
+const profileService = { setUpProfile, getProfileData }
 
 export default profileService

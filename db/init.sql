@@ -42,3 +42,11 @@ CREATE TABLE IF NOT EXISTS user_settings (
 	IP_location POINT NOT NULL DEFAULT '(0, 0)',
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS user_pictures (
+	picture_id SERIAL NOT NULL PRIMARY KEY,
+	user_id INT NOT NULL,
+	picture_data TEXT NOT NULL,
+	profile_pic enum_yesno DEFAULT 'NO',
+	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);

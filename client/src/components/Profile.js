@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { changeNotification } from '../reducers/notificationReducer'
-import { useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import {
 	Typography, Button, Paper, TextField, FormControl, FormLabel, createTheme,
 	RadioGroup, FormControlLabel, Radio, InputLabel, Select, MenuItem, TextareaAutosize,
@@ -9,6 +9,7 @@ import { Container } from '@mui/system';
 import { IconUserCircle } from '@tabler/icons';
 import Notification from './Notification'
 import { changeSeverity } from '../reducers/severityReducer'
+import { getProfileData } from '../reducers/profileReducer'
 import profileService from '../services/profileService'
 
 const ProfileSetUpForm = () => {
@@ -125,11 +126,28 @@ const ProfileSetUpForm = () => {
 }
 
 const Profile = () => {
-	return (
-		<>
-			<ProfileSetUpForm />
-		</>
-	)
+	const dispatch = useDispatch()
+
+	useEffect(() => {
+		dispatch(getProfileData())
+	}, [dispatch])
+
+	const profileData = useSelector(state => state.profile)
+	console.log(profileData)
+
+	if (!profileData.id) {
+		return (
+			<>
+				<ProfileSetUpForm />
+			</>
+		)
+	} else {
+		return (
+			<>
+				<div>There should be profile here!</div>
+			</>
+		)
+	}
 
 }
 

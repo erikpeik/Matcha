@@ -33,7 +33,7 @@ module.exports = function (app, pool, session, bcrypt) {
 	})
 
 	app.get('/api/login', (request, response) => {
-		var sess = request.session;
+		var sess = request.session
 		if (sess.username && sess.userid) {
 			response.send({ user: sess.username, id: sess.userid });
 		}

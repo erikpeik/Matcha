@@ -5,6 +5,7 @@ import signUpService from '../services/signUpService'
 import { setUser } from '../reducers/userReducer'
 import { changeNotification } from '../reducers/notificationReducer'
 import { changeSeverity } from '../reducers/severityReducer'
+import { getProfileData } from '../reducers/profileReducer'
 import { Typography, Button, Paper, TextField } from '@mui/material'
 import { Container } from '@mui/system';
 import { createTheme } from '@mui/material/styles'
@@ -35,6 +36,7 @@ const Login = () => {
 			if (result.userid) {
 				const sessionUser = { user: result.username, id: result.userid }
 				dispatch(setUser(sessionUser))
+				dispatch(getProfileData())
 			} else {
 				dispatch(changeSeverity('error'))
 				dispatch(changeNotification(result))
