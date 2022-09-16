@@ -7,9 +7,9 @@ import profileReducer from './reducers/profileReducer'
 const store = configureStore({
 	reducer: {
 		user: userReducer,
-		profile: profileReducer,
 		notification: notificationReducer,
-		severity: severityReducer
+		severity: severityReducer,
+		profile: profileReducer,
 	}
 })
 

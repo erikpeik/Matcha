@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import profileService from '../services/profileService'
 
 const profileSlice = createSlice({
-	name: 'filter',
+	name: 'profile',
 	initialState: {},
 	reducers: {
 		setProfileData(state, action) {
@@ -11,6 +11,7 @@ const profileSlice = createSlice({
 		}
 	},
 })
+
 export const { setProfileData } = profileSlice.actions
 
 export const getProfileData = () => {
