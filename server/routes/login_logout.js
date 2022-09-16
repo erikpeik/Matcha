@@ -1,4 +1,4 @@
-module.exports = function (app, pool, bcrypt) {
+module.exports = function (app, pool, session, bcrypt) {
 
 	app.post('/api/login', (request, response) => {
 		const { username, password } = request.body
@@ -14,7 +14,7 @@ module.exports = function (app, pool, bcrypt) {
 			} else {
 				const compareResult = await bcrypt.compare(password, rows[0]['password'])
 				if (compareResult) {
-					sess = request.session
+					var sess = request.session
 					sess.userid = rows[0]['id']
 					sess.username = rows[0]['username']
 					return (sess)
@@ -33,7 +33,7 @@ module.exports = function (app, pool, bcrypt) {
 	})
 
 	app.get('/api/login', (request, response) => {
-		sess = request.session;
+		var sess = request.session;
 		if (sess.username && sess.userid) {
 			response.send({ user: sess.username, id: sess.userid });
 		}

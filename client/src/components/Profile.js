@@ -8,9 +8,10 @@ import {
 import { Container } from '@mui/system';
 import { IconUserCircle } from '@tabler/icons';
 import Notification from './Notification'
+import { changeSeverity } from '../reducers/severityReducer'
+import profileService from '../services/profileService'
 
-
-const Profile = () => {
+const ProfileSetUpForm = () => {
 	const dispatch = useDispatch()
 
 	const theme = createTheme({
@@ -35,8 +36,17 @@ const Profile = () => {
 			biography: event.target.biography.value,
 		}
 
+		profileService.setUpProfile(ProfileSettings).then((result) => {
+			if (result === true) {
+				dispatch(changeSeverity('success'))
+				dispatch(changeNotification("Profile Settings Updated"))
+			} else {
+				dispatch(changeSeverity('error'))
+				dispatch(changeNotification(result))
+			}
+		})
+
 		console.log("Profile Settings: ", ProfileSettings)
-		dispatch(changeNotification("Profile Settings Updated"))
 	}
 
 	const imageStyle = {
@@ -110,6 +120,15 @@ const Profile = () => {
 				<Notification />
 			</Paper>
 		</Container>
+	)
+
+}
+
+const Profile = () => {
+	return (
+		<>
+			<ProfileSetUpForm />
+		</>
 	)
 
 }
