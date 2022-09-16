@@ -6,7 +6,7 @@ import {
 } from 'react-router-dom'
 import signUpService from './services/signUpService'
 import { setUser } from './reducers/userReducer'
-import { setProfileData } from './reducers/profileReducer'
+import { getProfileData } from './reducers/profileReducer'
 import Login from './components/Login'
 import Signup from './components/Signup'
 import Profile from './components/Profile'
@@ -30,7 +30,7 @@ const Logout = () => {
 	useEffect(() => {
 		signUpService.logOutUser()
 		dispatch(setUser(""))
-		dispatch(setProfileData({}))
+		dispatch(getProfileData())
 		navigate('/login')
 	}, [dispatch, navigate])
 }

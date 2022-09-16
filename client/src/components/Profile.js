@@ -133,7 +133,11 @@ const Profile = () => {
 	}, [dispatch])
 
 	const profileData = useSelector(state => state.profile)
-	console.log(profileData)
+	console.log(profileData.profile_pic)
+	// const profile_pic = require(`${profileData.profile_pic}`)
+	const profile_pic = require('../images/demo_profilepic.jpeg')
+	const other_pictures = profileData.other_pictures
+	console.log(other_pictures)
 
 	if (!profileData.id) {
 		return (
@@ -144,11 +148,36 @@ const Profile = () => {
 	} else {
 		return (
 			<>
-				<div>There should be profile here!</div>
+				<div id="profile_container">
+					<div id="picture_container">
+						<img alt="profile_picture" src={profile_pic} height="200px"></img>
+					</div>
+					<div id="profile_data">
+						<h1>{profileData.username}</h1>
+						<h3>Fame rating: {profileData.fame_rating}</h3>
+						<br></br>
+						<p>First name: {profileData.firstname}</p>
+						<p>Last name: {profileData.lastname}</p>
+						<p>Email address: {profileData.email}</p>
+						<p>Gender: {profileData.gender}</p>
+						<p>Age: {profileData.age}</p>
+						<p>Sexual preference: {profileData.sexual_pref}</p>
+						<p>Location: {profileData.user_location}</p>
+						<p>Biography: {profileData.biography}</p>
+						<br></br>
+						<button>Change password</button>
+					</div>
+				</div>
+				<div id="other_pictures">
+					{other_pictures.map(picture =>
+						<div>
+							<img key={picture.picture_id} alt="random_picture" height="100px" src={picture.picture_data}></img>
+						</div>
+					)}
+				</div>
 			</>
 		)
 	}
-
 }
 
 export default Profile

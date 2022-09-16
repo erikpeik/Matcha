@@ -67,25 +67,27 @@ const Login = () => {
 		filter: 'drop-shadow(0px 0px 3px rgb(241 25 38 / 0.8))',
 	}
 
-	return (
-		<Container maxWidth='sm' sx={{ pt: 5, pb: 5 }}>
-			<Paper elevation={10} sx={{ padding: 3 }}>
-				<HeartIcon style={imageStyle} />
-				<Typography variant='h5' align='center'
-					sx={{ fontWeight: 550 }}>Login</Typography>
-				<Typography align='center' xs={{ mb: 4 }}>Login and start dating now!</Typography>
-				<form onSubmit={submitUser}>
-					<TextField fullWidth margin='normal' name="username" label='Username'
-						placeholder="Username" autoComplete="username" required></TextField>
-					<TextField fullWidth margin='dense' type="password" name="password"
-						label='Password' placeholder="Password" autoComplete="password" required></TextField>
-					<Button type='submit' variant='contained' theme={theme} size='large' sx={{ mt: 1 }}>Submit</Button>
-				</form>
-				<Button onClick={navigateToReset} sx={{ mt: 1 }}>Forgot password?</Button>
-				<Notification />
-			</Paper>
-		</Container>
-	)
+	if (user === '') {
+		return (
+			<Container maxWidth='sm' sx={{ pt: 5, pb: 5 }}>
+				<Paper elevation={10} sx={{ padding: 3 }}>
+					<HeartIcon style={imageStyle} />
+					<Typography variant='h5' align='center'
+						sx={{ fontWeight: 550 }}>Login</Typography>
+					<Typography align='center' xs={{ mb: 4 }}>Login and start dating now!</Typography>
+					<form onSubmit={submitUser}>
+						<TextField fullWidth margin='normal' name="username" label='Username'
+							placeholder="Username" autoComplete="username" required></TextField>
+						<TextField fullWidth margin='dense' type="password" name="password"
+							label='Password' placeholder="Password" autoComplete="password" required></TextField>
+						<Button type='submit' variant='contained' theme={theme} size='large' sx={{ mt: 1 }}>Submit</Button>
+					</form>
+					<Button onClick={navigateToReset} sx={{ mt: 1 }}>Forgot password?</Button>
+					<Notification />
+				</Paper>
+			</Container>
+		)
+	}
 
 }
 

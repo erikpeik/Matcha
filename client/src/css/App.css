@@ -36,3 +36,17 @@ body {
 	left: 50%;
 	transform: translate(-50%, -50%);
 }
+
+/* for profile testing */
+
+#profile_container {
+	display: flex;
+}
+
+#picture_container {
+	margin: 20px;
+}
+
+#other_pictures {
+	display: flex
+}
