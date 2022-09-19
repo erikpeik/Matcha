@@ -37,7 +37,7 @@ services:
       POSTGRES_PASSWORD: root
       POSTGRES_DB: matcha
     volumes:
-      - ./db/sample.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
 
