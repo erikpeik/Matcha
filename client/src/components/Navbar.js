@@ -86,7 +86,7 @@ const NavBar = () => {
 	} else {
 		pages = {
 			'Profile': '/profile',
-			'Browse Users': '/browse_users',
+			'Browsing': '/browsing',
 			'Chat': '/chat',
 			'Log Out': '/logout'
 		}

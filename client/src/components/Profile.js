@@ -126,13 +126,23 @@ const ProfileSetUpForm = () => {
 }
 
 const Profile = () => {
+	const [isLoading, setLoading] = useState(true);
 	const dispatch = useDispatch()
 
 	useEffect(() => {
-		dispatch(getProfileData())
+		const getData = async () => {
+			await dispatch(getProfileData())
+			setLoading(false);
+		}
+		getData()
 	}, [dispatch])
 
 	const profileData = useSelector(state => state.profile)
+
+	if (isLoading) {
+		return <div>Loading...</div>;
+	}
+
 	// console.log(profileData.profile_pic['picture_data'])
 	// const profile_pic = require(`${profileData.profile_pic['picture_data']}`)
 	const profile_pic = require('../images/demo_profilepic.jpeg')

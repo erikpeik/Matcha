@@ -10,6 +10,7 @@ import { getProfileData } from './reducers/profileReducer'
 import Login from './components/Login'
 import Signup from './components/Signup'
 import Profile from './components/Profile'
+import Browsing from './components/Browsing'
 import NavBar from './components/Navbar'
 import Footer from './components/Footer'
 import ConfirmMail from './components/login/ConfirmMail'
@@ -65,7 +66,7 @@ const App = () => {
 				<Route path="/signup" element={<Signup />} />
 				<Route path="/confirm/:user/:code" element={<ConfirmMail />} />
 				<Route path="/profile" element={<Profile />} />
-				<Route path="/browse_users" element={<MainContainer />} />
+				<Route path="/browsing" element={<Browsing />} />
 				<Route path="/chat" element={<MainContainer />} />
 				<Route path="/logout" element={<Logout />} />
 			</Routes>

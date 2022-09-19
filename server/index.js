@@ -38,6 +38,7 @@ require('./routes/signup.js')(app, pool, bcrypt, transporter);
 require('./routes/login_logout.js')(app, pool, session, bcrypt)
 require('./routes/resetpassword.js')(app, pool, bcrypt, transporter)
 require('./routes/profile.js')(app, pool, session)
+require('./routes/browsing.js')(app, pool, session)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
