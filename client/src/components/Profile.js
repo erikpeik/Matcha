@@ -133,8 +133,8 @@ const Profile = () => {
 	}, [dispatch])
 
 	const profileData = useSelector(state => state.profile)
-	console.log(profileData.profile_pic)
-	// const profile_pic = require(`${profileData.profile_pic}`)
+	// console.log(profileData.profile_pic['picture_data'])
+	// const profile_pic = require(`${profileData.profile_pic['picture_data']}`)
 	const profile_pic = require('../images/demo_profilepic.jpeg')
 	const other_pictures = profileData.other_pictures
 	console.log(other_pictures)
