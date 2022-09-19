@@ -124,7 +124,6 @@ module.exports = function (app, pool, bcrypt, transporter) {
 						INNER JOIN users ON email_verify.user_id = users.id
 						WHERE email_verify.verify_code = $1`;
 			const { rows } = await pool.query(sql, [code])
-			console.log(result);
 			if (rows.length === 0) {
 				throw ("No code found!")
 			} else {
