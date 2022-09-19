@@ -23,7 +23,7 @@ module.exports = (app, pool, session) => {
 						INNER JOIN user_settings ON users.id = user_settings.user_id
 						WHERE users.id = $1`
 			var { rows } = await pool.query(sql, [sess.userid])
-			// console.log("Profile Data: ", rows[0])
+			console.log("Profile Data: ", rows[0])
 			var profileData = rows[0]
 
 			var sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND profile_pic = 'YES'`
