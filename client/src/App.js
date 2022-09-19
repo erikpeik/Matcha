@@ -9,12 +9,12 @@ import { setUser } from './reducers/userReducer'
 import { getProfileData } from './reducers/profileReducer'
 import Login from './components/Login'
 import Signup from './components/Signup'
-import Profile from './components/Profile'
+import Profile, { ProfileSetUpForm } from './components/Profile'
 import Browsing from './components/Browsing'
 import NavBar from './components/Navbar'
 import Footer from './components/Footer'
 import ConfirmMail from './components/login/ConfirmMail'
-import ResetPassword, {SetNewPassword} from './components/login/ResetPassword'
+import ResetPassword, { SetNewPassword } from './components/login/ResetPassword'
 import CheckLocation from './components/CheckLocation'
 import "./css/App.css"
 
@@ -64,6 +64,7 @@ const App = () => {
 				<Route path="/login/resetpassword" element={<ResetPassword />} />
 				<Route path="/resetpassword/:user/:code" element={<SetNewPassword />} />
 				<Route path="/signup" element={<Signup />} />
+				<Route path="/settings" element={<ProfileSetUpForm />} />
 				<Route path="/confirm/:user/:code" element={<ConfirmMail />} />
 				<Route path="/profile" element={<Profile />} />
 				<Route path="/browsing" element={<Browsing />} />

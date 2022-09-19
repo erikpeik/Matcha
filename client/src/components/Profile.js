@@ -12,7 +12,7 @@ import { changeSeverity } from '../reducers/severityReducer'
 import { getProfileData } from '../reducers/profileReducer'
 import profileService from '../services/profileService'
 
-const ProfileSetUpForm = () => {
+export const ProfileSetUpForm = () => {
 	const dispatch = useDispatch()
 
 	const theme = createTheme({
@@ -147,7 +147,7 @@ const Profile = () => {
 	// const profile_pic = require(`${profileData.profile_pic['picture_data']}`)
 	const profile_pic = require('../images/demo_profilepic.jpeg')
 	const other_pictures = profileData.other_pictures
-	console.log(other_pictures)
+	// console.log(other_pictures)
 
 	if (!profileData.id) {
 		return (

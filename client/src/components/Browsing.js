@@ -20,7 +20,7 @@ const Browsing = () => {
 		const getAllUsers = async (users) => {
 			const fetchedUsers = await browsingService.getAll()
 			setUsers(fetchedUsers)
-			console.log(Array.from(fetchedUsers))
+			console.log(fetchedUsers)
 			setLoading(false);
 		}
 		getAllUsers()
