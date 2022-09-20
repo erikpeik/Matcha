@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { changeNotification } from '../reducers/notificationReducer'
 import { useSelector, useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import {
 	Typography, Button, Paper, TextField, FormControl, FormLabel, createTheme,
 	RadioGroup, FormControlLabel, Radio, InputLabel, Select, MenuItem, TextareaAutosize,
@@ -14,6 +15,7 @@ import profileService from '../services/profileService'
 
 export const ProfileSetUpForm = () => {
 	const dispatch = useDispatch()
+	const navigate = useNavigate()
 
 	const theme = createTheme({
 		palette: {
@@ -41,6 +43,7 @@ export const ProfileSetUpForm = () => {
 			if (result === true) {
 				dispatch(changeSeverity('success'))
 				dispatch(changeNotification("Profile Settings Updated"))
+				navigate('/profile')
 			} else {
 				dispatch(changeSeverity('error'))
 				dispatch(changeNotification(result))
@@ -147,7 +150,7 @@ const Profile = () => {
 	// const profile_pic = require(`${profileData.profile_pic['picture_data']}`)
 	const profile_pic = require('../images/demo_profilepic.jpeg')
 	const other_pictures = profileData.other_pictures
-	// console.log(other_pictures)
+	// console.log(other_pictures[0]['picture_id'])
 
 	if (!profileData.id) {
 		return (
@@ -160,7 +163,7 @@ const Profile = () => {
 			<>
 				<div id="profile_container">
 					<div id="picture_container">
-						<img key={profileData.profile_pic.picture_id} alt="profile_picture" src={profile_pic} height="200px"></img>
+						<img key="789" alt="profile_picture" src={profile_pic} height="200px"></img>
 					</div>
 					<div id="profile_data">
 						<h1>{profileData.username}</h1>
@@ -181,7 +184,7 @@ const Profile = () => {
 				<div id="other_pictures">
 					{other_pictures.map(picture =>
 						<div>
-							<img key={picture.picture_id} alt="random_picture" height="100px" src={picture.picture_data}></img>
+							<img key={picture['picture_id']} alt="random_picture" height="100px" src={picture.picture_data}></img>
 						</div>
 					)}
 				</div>

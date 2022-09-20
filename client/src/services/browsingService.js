@@ -6,6 +6,11 @@ const getAll = () => {
 	return request.then(response => response.data)
 }
 
-const browsingService = { getAll }
+const getSortedUsers = searchCriteria => {
+	const request = axios.post(`${baseUrl}/sorted`, searchCriteria)
+	return request.then(response => response.data)
+}
+
+const browsingService = { getAll, getSortedUsers }
 
 export default browsingService

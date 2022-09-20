@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 // import { changeNotification } from '../reducers/notificationReducer'
 // import { useDispatch } from 'react-redux'
-// import {
-// 	Typography, Button, Paper, TextField, FormControl, FormLabel, createTheme,
-// 	RadioGroup, FormControlLabel, Radio, InputLabel, Select, MenuItem, TextareaAutosize,
-// } from '@mui/material'
+import {
+	Typography, Button, Paper, TextField, FormControl, FormLabel, createTheme,
+	RadioGroup, FormControlLabel, Radio, InputLabel, Select, MenuItem, TextareaAutosize,
+} from '@mui/material'
 // import { Container } from '@mui/system';
 // import { IconUserCircle } from '@tabler/icons';
 // import Notification from './Notification'
@@ -16,15 +16,38 @@ const Browsing = () => {
 	const [isLoading, setLoading] = useState(true);
 	const [users, setUsers] = useState([])
 
+	var searchCriteria = {
+		min_age: 18,
+		max_age: 99,
+		min_fame: 0,
+		max_fame: 100,
+		location: 'any',
+		sorting: 'age',
+		sort_order: 'asc',
+		amount: 25,
+	}
+
 	useEffect(() => {
 		const getAllUsers = async (users) => {
 			const fetchedUsers = await browsingService.getAll()
 			setUsers(fetchedUsers)
-			console.log(fetchedUsers)
+			// console.log(fetchedUsers)
 			setLoading(false);
 		}
 		getAllUsers()
 	}, [])
+
+	const handleSorting = async (event) => {
+		searchCriteria.sorting = event.target.value
+		var sortedUsers = await browsingService.getSortedUsers(searchCriteria)
+		if (event.target.value === 'age') {
+			sortedUsers = await sortedUsers.sort(((a, b) => (a.age > b.age) ? 1 : -1))
+			setUsers(sortedUsers)
+		} else if (event.target.value === 'user_location') {
+			sortedUsers = await sortedUsers.sort(((a, b) => (a.user_location > b.user_location) ? 1 : -1))
+			setUsers(sortedUsers)
+		}
+	}
 
 	if (isLoading) {
 		return <div>Loading...</div>;
@@ -32,10 +55,19 @@ const Browsing = () => {
 		const profile_pic = require('../images/demo_profilepic.jpeg')
 		return (
 			<>
+				<FormControl sx={{ mb: 2 }}>
+					<FormLabel id='sorted_by'>Results sorted by:</FormLabel>
+					<RadioGroup row aria-labelledby='sorted_by' name='sorted_by' onChange={handleSorting}>
+						<FormControlLabel value='age' control={<Radio />} label='Age' />
+						<FormControlLabel value='user_location' control={<Radio />} label='Location' />
+						<FormControlLabel value='fame_rating' control={<Radio />} label='Fame Rating' />
+						<FormControlLabel value='common_tags' control={<Radio />} label='Common tags' />
+					</RadioGroup>
+				</FormControl>
 				{users.map(user =>
 					<div id="profile_container">
 						<div id="picture_container">
-							<img key={user.id} alt="profile_picture" src={profile_pic} height="200px"></img>
+							<img key={user.uniqueId} alt="profile_picture" src={profile_pic} height="200px"></img>
 						</div>
 						<div id="profile_data">
 							<h1>{user.username}</h1>
