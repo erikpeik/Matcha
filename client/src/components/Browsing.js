@@ -1,16 +1,7 @@
-import axios from 'axios'
 import { useState, useEffect } from 'react'
-// import { changeNotification } from '../reducers/notificationReducer'
-// import { useDispatch } from 'react-redux'
 import {
-	Typography, Button, Paper, TextField, FormControl, FormLabel, createTheme,
-	RadioGroup, FormControlLabel, Radio, InputLabel, Select, MenuItem, TextareaAutosize, Box, Slider
+	FormControl, FormLabel,	RadioGroup, FormControlLabel, Radio, InputLabel, Select, MenuItem, Box, Slider
 } from '@mui/material'
-// import { Container } from '@mui/system';
-// import { IconUserCircle } from '@tabler/icons';
-// import Notification from './Notification'
-// import { changeSeverity } from '../reducers/severityReducer'
-// import { getProfileData } from '../reducers/profileReducer'
 import browsingService from '../services/browsingService'
 
 const Browsing = () => {
