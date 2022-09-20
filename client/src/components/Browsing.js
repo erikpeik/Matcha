@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { useState, useEffect } from 'react'
 // import { changeNotification } from '../reducers/notificationReducer'
 // import { useDispatch } from 'react-redux'
@@ -20,6 +21,8 @@ const Browsing = () => {
 		max_age: 99,
 		min_fame: 0,
 		max_fame: 100,
+		min_distance: 0,
+		max_distance: 20000,
 		location: 'any',
 		sorting: 'age',
 		sort_order: 'asc',
@@ -71,6 +74,13 @@ const Browsing = () => {
 		setUsers(sortedUsers)
 	}
 
+	const handleDistanceSlider = async (event) => {
+		const searchValues = { ...searchCriteria, min_distance: event.target.value[0], max_distance: event.target.value[1] }
+		var sortedUsers = await browsingService.getSortedUsers(searchValues)
+		setSearchCriteria(searchValues)
+		setUsers(sortedUsers)
+	}
+
 	if (isLoading) {
 		return <div>Loading...</div>;
 	} else {
@@ -103,6 +113,18 @@ const Browsing = () => {
 						aria-labelledby='fame range'
 						value={[searchCriteria.min_fame, searchCriteria.max_fame]}
 						onChange={handleFameSlider}
+						valueLabelDisplay="auto"
+						// getAriaValueText={valuetext}
+					/>
+				</Box>
+				<Box sx={{ width: 300 }}>
+					<InputLabel id='distanceslider'>Filter by distance:</InputLabel>
+					<Slider
+						min={0}
+						max={20000}
+						aria-labelledby='distance range'
+						value={[searchCriteria.min_distance, searchCriteria.max_distance]}
+						onChange={handleDistanceSlider}
 						valueLabelDisplay="auto"
 						// getAriaValueText={valuetext}
 					/>
@@ -140,6 +162,7 @@ const Browsing = () => {
 							<p>Age: {user.age}</p>
 							<p>Sexual preference: {user.sexual_pref}</p>
 							<p>Location: {user.user_location}</p>
+							<p>Distance: {Math.floor(user.distance)} km</p>
 							<p>Biography: {user.biography}</p>
 						</div>
 					</div>

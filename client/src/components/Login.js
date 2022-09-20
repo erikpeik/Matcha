@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -24,12 +25,16 @@ const Login = () => {
 		}
 	}, [user, navigate])
 
-	const submitUser = (event) => {
+	const submitUser = async (event) => {
 		event.preventDefault()
+
+		const locationData = await axios.get('https://geolocation-db.com/json/')
+		console.log(locationData.data);
 
 		const signedUpUser = {
 			username: event.target.username.value,
 			password: event.target.password.value,
+			location: [locationData.data.latitude, locationData.data.longitude]
 		}
 
 		signUpService.logInUser(signedUpUser).then((result) => {
