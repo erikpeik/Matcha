@@ -4,6 +4,7 @@ import {
 	Select, MenuItem, Box, Slider, Container, Paper
 } from '@mui/material'
 import browsingService from '../services/browsingService'
+import Loader from './Loader'
 
 const Browsing = () => {
 	const [isLoading, setLoading] = useState(true);
@@ -74,7 +75,7 @@ const Browsing = () => {
 	}
 
 	if (isLoading) {
-		return <div>Loading...</div>;
+		return <Loader />;
 	} else {
 		const profile_pic = require('../images/demo_profilepic.jpeg')
 		return (

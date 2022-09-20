@@ -15,6 +15,7 @@ import Notification from './Notification'
 import { changeSeverity } from '../reducers/severityReducer'
 import { getProfileData } from '../reducers/profileReducer'
 import profileService from '../services/profileService'
+import Loader from './Loader'
 
 const StyledRating = styled(Rating)({
 	'& .MuiRating-iconFilled': {
@@ -186,7 +187,7 @@ const Profile = () => {
 	const profileData = useSelector(state => state.profile)
 
 	if (isLoading) {
-		return <div>Loading...</div>;
+		return <Loader />
 	}
 
 	// console.log(profileData.profile_pic['picture_data'])
