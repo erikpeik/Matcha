@@ -240,7 +240,7 @@ const Profile = () => {
 							/>
 						</Box>
 					</Grid>
-					<Grid container spacing={2} direction="row" sx={{mb: 2}}>
+					<Grid container spacing={1} direction="row" sx={{mb: 2}}>
 						{Object.keys(ProfileData).map((key, index) => {
 							return <ProfileInput key={index} text={key} input={ProfileData[key]} />
 						})}
