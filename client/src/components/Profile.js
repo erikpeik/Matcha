@@ -92,7 +92,7 @@ export const ProfileSetUpForm = () => {
 					<FormControl fullWidth sx={{ mb: 2 }}>
 						<InputLabel id='age'>Age</InputLabel>
 						<Select labelId='age' id='age' name='age' value={age} onChange={handleAge} required>
-							{[...Array(83).keys()].map((i) => (
+							{[...Array(103).keys()].map((i) => (
 								<MenuItem value={i + 18} key={i + 18}>{i + 18}</MenuItem>
 							))}
 						</Select>
