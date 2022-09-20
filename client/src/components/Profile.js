@@ -5,13 +5,36 @@ import { useNavigate } from 'react-router-dom'
 import {
 	Typography, Button, Paper, TextField, FormControl, FormLabel, createTheme,
 	RadioGroup, FormControlLabel, Radio, InputLabel, Select, MenuItem, TextareaAutosize,
+	Box, Grid, Rating, styled
 } from '@mui/material'
-import { Container } from '@mui/system';
-import { IconUserCircle } from '@tabler/icons';
+import FavoriteIcon from '@mui/icons-material/Favorite'
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
+import { Container } from '@mui/system'
+import { IconUserCircle } from '@tabler/icons'
 import Notification from './Notification'
 import { changeSeverity } from '../reducers/severityReducer'
 import { getProfileData } from '../reducers/profileReducer'
 import profileService from '../services/profileService'
+
+const StyledRating = styled(Rating)({
+	'& .MuiRating-iconFilled': {
+		color: '#ff6d75',
+	},
+	'& .MuiRating-iconHover': {
+		color: '#ff3d47',
+	},
+})
+
+const theme = createTheme({
+	palette: {
+		primary: {
+			main: '#FF1E56',
+		},
+		secondary: {
+			main: '#F5F5F5',
+		},
+	}
+})
 
 export const ProfileSetUpForm = () => {
 	const dispatch = useDispatch()
@@ -128,6 +151,19 @@ export const ProfileSetUpForm = () => {
 
 }
 
+const ProfileInput = ({ text, input }) => {
+	return (
+		<Grid item xs={12} sm={6} sx={{ display: 'inline' }}>
+			<Typography sx={{ width: 170, display: 'inline-block', fontWeight: '700' }}>
+				{text}
+			</Typography>
+			<Typography sx={{ width: 'fit-content', display: 'inline' }}>
+				{input}
+			</Typography>
+		</Grid>
+	)
+}
+
 const Profile = () => {
 	const [isLoading, setLoading] = useState(true);
 	const dispatch = useDispatch()
@@ -139,6 +175,13 @@ const Profile = () => {
 		}
 		getData()
 	}, [dispatch])
+
+	const profilePicture = {
+		width: '100%',
+		aspectRatio: '1/1',
+		borderRadius: '50%',
+		objectFit: 'cover',
+	}
 
 	const profileData = useSelector(state => state.profile)
 
@@ -152,43 +195,77 @@ const Profile = () => {
 	const other_pictures = profileData.other_pictures
 	// console.log(other_pictures[0]['picture_id'])
 
+	const ProfileData = {
+		'First name:': profileData.firstname,
+		'Email address:': profileData.email,
+		'Last name:': profileData.lastname,
+		'Gender:': profileData.gender,
+		'Age:': profileData.age,
+		'Sexual preference:': profileData.sexual_pref,
+		'Location:': profileData.user_location
+	}
+
 	if (!profileData.id) {
-		return (
-			<>
-				<ProfileSetUpForm />
-			</>
-		)
+		return <ProfileSetUpForm />
 	} else {
 		return (
-			<>
-				<div id="profile_container">
-					<div id="picture_container">
-						<img key="789" alt="profile_picture" src={profile_pic} height="200px"></img>
+			<Container maxWidth='md' sx={{ pt: 5, pb: 5 }}>
+				<Paper elevation={10} sx={{ padding: 3 }}>
+					<Grid sx={{
+						display: 'flex',
+						alignContent: 'center',
+						alignItems: 'center',
+						justifyContent: 'center',
+						mb: 2,
+					}}>
+						<Box sx={{ width: '200px', display: 'inline-block' }}>
+							<img
+								src={profile_pic}
+								alt='profile'
+								style={profilePicture}
+							/>
+						</Box>
+						<Box sx={{ width: 'fit-content', ml: 5 }}>
+							<Typography variant='h2' align='center'>
+								{profileData.username}
+							</Typography>
+							<Typography variant='h5'>Fame Rating: {profileData.fame_rating}</Typography>
+							<StyledRating
+								name="read-only"
+								value={3.453}
+								precision={0.5}
+								icon={<FavoriteIcon fontSize="inherit" />}
+								emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
+								readOnly
+							/>
+						</Box>
+					</Grid>
+					<Grid container spacing={2} direction="row" sx={{mb: 2}}>
+						{Object.keys(ProfileData).map((key, index) => {
+							return <ProfileInput key={index} text={key} input={ProfileData[key]} />
+						})}
+					</Grid>
+					<Grid container sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+						<Typography sx={{ width: 'fit-content', fontWeight: '700' }}>
+							{"Biography: "}
+						</Typography>
+						<Grid item xs={12} sm={10}>
+						<Typography sx={{ width: 'fit-content' }}>
+							{profileData.biography}
+						</Typography>
+						</Grid>
+					</Grid>
+					<Button theme={theme}>Edit profile</Button>
+					<Button theme={theme}>Change password</Button>
+					<div id="other_pictures">
+						{other_pictures.map(picture =>
+							<div>
+								<img key={picture['picture_id']} alt="random_picture" height="100px" src={picture.picture_data}></img>
+							</div>
+						)}
 					</div>
-					<div id="profile_data">
-						<h1>{profileData.username}</h1>
-						<h3>Fame rating: {profileData.fame_rating}</h3>
-						<br></br>
-						<p>First name: {profileData.firstname}</p>
-						<p>Last name: {profileData.lastname}</p>
-						<p>Email address: {profileData.email}</p>
-						<p>Gender: {profileData.gender}</p>
-						<p>Age: {profileData.age}</p>
-						<p>Sexual preference: {profileData.sexual_pref}</p>
-						<p>Location: {profileData.user_location}</p>
-						<p>Biography: {profileData.biography}</p>
-						<br></br>
-						<button>Change password</button>
-					</div>
-				</div>
-				<div id="other_pictures">
-					{other_pictures.map(picture =>
-						<div>
-							<img key={picture['picture_id']} alt="random_picture" height="100px" src={picture.picture_data}></img>
-						</div>
-					)}
-				</div>
-			</>
+				</Paper>
+			</Container>
 		)
 	}
 }
