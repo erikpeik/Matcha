@@ -2,6 +2,29 @@ import { useSelector, useDispatch } from 'react-redux'
 import { setNotification } from '../../reducers/notificationReducer'
 import { useParams, useNavigate } from 'react-router-dom'
 import signUpService from '../../services/signUpService'
+import { Container, Paper, TextField, Typography, Button } from '@mui/material'
+import { createTheme } from '@mui/material/styles'
+import { IconMailForward } from '@tabler/icons';
+import Notification from '../Notification'
+
+const imageStyle = {
+	width: '100px',
+	display: 'relative',
+	marginLeft: 'calc(50% + 5px)',
+	transform: 'translate(-50%)',
+	filter: 'drop-shadow(0px 0px 3px rgb(241 25 38 / 0.8))',
+}
+
+const theme = createTheme({
+	palette: {
+		primary: {
+			main: '#FF1E56',
+		},
+		secondary: {
+			main: '#F5F5F5',
+		},
+	}
+})
 
 export const SetNewPassword = () => {
 	const dispatch = useDispatch()
@@ -77,18 +100,27 @@ const ResetPasswordForm = () => {
 	}
 
 	return (
-		<>
-			<h2>Reset password</h2>
-			<form onSubmit={sendPasswordMail}>
-				<p>Please enter either your username or e-mail address to reset your password.</p>
-				<br></br>
-				<div><input type="text" name="reset" placeholder="Username / Email address" size="30" autoComplete="off" required></input></div>
-				<button type="submit">Reset password</button>
-			</form>
-			<p>{notification}</p>
-		</>
+		<Container maxWidth='sm' sx={{ pt: 5, pb: 5 }}>
+			<Paper elevation={10} sx={{ p: 3 }}>
+				<IconMailForward size={100} color="#F11926" style={imageStyle} />
+				<Typography variant='h5' align='center' sx={{ frontWeight: 550 }}>
+					Reset Password
+				</Typography>
+				<Typography align='center'>
+					Please enter either your username or e-mail address to reset your password.
+				</Typography>
+				<form onSubmit={sendPasswordMail}>
+					<TextField fullWidth margin='normal' name='reset' size="30"
+						placeholder="Username / Email address"
+						label="Username / Email address"
+						autoComplete='email' required
+					/>
+					<Button type="submit" theme={theme} size='large' sx={{ mt: 1 }}>Reset password</Button>
+				</form>
+				<Notification />
+			</Paper>
+		</Container>
 	)
-
 }
 
 export default ResetPasswordForm
