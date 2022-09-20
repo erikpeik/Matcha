@@ -160,7 +160,7 @@ const Profile = () => {
 			<>
 				<div id="profile_container">
 					<div id="picture_container">
-						<img key="profile_picture" alt="profile_picture" src={profile_pic} height="200px"></img>
+						<img key={profileData.profile_pic.picture_id} alt="profile_picture" src={profile_pic} height="200px"></img>
 					</div>
 					<div id="profile_data">
 						<h1>{profileData.username}</h1>

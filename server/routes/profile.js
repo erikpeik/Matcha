@@ -31,7 +31,7 @@ module.exports = (app, pool, session) => {
 			var profile_pic = await pool.query(sql, [sess.userid])
 
 			if (profile_pic.rows[0]) {
-				profileData.profile_pic = profile_pic.rows[0]['picture_data']
+				profileData.profile_pic = profile_pic.rows[0]
 			}
 			// console.log(profile_pic.rows[0]['picture_data'])
 
