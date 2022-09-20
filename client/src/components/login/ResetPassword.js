@@ -74,8 +74,6 @@ const ResetPasswordForm = () => {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 
-	const notification = useSelector(state => state.notification)
-
 	const sendPasswordMail = (event) => {
 		event.preventDefault()
 		console.log("Sending password reset mail!")
