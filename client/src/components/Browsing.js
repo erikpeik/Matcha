@@ -11,7 +11,7 @@ const Browsing = () => {
 	const [users, setUsers] = useState([])
 	const [searchCriteria, setSearchCriteria] = useState({
 		min_age: 18,
-		max_age: 99,
+		max_age: 120,
 		min_fame: 0,
 		max_fame: 100,
 		min_distance: 0,
@@ -19,83 +19,77 @@ const Browsing = () => {
 		location: 'any',
 		sorting: 'age',
 		sort_order: 'asc',
-		amount: 2,
+		amount: 10,
+		page: 1,
+		offset: 0
 	})
 
 	useEffect(() => {
-		const getAllUsers = async () => {
-			const fetchedUsers = await browsingService.getAll()
-			if (fetchedUsers[0]) {
-				console.log("Fetched users: ", fetchedUsers)
-				setUsers(fetchedUsers)
-				// console.log(fetchedUsers)
+		const getUsers = async () => {
+			var sortedUsers = await browsingService.getSortedUsers(searchCriteria)
+			if (sortedUsers[0]) {
+				console.log("Fetched users: ", sortedUsers)
+				setUsers(sortedUsers)
 				setLoading(false);
 			}
 		}
-		getAllUsers()
-	}, [])
+		getUsers()
+	}, [searchCriteria])
 
-	const handleAmount = async (event) => {
-		const searchValues = { ...searchCriteria, amount: event.target.value }
-		var sortedUsers = await browsingService.getSortedUsers(searchValues)
-		setSearchCriteria(searchValues)
-		if (sortedUsers[0])
-			setUsers(sortedUsers)
+	const handleAmount = (event) => {
+		setSearchCriteria({ ...searchCriteria, amount: event.target.value })
 	}
 
-	const handleSorting = async (event) => {
-		const searchValues = { ...searchCriteria, sorting: event.target.value }
-		var sortedUsers = await browsingService.getSortedUsers(searchValues)
-		setSearchCriteria(searchValues)
-		if (sortedUsers[0])
-			setUsers(sortedUsers)
+	const handleSorting = (event) => {
+		setSearchCriteria({ ...searchCriteria, sorting: event.target.value })
 	}
 
-	const handleSortOrder = async (event) => {
-		const searchValues = { ...searchCriteria, sort_order: event.target.value }
-		var sortedUsers = await browsingService.getSortedUsers(searchValues)
-		setSearchCriteria(searchValues)
-		if (sortedUsers[0])
-			setUsers(sortedUsers)
+	const handleSortOrder = (event) => {
+		setSearchCriteria({ ...searchCriteria, sort_order: event.target.value })
 	}
 
-	const handleAgeSlider = async (event) => {
-		const searchValues = { ...searchCriteria, min_age: event.target.value[0], max_age: event.target.value[1] }
-		var sortedUsers = await browsingService.getSortedUsers(searchValues)
-		setSearchCriteria(searchValues)
-		if (sortedUsers[0])
-			setUsers(sortedUsers)
+	const handleAgeSlider = (event) => {
+		setSearchCriteria({ ...searchCriteria, min_age: event.target.value[0], max_age: event.target.value[1] })
 	}
 
-	const handleFameSlider = async (event) => {
-		const searchValues = { ...searchCriteria, min_fame: event.target.value[0], max_fame: event.target.value[1] }
-		var sortedUsers = await browsingService.getSortedUsers(searchValues)
-		setSearchCriteria(searchValues)
-		if (sortedUsers[0])
-			setUsers(sortedUsers)
+	const handleFameSlider = (event) => {
+		setSearchCriteria({ ...searchCriteria, min_fame: event.target.value[0], max_fame: event.target.value[1] })
 	}
 
-	const handleDistanceSlider = async (event) => {
-		const searchValues = { ...searchCriteria, min_distance: event.target.value[0], max_distance: event.target.value[1] }
-		var sortedUsers = await browsingService.getSortedUsers(searchValues)
-		setSearchCriteria(searchValues)
-		if (sortedUsers[0])
-			setUsers(sortedUsers)
+	const handleDistanceSlider = (event) => {
+		setSearchCriteria({ ...searchCriteria, min_distance: event.target.value[0], max_distance: event.target.value[1] })
+	}
+
+	const handlePageChange = (page) => {
+		setSearchCriteria({ ...searchCriteria, page: page, offset: (page - 1) * searchCriteria.amount})
 	}
 
 	if (isLoading) {
 		return <Loader />;
 	} else {
 		const profile_pic = require('../images/demo_profilepic.jpeg')
+		console.log("amount we got: ", users.length)
+		console.log("amount we wanted: ", searchCriteria.amount)
+		console.log("offset: ", searchCriteria.offset)
 		return (
 			<Container maxWidth='md' sx={{ pt: 5, pb: 5 }}>
 				<Paper elevation={10} sx={{ p: 3 }}>
+					<div className="pagination">
+						<button onClick={() => handlePageChange(1)}>First</button>
+						<button onClick={() => handlePageChange( searchCriteria.page - 1)}>&laquo;</button>
+						<>		Page {searchCriteria.page} / {users.length / searchCriteria.amount}		</>
+						<button onClick={() => handlePageChange( searchCriteria.page + 1)}>&raquo;</button>
+						<button onClick={() => handlePageChange(users.length / searchCriteria.amount)}>Last</button>
+					</div>
+					<br></br>
 					<FormControl fullWidth sx={{ mb: 2 }}>
-						<InputLabel id='amount'>Amount of results:</InputLabel>
+						<InputLabel id='amount'>Amount of results per page:</InputLabel>
 						<Select labelId='amount' id='amount' name='amount' value={searchCriteria.amount} onChange={handleAmount} required>
-							{[...Array(5).keys()].map((i) => (
-								<MenuItem value={i + 1} key={i + 1}>{i + 1}</MenuItem>
-							))}
+							<MenuItem value={10} key={10}>{10}</MenuItem>
+							<MenuItem value={50} key={50}>{50}</MenuItem>
+							<MenuItem value={100} key={100}>{100}</MenuItem>
+							<MenuItem value={250} key={250}>{250}</MenuItem>
+							<MenuItem value={500} key={500}>{500}</MenuItem>
 						</Select>
 					</FormControl>
 					<Box sx={{ width: 300 }}>
@@ -136,7 +130,7 @@ const Browsing = () => {
 						<FormLabel id='sorted_by'>Results sorted by:</FormLabel>
 						<RadioGroup row aria-labelledby='sorted_by' name='sorted_by' value={searchCriteria.sorting} onChange={handleSorting}>
 							<FormControlLabel value='age' control={<Radio />} label='Age' />
-							<FormControlLabel value='user_location' control={<Radio />} label='Location' />
+							<FormControlLabel value='distance' control={<Radio />} label='Distance' />
 							<FormControlLabel value='fame_rating' control={<Radio />} label='Fame Rating' />
 							<FormControlLabel value='common_tags' control={<Radio />} label='Common tags' />
 						</RadioGroup>
