@@ -26,7 +26,9 @@ const Browsing = () => {
 
 	useEffect(() => {
 		const getUsers = async () => {
-			var sortedUsers = await browsingService.getSortedUsers(searchCriteria)
+			const { total_results: totalResults, ...sortedUsersObj} = await browsingService.getSortedUsers(searchCriteria)
+			console.log("Total results: ", totalResults)
+			const sortedUsers = Object.values(sortedUsersObj)
 			if (sortedUsers[0]) {
 				console.log("Fetched users: ", sortedUsers)
 				setUsers(sortedUsers)
@@ -77,7 +79,7 @@ const Browsing = () => {
 					<div className="pagination">
 						<button onClick={() => handlePageChange(1)}>First</button>
 						<button onClick={() => handlePageChange( searchCriteria.page - 1)}>&laquo;</button>
-						<>		Page {searchCriteria.page} / {users.length / searchCriteria.amount}		</>
+						<>		Page {searchCriteria.page} / { users.length / searchCriteria.amount}		</>
 						<button onClick={() => handlePageChange( searchCriteria.page + 1)}>&raquo;</button>
 						<button onClick={() => handlePageChange(users.length / searchCriteria.amount)}>Last</button>
 					</div>

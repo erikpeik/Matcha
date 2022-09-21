@@ -71,9 +71,9 @@ module.exports = (app, pool, session) => {
 				var length = rows.length
 				console.log("Amount of results: ", length)
 				var selectedRows = rows.slice(body.offset, body.offset + body.amount)
-				// var returnRows = {...selectedRows, total_results: length}
-				console.log("Browsing Data To Show: ", selectedRows)
-				response.send(selectedRows)
+				var returnRows = {...selectedRows, total_results: length}
+				console.log("Browsing Data To Show: ", returnRows)
+				response.send(returnRows)
 			} else {
 				response.send({})
 			}
