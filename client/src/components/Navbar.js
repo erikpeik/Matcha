@@ -52,14 +52,12 @@ const UserMenu = ({ user }) => {
 				onClose={handleCloseUserMenu}
 			>
 				{
-					Object.keys(settings).map((setting) => {
-						return (
-							<MenuItem key={setting} onClick={handleCloseUserMenu}
-								component={Link} to={settings[setting]}>
-								{setting}
-							</MenuItem>
-						)
-					})
+					Object.keys(settings).map(setting =>
+						<MenuItem key={setting} onClick={handleCloseUserMenu}
+							component={Link} to={settings[setting]}>
+							{setting}
+						</MenuItem>
+					)
 				}
 			</Menu>
 			<Tooltip title="Open settings">
@@ -74,11 +72,20 @@ const UserMenu = ({ user }) => {
 
 
 const NavBar = () => {
-	const [anchorElNav, setAnchorElNav] = useState(null);
+	const [anchorElNav, setAnchorElNav] = useState(null)
+	const [userLoading, setLoading] = useState(true);
 
-	const user = useSelector(state => state.user)
+	const user = useSelector(state => {
+		if (userLoading)
+			setLoading(false)
+		return (state.user)
+	})
+
 	let pages = {}
-	if (user === undefined || user === '') {
+
+	if (userLoading) {
+		return (<></>)
+	} else if (user === '') {
 		pages = {
 			'Login': '/login',
 			'Signup': '/signup',

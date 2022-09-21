@@ -23,11 +23,14 @@ const Browsing = () => {
 	})
 
 	useEffect(() => {
-		const getAllUsers = async (users) => {
+		const getAllUsers = async () => {
 			const fetchedUsers = await browsingService.getAll()
-			setUsers(fetchedUsers)
-			// console.log(fetchedUsers)
-			setLoading(false);
+			if (fetchedUsers[0]) {
+				console.log("Fetched users: ", fetchedUsers)
+				setUsers(fetchedUsers)
+				// console.log(fetchedUsers)
+				setLoading(false);
+			}
 		}
 		getAllUsers()
 	}, [])
@@ -36,42 +39,48 @@ const Browsing = () => {
 		const searchValues = { ...searchCriteria, amount: event.target.value }
 		var sortedUsers = await browsingService.getSortedUsers(searchValues)
 		setSearchCriteria(searchValues)
-		setUsers(sortedUsers)
+		if (sortedUsers[0])
+			setUsers(sortedUsers)
 	}
 
 	const handleSorting = async (event) => {
 		const searchValues = { ...searchCriteria, sorting: event.target.value }
 		var sortedUsers = await browsingService.getSortedUsers(searchValues)
 		setSearchCriteria(searchValues)
-		setUsers(sortedUsers)
+		if (sortedUsers[0])
+			setUsers(sortedUsers)
 	}
 
 	const handleSortOrder = async (event) => {
 		const searchValues = { ...searchCriteria, sort_order: event.target.value }
 		var sortedUsers = await browsingService.getSortedUsers(searchValues)
 		setSearchCriteria(searchValues)
-		setUsers(sortedUsers)
+		if (sortedUsers[0])
+			setUsers(sortedUsers)
 	}
 
 	const handleAgeSlider = async (event) => {
 		const searchValues = { ...searchCriteria, min_age: event.target.value[0], max_age: event.target.value[1] }
 		var sortedUsers = await browsingService.getSortedUsers(searchValues)
 		setSearchCriteria(searchValues)
-		setUsers(sortedUsers)
+		if (sortedUsers[0])
+			setUsers(sortedUsers)
 	}
 
 	const handleFameSlider = async (event) => {
 		const searchValues = { ...searchCriteria, min_fame: event.target.value[0], max_fame: event.target.value[1] }
 		var sortedUsers = await browsingService.getSortedUsers(searchValues)
 		setSearchCriteria(searchValues)
-		setUsers(sortedUsers)
+		if (sortedUsers[0])
+			setUsers(sortedUsers)
 	}
 
 	const handleDistanceSlider = async (event) => {
 		const searchValues = { ...searchCriteria, min_distance: event.target.value[0], max_distance: event.target.value[1] }
 		var sortedUsers = await browsingService.getSortedUsers(searchValues)
 		setSearchCriteria(searchValues)
-		setUsers(sortedUsers)
+		if (sortedUsers[0])
+			setUsers(sortedUsers)
 	}
 
 	if (isLoading) {
@@ -125,7 +134,7 @@ const Browsing = () => {
 					</Box>
 					<FormControl sx={{ mb: 2 }}>
 						<FormLabel id='sorted_by'>Results sorted by:</FormLabel>
-						<RadioGroup row aria-labelledby='sorted_by' name='sorted_by' onChange={handleSorting}>
+						<RadioGroup row aria-labelledby='sorted_by' name='sorted_by' value={searchCriteria.sorting} onChange={handleSorting}>
 							<FormControlLabel value='age' control={<Radio />} label='Age' />
 							<FormControlLabel value='user_location' control={<Radio />} label='Location' />
 							<FormControlLabel value='fame_rating' control={<Radio />} label='Fame Rating' />
@@ -135,18 +144,18 @@ const Browsing = () => {
 					<Box>
 						<FormControl sx={{ mb: 2 }}>
 							<FormLabel id='asc_desc'></FormLabel>
-							<RadioGroup row aria-labelledby='asc_desc' name='asc_desc' onChange={handleSortOrder}>
+							<RadioGroup row aria-labelledby='asc_desc' name='asc_desc' value={searchCriteria.sort_order} onChange={handleSortOrder}>
 								<FormControlLabel value='asc' control={<Radio />} label='Ascending' />
 								<FormControlLabel value='desc' control={<Radio />} label='Descending' />
 							</RadioGroup>
 						</FormControl>
 					</Box>
 					{users.map(user =>
-						<div id="profile_container">
-							<div id="picture_container">
-								<img key={user.uniqueId} alt="profile_picture" src={profile_pic} height="200px"></img>
+						<div key={`profile_container${user.id}`} id="profile_container">
+							<div key={`picture_container${user.id}`} id="picture_container">
+								<img key={user.id} alt="profile_picture" src={profile_pic} height="200px"></img>
 							</div>
-							<div id="profile_data">
+							<div key={`profile_data${user.id}`} id="profile_data">
 								<h1>{user.username}</h1>
 								<h3>Fame rating: {user.fame_rating}</h3>
 								<br></br>

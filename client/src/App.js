@@ -13,9 +13,9 @@ import Profile, { ProfileSetUpForm } from './components/Profile'
 import Browsing from './components/Browsing'
 import NavBar from './components/Navbar'
 import Footer from './components/Footer'
+import Redirect from './components/Redirect'
 import ConfirmMail from './components/login/ConfirmMail'
 import ResetPassword, { SetNewPassword } from './components/login/ResetPassword'
-// import CheckLocation from './components/CheckLocation'
 import "./css/App.css"
 
 const MainContainer = () => {
@@ -56,10 +56,10 @@ const App = () => {
 
 	return <div className='content-wrap'>
 		<Router>
-			{/* <CheckLocation /> */}
+			<Redirect />
 			<NavBar />
 			<Routes>
-				<Route path="/" element={<Login />} />
+				<Route path="/" element={<Profile />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/login/resetpassword" element={<ResetPassword />} />
 				<Route path="/resetpassword/:user/:code" element={<SetNewPassword />} />

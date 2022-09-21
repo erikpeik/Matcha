@@ -259,9 +259,9 @@ const Profile = () => {
 					<Button theme={theme}>Edit profile</Button>
 					<Button theme={theme}>Change password</Button>
 					<div id="other_pictures">
-						{other_pictures.map(picture =>
-							<div>
-								<img key={picture['picture_id']} alt="random_picture" height="100px" src={picture.picture_data}></img>
+						{other_pictures.map((picture, i) =>
+							<div key={i}>
+								<img key={picture.picture_id} alt="random_picture" height="100px" src={picture.picture_data}></img>
 							</div>
 						)}
 					</div>
