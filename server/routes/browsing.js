@@ -57,7 +57,7 @@ module.exports = (app, pool, session) => {
 						LEFT JOIN user_pictures ON users.id = user_pictures.user_id
 						WHERE users.id != $1
 						AND age BETWEEN $2 and $3 AND fame_rating BETWEEN $4 AND $5
-						AND 'calculate_distance($9, $10, ip_location[0], ip_location[1], 'K')' BETWEEN $11 and $12
+						AND calculate_distance($9, $10, ip_location[0], ip_location[1], 'K') BETWEEN $11 and $12
 						ORDER BY (CASE WHEN $6 = 'age' AND $7 = 'asc' THEN age END) ASC,
 								(CASE WHEN $6 = 'age' AND $7 = 'desc' THEN age END) DESC,
 								(CASE WHEN $6 = 'user_location' AND $7 = 'asc' THEN user_location END) ASC,
