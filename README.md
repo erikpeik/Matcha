@@ -1,10 +1,10 @@
-# Matcha - Dating Site
+# Matcha - Dating Site 
 <img height='100px' src="https://raw.githubusercontent.com/erikpeik/Matcha/master/client/src/images/matcha_logo.svg" />
 
 ## 💼 Made by [SeanTroy](https://github.com/SeanTroy) and [erikpeik](https://github.com/erikpeik)
 
 ### Matcha is a dating site where you can find your soulmate
-
+### ⚠️ Work in Progress! Project is not finished yet. ⚠️
 ## 🎯 Projects goal:
 It's a project for the Web branch of the 42 school curriculum. The goal of the project is to create a dating site from scratch using Node.js, Express, React, Redux, and PostgreSQL.
 
@@ -33,7 +33,7 @@ Works like most of dating apps, but here are some of the features:
 Please make sure you have [Docker](https://www.docker.com/) installed on your machine.
 
 1. Clone the repository
-2. `.env` file is required to run the project in the root directory.
+2. Create `.env` file is required to run the project in the root directory.
 ```
 EMAIL_ADDRESS = <your email address>
 EMAIL_PASSWORD = <your email password>
