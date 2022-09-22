@@ -11,6 +11,11 @@ const getProfileData = () => {
 	return request.then(response => response.data)
 }
 
-const profileService = { setUpProfile, getProfileData }
+const uploadPicture = Picture => {
+	const request = axios.post(`${baseUrl}/imageupload`, Picture)
+	return request.then(response => response.data)
+}
+
+const profileService = { setUpProfile, getProfileData, uploadPicture }
 
 export default profileService

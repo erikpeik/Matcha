@@ -7,8 +7,12 @@ var nodemailer = require('nodemailer'); // middleware to send e-mails
 const cors = require('cors') // Cross-origin resource sharing (CORS) middleware is required to allow requests from other origins
 const bcrypt = require("bcrypt") // For password hashing and comparing
 const session = require('express-session'); // for session management
+const multer = require('multer') // for image upload and storage
+const fs = require('fs'); // for base64 conversion of images
+const path = require('path')
 app.use(cors())
 app.use(express.static('build')) // express checks if the 'build' directory contains the requested file
+app.use('/images', express.static('./images')) // to serve static files to path /images, from images folder
 app.use(session({ secret: 'matchac2r2p6', saveUninitialized: true, resave: true }));
 
 morgan.token('body', request => {
@@ -34,10 +38,21 @@ var transporter = nodemailer.createTransport({
 	}
 });
 
+const storage = multer.diskStorage({
+	destination: (req, file, cb) => {
+		cb(null, 'images/')
+	},
+	filename: (req, file, cb) => {
+		cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname))
+	},
+})
+// const storage = multer.memoryStorage()
+const upload = multer({ storage: storage })
+
 require('./routes/signup.js')(app, pool, bcrypt, transporter);
 require('./routes/login_logout.js')(app, pool, session, bcrypt)
 require('./routes/resetpassword.js')(app, pool, bcrypt, transporter)
-require('./routes/profile.js')(app, pool, session)
+require('./routes/profile.js')(app, pool, session, upload, fs, path)
 require('./routes/browsing.js')(app, pool, session)
 
 const PORT = process.env.PORT || 3001

@@ -51,3 +51,13 @@ body {
 #other_pictures {
 	display: flex
 }
+
+/* for image upload */
+
+input[type=file] {
+	display: none;
+}
+
+.styled-image-upload {
+	cursor: pointer;
+}

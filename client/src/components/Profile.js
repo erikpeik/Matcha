@@ -192,10 +192,10 @@ const Profile = () => {
 	}
 
 	// console.log(profileData.profile_pic['picture_data'])
-	// const profile_pic = require(`${profileData.profile_pic['picture_data']}`)
-	const profile_pic = require('../images/demo_profilepic.jpeg')
+	const profile_pic = profileData.profile_pic['picture_data']
+	// const profile_pic = require('../images/demo_profilepic.jpeg')
 	const other_pictures = profileData.other_pictures
-	// console.log(other_pictures[0]['picture_id'])
+	// console.log(other_pictures)
 
 	const ProfileData = {
 		'First name:': profileData.firstname,
@@ -205,6 +205,20 @@ const Profile = () => {
 		'Age:': profileData.age,
 		'Sexual preference:': profileData.sexual_pref,
 		'Location:': profileData.user_location
+	}
+
+	const deleteImage = (id) => {
+		console.log("Deleted image: ", id)
+	}
+
+	const handleImageUpload = async (event) => {
+		const image = event.target.files[0]
+
+		let formData = new FormData()
+		formData.append('file', image)
+		await profileService.uploadPicture(formData)
+		dispatch(getProfileData())
+		event.target.value = ''
 	}
 
 	if (!profileData.id) {
@@ -242,7 +256,7 @@ const Profile = () => {
 							/>
 						</Box>
 					</Grid>
-					<Grid container spacing={1} direction="row" sx={{mb: 2}}>
+					<Grid container spacing={1} direction="row" sx={{ mb: 2 }}>
 						{Object.keys(ProfileData).map((key, index) => {
 							return <ProfileInput key={index} text={key} input={ProfileData[key]} />
 						})}
@@ -252,17 +266,31 @@ const Profile = () => {
 							{"Biography: "}
 						</Typography>
 						<Grid item xs={12} sm={10}>
-						<Typography sx={{ width: 'fit-content' }}>
-							{profileData.biography}
-						</Typography>
+							<Typography sx={{ width: 'fit-content' }}>
+								{profileData.biography}
+							</Typography>
 						</Grid>
 					</Grid>
 					<Button theme={theme}>Edit profile</Button>
 					<Button theme={theme}>Change password</Button>
+					<Button theme={theme}>
+						<label htmlFor="image-upload" className="styled-image-upload">
+							Change profile picture
+							<input type="file" name="file" id="image-upload" accept="image/jpeg, image/png, image/jpg" onChange={handleImageUpload}></input>
+						</label>
+					</Button>
 					<div id="other_pictures">
 						{other_pictures.map((picture, i) =>
 							<div key={i}>
-								<img key={picture.picture_id} alt="random_picture" height="100px" src={picture.picture_data}></img>
+								<label htmlFor="image-upload" className="styled-image-upload">
+									<img key={picture.picture_id} alt="random_picture" height="100px" src={picture.picture_data}></img>
+								</label>
+								<input key={picture.picture_id} type="file" name="file" id="image-upload" accept="image/jpeg, image/png, image/jpg"
+									onChange={(event, picture) => {
+										event.preventDefault()
+										deleteImage(picture.picture_id)
+										handleImageUpload()
+									}}></input>
 							</div>
 						)}
 					</div>
