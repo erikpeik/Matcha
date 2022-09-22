@@ -65,15 +65,16 @@ module.exports = (app, pool, session) => {
 								(CASE WHEN $6 = 'distance' AND $7 = 'desc'
 									THEN calculate_distance($8, $9, ip_location[0], ip_location[1], 'K') END) DESC,
 								(CASE WHEN $6 = 'fame_rating' AND $7 = 'asc' THEN fame_rating END) ASC,
-								(CASE WHEN $6 = 'fame_rating' AND $7 = 'desc' THEN fame_rating END) DESC`
+								(CASE WHEN $6 = 'fame_rating' AND $7 = 'desc' THEN fame_rating END) DESC, username`
 				var { rows } = await pool.query(sql, variables)
 				// console.log("Browsing Data: ", rows)
-				var length = rows.length
-				console.log("Amount of results: ", length)
+				// var length = rows.length
+				console.log("Amount of results: ", rows.length)
 				var selectedRows = rows.slice(body.offset, body.offset + body.amount)
-				var returnRows = {...selectedRows, total_results: length}
-				console.log("Browsing Data To Show: ", returnRows)
-				response.send(returnRows)
+				// selectedRows[0].push({total_results: rows.length})
+				// var returnRows = {...selectedRows, total_results: length}
+				console.log("Browsing Data To Show: ", selectedRows)
+				response.send(selectedRows)
 			} else {
 				response.send({})
 			}

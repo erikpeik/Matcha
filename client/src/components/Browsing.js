@@ -26,14 +26,12 @@ const Browsing = () => {
 
 	useEffect(() => {
 		const getUsers = async () => {
-			const { total_results: totalResults, ...sortedUsersObj} = await browsingService.getSortedUsers(searchCriteria)
-			console.log("Total results: ", totalResults)
-			const sortedUsers = Object.values(sortedUsersObj)
-			if (sortedUsers[0]) {
-				console.log("Fetched users: ", sortedUsers)
-				setUsers(sortedUsers)
-				setLoading(false);
-			}
+			const sortedUsers = await browsingService.getSortedUsers(searchCriteria)
+			// console.log("Total results: ", sortedUsers[0].total_results)
+			// const sortedUsers = Object.values(sortedUsersObj)
+			console.log("Fetched users: ", sortedUsers)
+			setUsers(sortedUsers)
+			setLoading(false);
 		}
 		getUsers()
 	}, [searchCriteria])
