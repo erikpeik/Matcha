@@ -57,9 +57,15 @@ const Signup = () => {
 			if (result === true) {
 				signUpService
 					.createUser(signedUpUser)
-					.then(responseData => {
-						dispatch(changeSeverity('success'))
-						dispatch(changeNotification("User created successfully!"))
+					.then(result => {
+						if (result === true) {
+							console.log(result)
+							dispatch(changeSeverity('success'))
+							dispatch(changeNotification("User created successfully! Please check your inbox for confirmation e-mail."))
+						} else {
+							dispatch(changeSeverity('error'))
+							dispatch(changeNotification(result))
+						}
 					})
 			} else {
 				dispatch(changeSeverity('error'))

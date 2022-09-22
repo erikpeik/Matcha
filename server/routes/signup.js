@@ -58,7 +58,7 @@ module.exports = function (app, pool, bcrypt, transporter) {
 				return
 			} catch (error) {
 				console.log("ERROR :", error)
-				throw (error)
+				throw ("User creation failed!")
 			}
 		}
 
@@ -110,7 +110,7 @@ module.exports = function (app, pool, bcrypt, transporter) {
 		saveHashedUser().then(() => createVerifyCode())
 			.then((code) => sendConfirmationMail(email, code))
 			.then(() => {
-				response.send("New user created!")
+				response.send(true)
 			}).catch((error) => {
 				response.send(error)
 			})
