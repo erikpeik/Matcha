@@ -67,6 +67,7 @@ export const ProfileSetUpForm = () => {
 			if (result === true) {
 				dispatch(changeSeverity('success'))
 				dispatch(changeNotification("Profile Settings Updated"))
+				dispatch(getProfileData())
 				navigate('/profile')
 			} else {
 				dispatch(changeSeverity('error'))
