@@ -15,14 +15,12 @@ import NavBar from './components/Navbar'
 import Footer from './components/Footer'
 import Redirect from './components/Redirect'
 import ConfirmMail from './components/login/ConfirmMail'
+import Chat from './components/Chat'
 import ResetPassword, { SetNewPassword } from './components/login/ResetPassword'
 import "./css/App.css"
 
-const MainContainer = () => {
-	return (
-		<h2>page coming soon...</h2>
-	)
-}
+import socketIO from 'socket.io-client';
+const socket = socketIO.connect('http://localhost:3001');
 
 const Logout = () => {
 	const dispatch = useDispatch()
@@ -68,7 +66,7 @@ const App = () => {
 				<Route path="/confirm/:user/:code" element={<ConfirmMail />} />
 				<Route path="/profile" element={<Profile />} />
 				<Route path="/browsing" element={<Browsing />} />
-				<Route path="/chat" element={<MainContainer />} />
+				<Route path="/chat" element={<Chat socket={socket} />} />
 				<Route path="/logout" element={<Logout />} />
 			</Routes>
 		</Router>

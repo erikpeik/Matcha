@@ -14,6 +14,7 @@ app.use(cors())
 app.use(express.static('build')) // express checks if the 'build' directory contains the requested file
 app.use('/images', express.static('./images')) // to serve static files to path /images, from images folder
 app.use(session({ secret: 'matchac2r2p6', saveUninitialized: true, resave: true }));
+const http = require('http').Server(app)
 
 morgan.token('body', request => {
 	return JSON.stringify(request.body)
@@ -54,8 +55,10 @@ require('./routes/login_logout.js')(app, pool, session, bcrypt)
 require('./routes/resetpassword.js')(app, pool, bcrypt, transporter)
 require('./routes/profile.js')(app, pool, session, upload, fs, path)
 require('./routes/browsing.js')(app, pool, session)
+require('./routes/chat.js')(http)
 
 const PORT = process.env.PORT || 3001
-app.listen(PORT, () => {
-	console.log(`Server running on port ${PORT}`)
+
+http.listen(PORT, () => {
+	console.log(`Server listening on ${PORT}`)
 })
