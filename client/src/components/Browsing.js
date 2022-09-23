@@ -29,9 +29,11 @@ const Browsing = () => {
 			const sortedUsers = await browsingService.getSortedUsers(searchCriteria)
 			// console.log("Total results: ", sortedUsers[0].total_results)
 			// const sortedUsers = Object.values(sortedUsersObj)
-			console.log("Fetched users: ", sortedUsers)
-			setUsers(sortedUsers)
-			setLoading(false);
+			if (sortedUsers) {
+				console.log("Fetched users: ", sortedUsers)
+				setUsers(sortedUsers)
+				setLoading(false);
+			}
 		}
 		getUsers()
 	}, [searchCriteria])
@@ -61,7 +63,7 @@ const Browsing = () => {
 	}
 
 	const handlePageChange = (page) => {
-		setSearchCriteria({ ...searchCriteria, page: page, offset: (page - 1) * searchCriteria.amount})
+		setSearchCriteria({ ...searchCriteria, page: page, offset: (page - 1) * searchCriteria.amount })
 	}
 
 	if (isLoading) {
@@ -76,9 +78,9 @@ const Browsing = () => {
 				<Paper elevation={10} sx={{ p: 3 }}>
 					<div className="pagination">
 						<button onClick={() => handlePageChange(1)}>First</button>
-						<button onClick={() => handlePageChange( searchCriteria.page - 1)}>&laquo;</button>
-						<>		Page {searchCriteria.page} / { users.length / searchCriteria.amount}		</>
-						<button onClick={() => handlePageChange( searchCriteria.page + 1)}>&raquo;</button>
+						<button onClick={() => handlePageChange(searchCriteria.page - 1)}>&laquo;</button>
+						<>		Page {searchCriteria.page} / {users.length / searchCriteria.amount}		</>
+						<button onClick={() => handlePageChange(searchCriteria.page + 1)}>&raquo;</button>
 						<button onClick={() => handlePageChange(users.length / searchCriteria.amount)}>Last</button>
 					</div>
 					<br></br>

@@ -169,6 +169,7 @@ const ProfileInput = ({ text, input }) => {
 const Profile = () => {
 	const [isLoading, setLoading] = useState(true);
 	const dispatch = useDispatch()
+	const profileData = useSelector(state => state.profile)
 
 	useEffect(() => {
 		const getData = async () => {
@@ -185,15 +186,12 @@ const Profile = () => {
 		objectFit: 'cover',
 	}
 
-	const profileData = useSelector(state => state.profile)
-
-	if (isLoading) {
+	if (isLoading || !profileData) {
 		return <Loader />
 	}
 
 	// console.log(profileData.profile_pic['picture_data'])
 	const profile_pic = profileData.profile_pic['picture_data']
-	// const profile_pic = require('../images/demo_profilepic.jpeg')
 	const other_pictures = profileData.other_pictures
 	// console.log(other_pictures)
 
@@ -207,8 +205,12 @@ const Profile = () => {
 		'Location:': profileData.user_location
 	}
 
-	const deleteImage = (id) => {
-		console.log("Deleted image: ", id)
+	const deleteImage = async (id) => {
+		if (window.confirm("Are you sure you want to delete this beautiful picture?")) {
+			await profileService.deletePicture(id)
+			dispatch(getProfileData())
+			console.log("Deleted image: ", id)
+		}
 	}
 
 	const handleImageUpload = async (event) => {
@@ -216,7 +218,22 @@ const Profile = () => {
 
 		let formData = new FormData()
 		formData.append('file', image)
-		await profileService.uploadPicture(formData)
+		const result = await profileService.uploadPicture(formData)
+		if (result === true) {
+			dispatch(getProfileData())
+		} else {
+			dispatch(changeSeverity('error'))
+			dispatch(changeNotification(result))
+		}
+		event.target.value = ''
+	}
+
+	const setProfilePicture = async (event) => {
+		const image = event.target.files[0]
+
+		let formData = new FormData()
+		formData.append('file', image)
+		await profileService.setProfilePic(formData)
 		dispatch(getProfileData())
 		event.target.value = ''
 	}
@@ -276,24 +293,24 @@ const Profile = () => {
 					<Button theme={theme}>
 						<label htmlFor="image-upload" className="styled-image-upload">
 							Change profile picture
-							<input type="file" name="file" id="image-upload" accept="image/jpeg, image/png, image/jpg" onChange={handleImageUpload}></input>
+							<input type="file" name="file" id="image-upload" accept="image/jpeg, image/png, image/jpg" onChange={setProfilePicture}></input>
 						</label>
 					</Button>
 					<div id="other_pictures">
 						{other_pictures.map((picture, i) =>
 							<div key={i}>
-								<label htmlFor="image-upload" className="styled-image-upload">
-									<img key={picture.picture_id} alt="random_picture" height="100px" src={picture.picture_data}></img>
-								</label>
-								<input key={picture.picture_id} type="file" name="file" id="image-upload" accept="image/jpeg, image/png, image/jpg"
-									onChange={(event, picture) => {
-										event.preventDefault()
-										deleteImage(picture.picture_id)
-										handleImageUpload()
-									}}></input>
+								<img key={picture.picture_id} alt="random_picture" height="100px" src={picture.picture_data}></img>
+								<Button onClick={() => { deleteImage(picture.picture_id) }} theme={theme}>Delete picture</Button>
 							</div>
 						)}
 					</div>
+					<Button theme={theme}>
+						<label htmlFor="image-upload" className="styled-image-upload">
+							ADD NEW PICTURE
+							<input type="file" name="testifile" id="image-uploadtesti" accept="image/jpeg, image/png, image/jpg"
+								onChange={handleImageUpload}></input>
+						</label>
+					</Button>
 				</Paper>
 			</Container>
 		)

@@ -33,7 +33,7 @@ module.exports = (app, pool, session, upload, fs, path) => {
 			if (profile_pic.rows[0]) {
 				profileData.profile_pic = profile_pic.rows[0]
 			} else {
-				profileData.profile_pic = { user_id: sess.userid, picture_data: 'http://localhost:3000/images/default_profilepic.jpeg'}
+				profileData.profile_pic = { user_id: sess.userid, picture_data: 'http://localhost:3000/images/default_profilepic.jpeg' }
 			}
 			// console.log(profile_pic.rows[0]['picture_data'])
 
@@ -45,18 +45,16 @@ module.exports = (app, pool, session, upload, fs, path) => {
 			}
 			response.send(profileData)
 		} catch (error) {
-			response.send(error)
+			response.send(false)
 		}
 	})
 
-	app.post('/api/profile/imageupload', upload.single('file'), async (request, response) => {
+	app.post('/api/profile/setprofilepic', upload.single('file'), async (request, response) => {
 		const sess = request.session
 		const image = 'http://localhost:3000/images/' + request.file.filename
-		console.log(request.id)
 
 		var sql = `SELECT * FROM user_pictures
-					INNER JOIN users ON users.id = user_pictures.user_id
-					WHERE users.id = $1 AND user_pictures.profile_pic = 'YES'`
+					WHERE user_id = $1 AND profile_pic = 'YES'`
 		var { rows } = await pool.query(sql, [sess.userid])
 
 		if (rows.length === 0) {
@@ -64,15 +62,17 @@ module.exports = (app, pool, session, upload, fs, path) => {
 			await pool.query(sql, [sess.userid, image])
 		} else {
 			var oldImageData = rows[0]['picture_data']
-			const oldImage = path.resolve(__dirname, '../images') + oldImageData.replace('http://localhost:3000/images', '');
-			console.log(oldImage)
-			if (fs.existsSync(oldImage)) {
-				fs.unlink(oldImage, (err) => {
-					if (err) {
-						console.error(err);
-						return;
-					}
-				})
+			if (oldImageData !== 'http://localhost:3000/images/default_profilepic.jpeg') {
+				const oldImage = path.resolve(__dirname, '../images') + oldImageData.replace('http://localhost:3000/images', '');
+				console.log(oldImage)
+				if (fs.existsSync(oldImage)) {
+					fs.unlink(oldImage, (err) => {
+						if (err) {
+							console.error(err);
+							return;
+						}
+					})
+				}
 			}
 			var sql = `UPDATE user_pictures SET picture_data = $1
 						WHERE user_id = $2 AND profile_pic = 'YES'`
@@ -80,6 +80,30 @@ module.exports = (app, pool, session, upload, fs, path) => {
 		}
 		response.send("Success uploading!")
 	})
+
+	app.post('/api/profile/imageupload', upload.single('file'), async (request, response) => {
+		const sess = request.session
+		const image = 'http://localhost:3000/images/' + request.file.filename
+
+		if (sess.userid) {
+			try {
+				var sql = `SELECT * FROM user_pictures WHERE user_id = $1`
+				var { rows } = await pool.query(sql, [sess.userid])
+
+				if (rows.length < 5) {
+					var sql = `INSERT INTO user_pictures (user_id, picture_data, profile_pic) VALUES ($1, $2, 'NO')`
+					await pool.query(sql, [sess.userid, image])
+					response.send(true)
+				} else {
+					response.send("You have uploaded too many pictures. Delete some to make room for new ones!")
+				}
+			} catch (error) {
+				console.log(error)
+			}
+		}
+	})
+
+	// BASE64 VERSION
 
 	// app.post('/api/profile/imageupload', upload.single('file'), async function (request, response) {
 	// 	const sess = request.session
@@ -102,4 +126,31 @@ module.exports = (app, pool, session, upload, fs, path) => {
 	// 	response.send("Success uploading!")
 	// });
 
+	app.delete('/api/profile/deletepicture/:id', async (request, response) => {
+		const sess = request.session
+
+		if (sess.userid) {
+			const picture_id = request.params.id
+
+			var sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND picture_id = $2`
+			var { rows } = await pool.query(sql, [sess.userid, picture_id])
+
+			var oldImageData = rows[0]['picture_data']
+			if (oldImageData !== 'http://localhost:3000/images/default_profilepic.jpeg') {
+				const oldImage = path.resolve(__dirname, '../images') + oldImageData.replace('http://localhost:3000/images', '');
+				console.log(oldImage)
+				if (fs.existsSync(oldImage)) {
+					fs.unlink(oldImage, (err) => {
+						if (err) {
+							console.error(err);
+							return;
+						}
+					})
+				}
+			}
+			var sql = "DELETE FROM user_pictures WHERE user_id = $1 AND picture_id = $2"
+			await pool.query(sql, [sess.userid, picture_id])
+			response.status(200).send("Picture deleted")
+		}
+	})
 }

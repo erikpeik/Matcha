@@ -11,11 +11,21 @@ const getProfileData = () => {
 	return request.then(response => response.data)
 }
 
+const setProfilePic = Picture => {
+	const request = axios.post(`${baseUrl}/setprofilepic`, Picture)
+	return request.then(response => response.data)
+}
+
 const uploadPicture = Picture => {
 	const request = axios.post(`${baseUrl}/imageupload`, Picture)
 	return request.then(response => response.data)
 }
 
-const profileService = { setUpProfile, getProfileData, uploadPicture }
+const deletePicture = PictureId => {
+	const request = axios.delete(`${baseUrl}/deletepicture/${PictureId}`)
+	return request.then(response => response.data)
+}
+
+const profileService = { setUpProfile, getProfileData, setProfilePic, uploadPicture, deletePicture }
 
 export default profileService

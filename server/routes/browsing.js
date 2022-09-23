@@ -33,7 +33,7 @@ module.exports = (app, pool, session) => {
 				// }
 				response.send(browsingData)
 			} else {
-				response.send({})
+				response.send(false)
 			}
 		} catch (error) {
 			response.send(error)
@@ -55,7 +55,7 @@ module.exports = (app, pool, session) => {
 						FROM users
 						LEFT JOIN user_settings ON users.id = user_settings.user_id
 						LEFT JOIN user_pictures ON users.id = user_pictures.user_id
-						WHERE users.id != $1
+						WHERE users.id != $1 AND users.verified = 'YES'
 						AND age BETWEEN $2 and $3 AND fame_rating BETWEEN $4 AND $5
 						AND calculate_distance($8, $9, ip_location[0], ip_location[1], 'K') BETWEEN $10 and $11
 						ORDER BY (CASE WHEN $6 = 'age' AND $7 = 'asc' THEN age END) ASC,
@@ -76,7 +76,7 @@ module.exports = (app, pool, session) => {
 				console.log("Browsing Data To Show: ", selectedRows)
 				response.send(selectedRows)
 			} else {
-				response.send({})
+				response.send(false)
 			}
 		} catch (error) {
 			response.send(error)

@@ -2,6 +2,7 @@ require('dotenv').config() // to use .env variables
 const express = require('express')
 const app = express()
 app.use(express.json()) // needed to attach JSON data to POST body property
+app.use(express.urlencoded()) // needed to attach urlencoded data to POST body property
 var morgan = require('morgan') // middleware to log requests
 var nodemailer = require('nodemailer'); // middleware to send e-mails
 const cors = require('cors') // Cross-origin resource sharing (CORS) middleware is required to allow requests from other origins
