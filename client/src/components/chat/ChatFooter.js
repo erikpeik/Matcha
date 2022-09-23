@@ -1,10 +1,10 @@
 import { Button, Input } from '@mui/material'
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
 
-const ChatFooter = ({ socket }) => {
+
+const ChatFooter = ({ socket, user }) => {
 	const [message, setMessage] = useState('')
-	const user = useSelector(state => state.user)
+
 	const handleSendMessage = (e) => {
 		e.preventDefault()
 		if (message.trim() && user) {
