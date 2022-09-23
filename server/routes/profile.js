@@ -32,6 +32,8 @@ module.exports = (app, pool, session, upload, fs, path) => {
 
 			if (profile_pic.rows[0]) {
 				profileData.profile_pic = profile_pic.rows[0]
+			} else {
+				profileData.profile_pic = { user_id: sess.userid, picture_data: 'http://localhost:3000/images/default_profilepic.jpeg'}
 			}
 			// console.log(profile_pic.rows[0]['picture_data'])
 
