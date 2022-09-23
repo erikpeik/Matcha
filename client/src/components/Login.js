@@ -30,7 +30,7 @@ const Login = ({ socket }) => {
 
 		signUpService.logInUser(signedUpUser).then((result) => {
 			if (result.userid) {
-				const sessionUser = { user: result.username, id: result.userid }
+				const sessionUser = { name: result.username, id: result.userid }
 				dispatch(setUser(sessionUser))
 				dispatch(getProfileData())
 				socket.emit("newUser", {userName: result.username, socketId: socket.id})
