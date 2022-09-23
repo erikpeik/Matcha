@@ -16,6 +16,11 @@ const likeUser = user_id => {
 	return request.then(response => response.data)
 }
 
+const unlikeUser = user_id => {
+	const request = axios.post(`${baseUrl}/unlikeuser/${user_id}`)
+	return request.then(response => response.data)
+}
+
 const getLikedUsers = () => {
 	const request = axios.get(`${baseUrl}/likedusers`)
 	return request.then(response => response.data)
@@ -26,6 +31,6 @@ const getConnectedUsers = () => {
 	return request.then(response => response.data)
 }
 
-const browsingService = { getAll, getSortedUsers, likeUser, getLikedUsers, getConnectedUsers }
+const browsingService = { getAll, getSortedUsers, likeUser, unlikeUser, getLikedUsers, getConnectedUsers }
 
 export default browsingService

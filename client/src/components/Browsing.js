@@ -1,10 +1,32 @@
 import { useState, useEffect } from 'react'
 import {
 	FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, InputLabel,
-	Select, MenuItem, Box, Slider, Container, Paper
+	Select, MenuItem, Box, Slider, Container, Paper, Button, createTheme
 } from '@mui/material'
 import browsingService from '../services/browsingService'
 import Loader from './Loader'
+
+const themelike = createTheme({
+	palette: {
+		primary: {
+			main: '#4CBB17',
+		},
+		secondary: {
+			main: '#F5F5F5',
+		},
+	}
+})
+
+const themeunlike = createTheme({
+	palette: {
+		primary: {
+			main: '#FF1E56',
+		},
+		secondary: {
+			main: '#F5F5F5',
+		},
+	}
+})
 
 const Browsing = () => {
 	const [isLoading, setLoading] = useState(true);
@@ -79,6 +101,14 @@ const Browsing = () => {
 		browsingService.likeUser(user_id).then((response) => {
 			console.log(response)
 		})
+		setSearchCriteria({...searchCriteria})
+	}
+
+	const unlikeUser = async (user_id) => {
+		browsingService.unlikeUser(user_id).then((response) => {
+			console.log(response)
+		})
+		setSearchCriteria({...searchCriteria})
 	}
 
 	if (isLoading) {
@@ -162,10 +192,13 @@ const Browsing = () => {
 						</FormControl>
 					</Box>
 					{users.map(user => {
+						var button
 						if (connectedUsers.includes(user.id)) {
-							<button onClick={() => { likeUser(user.id) }}>Like user</button>
+							button = <div><Button theme={themeunlike} onClick={() => { unlikeUser(user.id) }}>Unlike user</Button><Button>Connected</Button></div>
 						} else if (likedUsers.includes(user.id)) {
-							<button onClick={() => { likeUser(user.id) }}>Like user</button>
+							button = <Button theme={themeunlike} onClick={() => { unlikeUser(user.id) }}>Unlike user</Button>
+						} else {
+							button = <Button theme={themelike} onClick={() => { likeUser(user.id) }}>Like user</Button>
 						}
 
 						return (<div key={`profile_container${user.id}`} id="profile_container">
@@ -184,7 +217,7 @@ const Browsing = () => {
 								<p>Location: {user.user_location}</p>
 								<p>Distance: {Math.floor(user.distance)} km</p>
 								<p>Biography: {user.biography}</p>
-								<button onClick={() => { likeUser(user.id) }}>Like user</button>
+								{button}
 							</div>
 						</div>
 						)

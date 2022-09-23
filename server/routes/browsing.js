@@ -104,6 +104,23 @@ module.exports = (app, pool, session) => {
 		}
 	})
 
+	app.post('/api/browsing/unlikeuser/:id', async (request, response) => {
+		const sess = request.session
+
+		if (sess.userid) {
+			const liked_person_id = request.params.id
+
+			var sql = `DELETE FROM likes WHERE liker_id = $1 AND target_id = $2`
+			await pool.query(sql, [sess.userid, liked_person_id])
+
+			var sql = `DELETE FROM connections
+					WHERE (user1_id = $1 AND user2_id = $2) OR (user1_id = $2 AND user2_id = $1)`
+			const { rows } = await pool.query(sql, [sess.userid, liked_person_id])
+
+			response.status(200).send("Unliked user!")
+		}
+	})
+
 	app.get('/api/browsing/likedusers', async (request, response) => {
 		const sess = request.session
 
