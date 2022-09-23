@@ -12,7 +12,7 @@ import { createTheme } from '@mui/material/styles'
 import { ReactComponent as HeartIcon } from '../images/matcha_icon_with_heart.svg'
 import Notification from './Notification'
 
-const Login = () => {
+const Login = ({ socket }) => {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 
@@ -33,6 +33,7 @@ const Login = () => {
 				const sessionUser = { user: result.username, id: result.userid }
 				dispatch(setUser(sessionUser))
 				dispatch(getProfileData())
+				socket.emit("newUser", {userName: result.username, socketId: socket.id})
 			} else {
 				dispatch(changeSeverity('error'))
 				dispatch(changeNotification(result))

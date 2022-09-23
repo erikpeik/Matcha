@@ -58,7 +58,7 @@ const App = () => {
 			<NavBar />
 			<Routes>
 				<Route path="/" element={<Profile />} />
-				<Route path="/login" element={<Login />} />
+				<Route path="/login" element={<Login socket={socket} />} />
 				<Route path="/login/resetpassword" element={<ResetPassword />} />
 				<Route path="/resetpassword/:user/:code" element={<SetNewPassword />} />
 				<Route path="/signup" element={<Signup />} />

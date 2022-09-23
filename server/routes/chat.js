@@ -5,6 +5,8 @@ module.exports = (http) => {
 		}
 	});
 
+	let users = []
+
 	socketIO.on('connection', (socket) => {
 		console.log('socket connected:', socket.id);
 
@@ -12,8 +14,18 @@ module.exports = (http) => {
 			socketIO.emit('messageResponse', data)
 		})
 
+		socket.on('newUser', (data) => {
+			users.push(data)
+			console.log("users:", users)
+			socketIO.emit('newUserResponse', users)
+		})
+
 		socket.on('disconnect', () => {
 			console.log('socket disconnected: ', socket.id);
+			users = users.filter(user => user.socketID !== socket.id)
+			console.log('users:', users)
+			socketIO.emit('newUserResponse', users)
+			socket.disconnect()
 		})
 	})
 
