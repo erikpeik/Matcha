@@ -37,7 +37,7 @@ module.exports = (app, pool, session, upload, fs, path) => {
 			}
 			// console.log(profile_pic.rows[0]['picture_data'])
 
-			var sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND profile_pic = 'NO'`
+			var sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND profile_pic = 'NO' ORDER BY picture_id`
 			var other_pictures = await pool.query(sql, [sess.userid])
 			// console.log(other_pictures.rows)
 			if (other_pictures.rows) {

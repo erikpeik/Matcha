@@ -213,7 +213,7 @@ const Profile = () => {
 		}
 	}
 
-	const handleImageUpload = async (event) => {
+	const uploadImage = async (event) => {
 		const image = event.target.files[0]
 
 		let formData = new FormData()
@@ -221,6 +221,8 @@ const Profile = () => {
 		const result = await profileService.uploadPicture(formData)
 		if (result === true) {
 			dispatch(getProfileData())
+			dispatch(changeSeverity('success'))
+			dispatch(changeNotification("Image uploaded successfully!"))
 		} else {
 			dispatch(changeSeverity('error'))
 			dispatch(changeNotification(result))
@@ -235,6 +237,8 @@ const Profile = () => {
 		formData.append('file', image)
 		await profileService.setProfilePic(formData)
 		dispatch(getProfileData())
+		dispatch(changeSeverity('success'))
+		dispatch(changeNotification("Profile picture set!"))
 		event.target.value = ''
 	}
 
@@ -291,10 +295,10 @@ const Profile = () => {
 					<Button theme={theme}>Edit profile</Button>
 					<Button theme={theme}>Change password</Button>
 					<Button theme={theme}>
-						<label htmlFor="image-upload" className="styled-image-upload">
+						<label htmlFor="set_profilepic" className="styled-image-upload">
 							Change profile picture
-							<input type="file" name="file" id="image-upload" accept="image/jpeg, image/png, image/jpg" onChange={setProfilePicture}></input>
 						</label>
+						<input type="file" name="file" id="set_profilepic" accept="image/jpeg, image/png, image/jpg" onChange={setProfilePicture}></input>
 					</Button>
 					<div id="other_pictures">
 						{other_pictures.map((picture, i) =>
@@ -307,11 +311,12 @@ const Profile = () => {
 					<Button theme={theme}>
 						<label htmlFor="image-upload" className="styled-image-upload">
 							ADD NEW PICTURE
-							<input type="file" name="testifile" id="image-uploadtesti" accept="image/jpeg, image/png, image/jpg"
-								onChange={handleImageUpload}></input>
 						</label>
+						<input type="file" name="file" id="image-upload" accept="image/jpeg, image/png, image/jpg"
+							onChange={uploadImage}></input>
 					</Button>
 				</Paper>
+				<Notification />
 			</Container>
 		)
 	}
