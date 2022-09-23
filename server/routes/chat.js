@@ -15,7 +15,9 @@ module.exports = (http) => {
 		})
 
 		socket.on('newUser', (data) => {
-			users.push(data)
+			if (users.indexOf(data.name) !== -1) {
+				users.push(data)
+			}
 			console.log("users:", users)
 			socketIO.emit('newUserResponse', users)
 		})

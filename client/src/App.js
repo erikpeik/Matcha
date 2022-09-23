@@ -55,7 +55,7 @@ const App = () => {
 	return <div className='content-wrap'>
 		<Router>
 			<Redirect />
-			<NavBar />
+			<NavBar socket={socket} />
 			<Routes>
 				<Route path="/" element={<Profile />} />
 				<Route path="/login" element={<Login socket={socket} />} />

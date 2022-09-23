@@ -71,7 +71,7 @@ const UserMenu = ({ user }) => {
 }
 
 
-const NavBar = () => {
+const NavBar = ({ socket }) => {
 	const [anchorElNav, setAnchorElNav] = useState(null)
 	const [userLoading, setLoading] = useState(true);
 
@@ -82,6 +82,14 @@ const NavBar = () => {
 	})
 
 	let pages = {}
+
+
+	// if (user && user.name && user !== '' ) {
+	// 	console.log(user.name.length)
+	// 	if (user.name.length > 0) {
+	// 		socket.emit("newUser", { name: user.name, socketID: socket.id })
+	// 	}
+	// }
 
 	if (userLoading) {
 		return (<></>)

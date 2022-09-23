@@ -33,7 +33,7 @@ const Login = ({ socket }) => {
 				const sessionUser = { name: result.username, id: result.userid }
 				dispatch(setUser(sessionUser))
 				dispatch(getProfileData())
-				socket.emit("newUser", {userName: result.username, socketId: socket.id})
+				socket.emit("newUser", {name: result.username, socketID: socket.id})
 			} else {
 				dispatch(changeSeverity('error'))
 				dispatch(changeNotification(result))
