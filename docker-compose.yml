@@ -26,6 +26,8 @@ services:
       - ./client/src:/app/src
     links:
       - server
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: npm start
 
   postgres-db:
