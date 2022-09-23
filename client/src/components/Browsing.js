@@ -9,6 +9,8 @@ import Loader from './Loader'
 const Browsing = () => {
 	const [isLoading, setLoading] = useState(true);
 	const [users, setUsers] = useState([])
+	const [likedUsers, setLikedUsers] = useState([])
+	const [connectedUsers, setConnectedUsers] = useState([])
 	const [searchCriteria, setSearchCriteria] = useState({
 		min_age: 18,
 		max_age: 120,
@@ -34,9 +36,16 @@ const Browsing = () => {
 				setUsers(sortedUsers)
 				setLoading(false);
 			}
+			const likedUsersList = await browsingService.getLikedUsers()
+			setLikedUsers(likedUsersList)
+			const connectedUsersList = await browsingService.getConnectedUsers()
+			setConnectedUsers(connectedUsersList)
 		}
 		getUsers()
 	}, [searchCriteria])
+
+	console.log("Liked users: ", likedUsers)
+	console.log("Connected users: ", connectedUsers)
 
 	const handleAmount = (event) => {
 		setSearchCriteria({ ...searchCriteria, amount: event.target.value })
@@ -64,6 +73,12 @@ const Browsing = () => {
 
 	const handlePageChange = (page) => {
 		setSearchCriteria({ ...searchCriteria, page: page, offset: (page - 1) * searchCriteria.amount })
+	}
+
+	const likeUser = async (user_id) => {
+		browsingService.likeUser(user_id).then((response) => {
+			console.log(response)
+		})
 	}
 
 	if (isLoading) {
@@ -146,8 +161,14 @@ const Browsing = () => {
 							</RadioGroup>
 						</FormControl>
 					</Box>
-					{users.map(user =>
-						<div key={`profile_container${user.id}`} id="profile_container">
+					{users.map(user => {
+						if (connectedUsers.includes(user.id)) {
+							<button onClick={() => { likeUser(user.id) }}>Like user</button>
+						} else if (likedUsers.includes(user.id)) {
+							<button onClick={() => { likeUser(user.id) }}>Like user</button>
+						}
+
+						return (<div key={`profile_container${user.id}`} id="profile_container">
 							<div key={`picture_container${user.id}`} id="picture_container">
 								<img key={user.id} alt="profile_picture" src={profile_pic} height="200px"></img>
 							</div>
@@ -163,11 +184,14 @@ const Browsing = () => {
 								<p>Location: {user.user_location}</p>
 								<p>Distance: {Math.floor(user.distance)} km</p>
 								<p>Biography: {user.biography}</p>
+								<button onClick={() => { likeUser(user.id) }}>Like user</button>
 							</div>
 						</div>
+						)
+					}
 					)}
 				</Paper>
-			</Container>
+			</Container >
 		)
 	}
 }

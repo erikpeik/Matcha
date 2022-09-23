@@ -11,6 +11,21 @@ const getSortedUsers = searchCriteria => {
 	return request.then(response => response.data)
 }
 
-const browsingService = { getAll, getSortedUsers }
+const likeUser = user_id => {
+	const request = axios.post(`${baseUrl}/likeuser/${user_id}`)
+	return request.then(response => response.data)
+}
+
+const getLikedUsers = () => {
+	const request = axios.get(`${baseUrl}/likedusers`)
+	return request.then(response => response.data)
+}
+
+const getConnectedUsers = () => {
+	const request = axios.get(`${baseUrl}/connectedusers`)
+	return request.then(response => response.data)
+}
+
+const browsingService = { getAll, getSortedUsers, likeUser, getLikedUsers, getConnectedUsers }
 
 export default browsingService

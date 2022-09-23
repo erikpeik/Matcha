@@ -82,3 +82,16 @@ CREATE TABLE IF NOT EXISTS user_pictures (
 	profile_pic enum_yesno DEFAULT 'NO',
 	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS likes (
+	running_id SERIAL NOT NULL PRIMARY KEY,
+	liker_id INT NOT NULL,
+	target_id INT NOT NULL,
+	liketime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS connections (
+	connection_id SERIAL NOT NULL PRIMARY KEY,
+	user1_id INT NOT NULL,
+	user2_id INT NOT NULL
+);

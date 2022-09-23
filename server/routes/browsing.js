@@ -47,7 +47,7 @@ module.exports = (app, pool, session) => {
 		try {
 			if (sess.userid) {
 				const variables = [sess.userid, body.min_age, body.max_age, body.min_fame, body.max_fame, body.sorting, body.sort_order,
-									sess.location[0], sess.location[1], body.min_distance, body.max_distance]
+				sess.location[0], sess.location[1], body.min_distance, body.max_distance]
 				console.log("Variables: ", body, sess.location[0], sess.location[1])
 				var sql = `SELECT id, username, firstname, lastname, gender, age, sexual_pref,
 						biography, fame_rating, user_location, picture_data AS profile_pic,
@@ -82,4 +82,60 @@ module.exports = (app, pool, session) => {
 			response.send(error)
 		}
 	})
+
+	app.post('/api/browsing/likeuser/:id', async (request, response) => {
+		const sess = request.session
+
+		if (sess.userid) {
+			const liked_person_id = request.params.id
+
+			var sql = `INSERT INTO likes (liker_id, target_id) VALUES ($1, $2)`
+			await pool.query(sql, [sess.userid, liked_person_id])
+
+			var sql = `SELECT * FROM likes WHERE liker_id = $2 AND target_id = $1`
+			const { rows } = await pool.query(sql, [sess.userid, liked_person_id])
+
+			if (rows.length !== 0) {
+				var sql = `INSERT INTO connections (user1_id, user2_id) VALUES ($1, $2)`
+				await pool.query(sql, [sess.userid, liked_person_id])
+			}
+
+			response.status(200).send("Liked user!")
+		}
+	})
+
+	app.get('/api/browsing/likedusers', async (request, response) => {
+		const sess = request.session
+
+		if (sess.userid) {
+			var sql = `SELECT target_id FROM likes WHERE liker_id = $1`
+			const { rows } = await pool.query(sql, [sess.userid])
+			const likedUserIds = rows.map(user => user.target_id)
+			console.log(likedUserIds)
+			response.send(likedUserIds)
+		}
+	})
+
+	app.get('/api/browsing/connectedusers', async (request, response) => {
+		const sess = request.session
+
+		if (sess.userid) {
+			var sql = `SELECT user2_id FROM connections WHERE user1_id = $1`
+			var results1 = await pool.query(sql, [sess.userid])
+
+			var sql = `SELECT user1_id FROM connections WHERE user2_id = $1`
+			var results2 = await pool.query(sql, [sess.userid])
+
+			const results = results1.rows.concat(results2.rows)
+			const connectedUserIds = results.map(result => {
+				if (result.user1_id)
+					return (result.user1_id)
+				else if (result.user2_id)
+					return (result.user2_id)
+			})
+			console.log(connectedUserIds)
+			response.send(connectedUserIds)
+		}
+	})
+
 }
