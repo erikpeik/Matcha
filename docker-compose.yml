@@ -51,6 +51,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: matcha@matcha.com
       PGADMIN_DEFAULT_USER: matcha
       PGADMIN_DEFAULT_PASSWORD: root
+      GUNICORN_ACCESS_LOGFILE: '/dev/null'
     ports:
       - "8080:80"
     volumes:

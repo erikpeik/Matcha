@@ -9,7 +9,8 @@ import { setUser } from './reducers/userReducer'
 import { getProfileData } from './reducers/profileReducer'
 import Login from './components/Login'
 import Signup from './components/Signup'
-import Profile, { ProfileSetUpForm } from './components/Profile'
+import Profile from './components/Profile'
+import ProfileSettings from './components/profile/ProfileSettings'
 import Browsing from './components/Browsing'
 import NavBar from './components/Navbar'
 import Footer from './components/Footer'
@@ -62,7 +63,7 @@ const App = () => {
 				<Route path="/login/resetpassword" element={<ResetPassword />} />
 				<Route path="/resetpassword/:user/:code" element={<SetNewPassword />} />
 				<Route path="/signup" element={<Signup />} />
-				<Route path="/settings" element={<ProfileSetUpForm />} />
+				<Route path="/settings" element={<ProfileSettings />} />
 				<Route path="/confirm/:user/:code" element={<ConfirmMail />} />
 				<Route path="/profile" element={<Profile />} />
 				<Route path="/browsing" element={<Browsing />} />

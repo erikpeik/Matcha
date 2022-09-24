@@ -15,6 +15,28 @@ module.exports = (app, pool, session, upload, fs, path) => {
 		}
 	})
 
+	app.post('/api/profile/editsettings', async (request, response) => {
+		var sess = request.session
+		const { username, firstname, lastname, email, gender, age, location, sexual_pref, biography } = request.body
+
+		// MUST CREATE CHECKS FOR ALL THE VARIABLES FIRST
+		if (sess.userid) {
+			try {
+				var sql = `UPDATE users SET username = $1, firstname = $2, lastname = $3, email = $4
+						WHERE id = $5`
+				await pool.query(sql, [username, firstname, lastname, email, sess.userid])
+
+				var sql = `UPDATE user_settings
+						SET gender = $1, age = $2, user_location = $3, sexual_pref = $4, biography = $5
+						WHERE user_id = $6`
+				await pool.query(sql, [gender, age, location, sexual_pref, biography, sess.userid])
+				response.send(true)
+			} catch (error) {
+				response.send(error)
+			}
+		}
+	})
+
 	app.get('/api/profile', async (request, response) => {
 		const sess = request.session
 

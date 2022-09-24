@@ -20,7 +20,7 @@ export const getProfileData = () => {
 		if (profile) {
 			dispatch(setProfileData(profile))
 		} else {
-			dispatch(setProfileData(null))
+			dispatch(setProfileData({}))
 		}
 	}
 }
