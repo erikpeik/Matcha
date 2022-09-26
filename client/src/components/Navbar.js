@@ -73,29 +73,23 @@ const UserMenu = ({ user }) => {
 
 const NavBar = ({ socket }) => {
 	const [anchorElNav, setAnchorElNav] = useState(null)
-	const [userLoading, setLoading] = useState(true);
 
-	const user = useSelector(state => {
-		if (userLoading)
-			setLoading(false)
-		return (state.user)
-	})
+	const user = useSelector(state => state.user)
 
 	let pages = {}
 
-
 	if (user) {
-		console.log("user:", user)
-		if (user.name) {
-			console.log("user.name:", user.name)
-			console.log("user.name length:", user.name.length)
+		// console.log("user:", user)
+		// console.log('username:', user.name)
+		// console.log('socket id:', socket.id)
+		if (user.name && socket.id) {
+			// console.log("user.name:", user.name)
+			// console.log("user.name length:", user.name.length)
 			socket.emit("newUser", { name: user.name, socketID: socket.id })
 		}
 	}
 
-	if (userLoading) {
-		return (<></>)
-	} else if (user === '') {
+	if (user === '') {
 		pages = {
 			'Login': '/login',
 			'Signup': '/signup',

@@ -15,9 +15,8 @@ module.exports = (http) => {
 		})
 
 		socket.on('newUser', (data) => {
-			console.log("data.name:", data)
-			console.log("result:", users.indexOf(data.name))
-			console.log(JSON.stringify(users).includes(data.name))
+			console.log("data:", data)
+			console.log('Includes:', JSON.stringify(users).includes(data.name))
 			if (JSON.stringify(users).includes(data.name) === false) {
 				if (data.socketID) {
 					users.push(data)
