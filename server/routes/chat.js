@@ -15,8 +15,13 @@ module.exports = (http) => {
 		})
 
 		socket.on('newUser', (data) => {
-			if (users.indexOf(data.name) !== -1) {
-				users.push(data)
+			console.log("data.name:", data)
+			console.log("result:", users.indexOf(data.name))
+			console.log(JSON.stringify(users).includes(data.name))
+			if (JSON.stringify(users).includes(data.name) === false) {
+				if (data.socketID) {
+					users.push(data)
+				}
 			}
 			console.log("users:", users)
 			socketIO.emit('newUserResponse', users)
@@ -28,6 +33,13 @@ module.exports = (http) => {
 			console.log('users:', users)
 			socketIO.emit('newUserResponse', users)
 			socket.disconnect()
+		})
+
+		socket.on('logOut', (data) => {
+			console.log("data:", data)
+			users = users.filter(user => user.socketID !== data.socketID)
+			console.log("users:", users)
+			socketIO.emit('newUserResponse', users)
 		})
 	})
 

@@ -84,12 +84,14 @@ const NavBar = ({ socket }) => {
 	let pages = {}
 
 
-	// if (user && user.name && user !== '' ) {
-	// 	console.log(user.name.length)
-	// 	if (user.name.length > 0) {
-	// 		socket.emit("newUser", { name: user.name, socketID: socket.id })
-	// 	}
-	// }
+	if (user) {
+		console.log("user:", user)
+		if (user.name) {
+			console.log("user.name:", user.name)
+			console.log("user.name length:", user.name.length)
+			socket.emit("newUser", { name: user.name, socketID: socket.id })
+		}
+	}
 
 	if (userLoading) {
 		return (<></>)
