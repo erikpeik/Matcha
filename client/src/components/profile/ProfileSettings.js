@@ -14,7 +14,7 @@ import profileService from '../../services/profileService'
 import Loader from '../Loader'
 import ProfileSetUpForm from './ProfileSetUpForm'
 
-const TagsInput = ({tags, setTags}) => {
+const TagsInput = ({ tags, setTags }) => {
 
 	const handleTagChange = (event) => {
 		if (event.key !== 'Enter' || event.target.value === '')
@@ -46,7 +46,7 @@ const ProfileSettings = () => {
 	const navigate = useNavigate()
 	const profileData = useSelector(state => state.profile)
 	const [settings, changeSettings] = useState({})
-	const [tags, setTagState] = useState(profileData.tags)
+	const [tags, setTagState] = useState([])
 
 	useEffect(() => {
 		if (profileData) {
@@ -62,6 +62,7 @@ const ProfileSettings = () => {
 				biography: profileData.biography,
 				tags: profileData.tags
 			})
+			setTagState(profileData.tags)
 		}
 		setLoading(false)
 	}, [profileData])
@@ -209,7 +210,7 @@ const ProfileSettings = () => {
 					</Button>
 				</form>
 				<FormLabel id='tags' >Tags</FormLabel>
-				<TagsInput tags={tags} setTags={setTags}/>
+				<TagsInput tags={tags} setTags={setTags} />
 				<Notification />
 			</Paper>
 		</Container>

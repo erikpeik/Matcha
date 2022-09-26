@@ -37,7 +37,7 @@ const Logout = ({ socket }) => {
 		dispatch(getProfileData())
 		dispatch(changeSeverity('success'))
 		dispatch(changeNotification("Logged out. Thank you for using Matcha!"))
-		socket.emit("logOut", {socketID: socket.id})
+		socket.emit("logOut", { socketID: socket.id })
 		navigate('/login')
 	}, [dispatch, navigate, socket])
 }
@@ -63,6 +63,7 @@ const App = () => {
 	}, [socket, dispatch])
 
 	useEffect(() => {
+		dispatch(getProfileData())
 		signUpService
 			.getSessionUser()
 			.then(result => {
