@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import {
-	BrowserRouter as Router,
-	Routes, Route, useNavigate
+	BrowserRouter as Router, Routes, Route
 } from 'react-router-dom'
 import signUpService from './services/signUpService'
 import { setUser } from './reducers/userReducer'
@@ -12,35 +11,17 @@ import Signup from './components/Signup'
 import Profile from './components/Profile'
 import ProfileSettings from './components/profile/ProfileSettings'
 import Browsing from './components/Browsing'
-import NavBar from './components/Navbar'
+import NavBar from './components/navbar/Navbar'
 import Footer from './components/Footer'
 import Redirect from './components/Redirect'
 import ConfirmMail from './components/login/ConfirmMail'
 import Chat from './components/chat/Chat'
 import Loader from './components/Loader'
 import ResetPassword, { SetNewPassword } from './components/login/ResetPassword'
-import { changeNotification } from './reducers/notificationReducer'
-import { changeSeverity } from './reducers/severityReducer'
+import Logout from './components/Logout'
 import { changeOnlineUsers } from './reducers/onlineUsersReducer'
-import "./css/App.css"
-
 import socketIO from 'socket.io-client';
-
-
-const Logout = ({ socket }) => {
-	const dispatch = useDispatch()
-	const navigate = useNavigate()
-
-	useEffect(() => {
-		signUpService.logOutUser()
-		dispatch(setUser(""))
-		dispatch(getProfileData())
-		dispatch(changeSeverity('success'))
-		dispatch(changeNotification("Logged out. Thank you for using Matcha!"))
-		socket.emit("logOut", { socketID: socket.id })
-		navigate('/login')
-	}, [dispatch, navigate, socket])
-}
+import "./css/App.css"
 
 const App = () => {
 	const [socket, setSocket] = useState(null)
@@ -73,8 +54,8 @@ const App = () => {
 
 	if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(position => {
-			console.log(position.coords.latitude);
-			console.log(position.coords.longitude);
+			console.log(position.coords.latitude)
+			console.log(position.coords.longitude)
 		});
 	}
 	if (!socketConnected) return <Loader />

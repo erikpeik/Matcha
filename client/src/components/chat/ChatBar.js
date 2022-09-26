@@ -1,10 +1,9 @@
-import { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Paper, Typography, Box } from '@mui/material'
-import { changeOnlineUsers } from '../../reducers/onlineUsersReducer'
+
 const ChatBar = ({ socket }) => {
 	const onlineUsers = useSelector(state => state.onlineUsers)
-	const dispatch = useDispatch()
+	// const dispatch = useDispatch()
 	// useEffect(() => {
 	// 	socket.on('newUserResponse', (data) => dispatch(changeOnlineUsers(data)))
 		// console.log('users from chat:', onlineUsers)

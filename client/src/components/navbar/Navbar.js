@@ -3,11 +3,12 @@ import { Link } from 'react-router-dom'
 import { createTheme } from '@mui/material/styles'
 import {
 	AppBar, Container, Toolbar, Box, IconButton,
-	Menu, MenuItem, Button, Tooltip, Avatar
+	Menu, MenuItem, Button
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
-import { ReactComponent as Logo } from '../images/matcha_logo.svg'
+import { ReactComponent as Logo } from '../../images/matcha_logo.svg'
 import { useSelector } from 'react-redux'
+import UserMenu from './UserMenu'
 
 const navbar_theme = createTheme({
 	palette: {
@@ -20,60 +21,6 @@ const navbar_theme = createTheme({
 	}
 })
 
-const UserMenu = ({ user }) => {
-	const [anchorElUser, setAnchorElUser] = useState(null);
-	const profileData = useSelector(state => state.profile)
-	// console.log('profileData:', profileData)
-	if (profileData != null && Object.keys(profileData).length > 0)
-		var profile_pic = profileData.profile_pic['picture_data']
-
-	const handleOpenUserMenu = (event) => {
-		setAnchorElUser(event.currentTarget);
-	};
-
-	const handleCloseUserMenu = () => {
-		setAnchorElUser(null);
-	};
-
-	const settings = {
-		'Profile': '/profile',
-		'Settings': '/settings',
-		'Log Out': '/logout'
-	}
-
-	// console.log('profile_pic:', profile_pic)
-	if (user !== undefined && user !== '' && profile_pic !== undefined) {
-		return <Box sx={{ flexGrow: 0 }}>
-			<Menu
-				sx={{ mt: '45px' }}
-				id="menu-appbar"
-				anchorEl={anchorElUser}
-				anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-				keepMounted
-				transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-				open={Boolean(anchorElUser)}
-				onClose={handleCloseUserMenu}
-			>
-				{
-					Object.keys(settings).map(setting =>
-						<MenuItem key={setting} onClick={handleCloseUserMenu}
-							component={Link} to={settings[setting]}>
-							{setting}
-						</MenuItem>
-					)
-				}
-			</Menu>
-			<Tooltip title="Open settings">
-				<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-					<Avatar
-						src={profile_pic} />
-				</IconButton>
-			</Tooltip>
-		</Box>
-	}
-}
-
-
 const NavBar = ({ socket }) => {
 	const [anchorElNav, setAnchorElNav] = useState(null)
 
@@ -82,12 +29,7 @@ const NavBar = ({ socket }) => {
 	let pages = {}
 
 	if (user) {
-		// console.log("user:", user)
-		// console.log('username:', user.name)
-		// console.log('socket id:', socket.id)
 		if (user.name && socket.id) {
-			// console.log("user.name:", user.name)
-			// console.log("user.name length:", user.name.length)
 			socket.emit("newUser", { name: user.name, socketID: socket.id })
 		}
 	}
