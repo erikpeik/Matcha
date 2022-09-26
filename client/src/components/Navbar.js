@@ -7,7 +7,6 @@ import {
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import { ReactComponent as Logo } from '../images/matcha_logo.svg'
-import avatar from '../images/random_picture.jpeg'
 import { useSelector } from 'react-redux'
 
 const navbar_theme = createTheme({
