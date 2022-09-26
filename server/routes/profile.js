@@ -17,7 +17,7 @@ module.exports = (app, pool, session, upload, fs, path) => {
 
 	app.post('/api/profile/editsettings', async (request, response) => {
 		var sess = request.session
-		const { username, firstname, lastname, email, gender, age, location, sexual_pref, biography } = request.body
+		const { username, firstname, lastname, email, gender, age, location, sexual_pref, biography, tags } = request.body
 
 		// MUST CREATE CHECKS FOR ALL THE VARIABLES FIRST
 		if (sess.userid) {
@@ -30,8 +30,28 @@ module.exports = (app, pool, session, upload, fs, path) => {
 						SET gender = $1, age = $2, user_location = $3, sexual_pref = $4, biography = $5
 						WHERE user_id = $6`
 				await pool.query(sql, [gender, age, location, sexual_pref, biography, sess.userid])
+
+				var sql = `UPDATE tags SET tagged_users = array_remove(tagged_users, $1)
+							WHERE (array[$2] @> array[tag_content]::TEXT[]) IS NOT TRUE`
+				await pool.query(sql, [sess.userid, tags])
+
+				tags.map(async (tagtext) => {
+					var sql = "SELECT * FROM tags WHERE tag_content = $1"
+					var { rows } = await pool.query(sql, [tagtext])
+
+					if (rows.length === 0) {
+						var sql = `INSERT INTO tags (tag_content, tagged_users) VALUES ($2, array[$1]::INT[])`
+						await pool.query(sql, [sess.userid, tagtext])
+					} else {
+						var sql = `UPDATE tags SET tagged_users = array_append(tagged_users, $1)
+								WHERE tag_content = $2 AND (tagged_users @> array[$1]::INT[]) IS NOT TRUE`
+						await pool.query(sql, [sess.userid, tagtext])
+					}
+				})
+				// console.log(tagtext)
 				response.send(true)
 			} catch (error) {
+				console.log(error)
 				response.send(error)
 			}
 		}
@@ -48,6 +68,11 @@ module.exports = (app, pool, session, upload, fs, path) => {
 			// console.log("Profile Data: ", rows[0])
 			const { password: removed_password, ...profileData } = rows[0]
 			// console.log("Profile Data: ", profileData)
+
+			var sql = `SELECT * FROM tags WHERE tagged_users @> array[$1]::INT[]`
+			var tags = await pool.query(sql, [sess.userid])
+
+			profileData.tags = tags.rows.map(tag => tag.tag_content)
 
 			var sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND profile_pic = 'YES'`
 			var profile_pic = await pool.query(sql, [sess.userid])

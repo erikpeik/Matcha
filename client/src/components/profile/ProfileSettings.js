@@ -14,12 +14,39 @@ import profileService from '../../services/profileService'
 import Loader from '../Loader'
 import ProfileSetUpForm from './ProfileSetUpForm'
 
+const TagsInput = ({tags, setTags}) => {
+
+	const handleTagChange = (event) => {
+		if (event.key !== 'Enter' || event.target.value === '')
+			return
+		setTags([...tags, event.target.value])
+		event.target.value = ''
+	}
+
+	const removeTag = (index) => {
+		setTags(tags.filter((tag, i) => i !== index))
+	}
+
+	return (
+		<div className="tags-input-container">
+			{tags.map((tag, index) => (
+				<div className="tag-item" key={index}>
+					<span className="text">{tag}</span>
+					<span className="close" onClick={() => removeTag(index)}>&times;</span>
+				</div>
+			))}
+			<input onKeyDown={handleTagChange} type="text" className="tags-input" placeholder="Enter tag text" />
+		</div>
+	)
+}
+
 const ProfileSettings = () => {
 	const [isLoading, setLoading] = useState(true);
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 	const profileData = useSelector(state => state.profile)
 	const [settings, changeSettings] = useState({})
+	const [tags, setTagState] = useState(profileData.tags)
 
 	useEffect(() => {
 		if (profileData) {
@@ -32,7 +59,8 @@ const ProfileSettings = () => {
 				age: profileData.age,
 				location: profileData.user_location,
 				sexual_pref: profileData.sexual_pref,
-				biography: profileData.biography
+				biography: profileData.biography,
+				tags: profileData.tags
 			})
 		}
 		setLoading(false)
@@ -115,6 +143,11 @@ const ProfileSettings = () => {
 		changeSettings({ ...settings, biography: event.target.value })
 	}
 
+	const setTags = (tagData) => {
+		setTagState(tagData)
+		changeSettings({ ...settings, tags: tagData })
+	}
+
 	return (
 		<Container maxWidth='md' sx={{ pt: 5, pb: 5 }}>
 			<Paper elevation={10} sx={{ padding: 3 }}>
@@ -125,14 +158,14 @@ const ProfileSettings = () => {
 					Here you can edit your profile settings
 				</Typography>
 				<form onSubmit={submitSettings}>
-						<TextField fullWidth margin='normal' name="username" label='Username'
-							placeholder="Username" value={settings.username} onChange={handleUsername} required></TextField>
-						<TextField sx={{ width: '49%', mr: '1%' }} margin='dense' name="firstname"
-							label='First name' placeholder="First name" value={settings.firstname} onChange={handleFirstname} required></TextField>
-						<TextField sx={{ width: '49%', ml: '1%' }} margin='dense' name="lastname"
-							label='Last name' placeholder="Last name" value={settings.lastname} onChange={handleLastname} required></TextField>
-						<TextField fullWidth margin='dense' name="email" label='E-mail'
-							placeholder="E-mail" value={settings.email} onChange={handleEmail} required></TextField>
+					<TextField fullWidth margin='normal' name="username" label='Username'
+						placeholder="Username" value={settings.username} onChange={handleUsername} required></TextField>
+					<TextField sx={{ width: '49%', mr: '1%' }} margin='dense' name="firstname"
+						label='First name' placeholder="First name" value={settings.firstname} onChange={handleFirstname} required></TextField>
+					<TextField sx={{ width: '49%', ml: '1%' }} margin='dense' name="lastname"
+						label='Last name' placeholder="Last name" value={settings.lastname} onChange={handleLastname} required></TextField>
+					<TextField fullWidth margin='dense' name="email" label='E-mail'
+						placeholder="E-mail" value={settings.email} onChange={handleEmail} required></TextField>
 					<FormControl sx={{ mb: 2 }}>
 						<FormLabel id='gender'>Gender</FormLabel>
 						<RadioGroup row aria-labelledby='gender' name='gender' value={settings.gender} onChange={handleGender}>
@@ -175,6 +208,8 @@ const ProfileSettings = () => {
 						Save settings
 					</Button>
 				</form>
+				<FormLabel id='tags' >Tags</FormLabel>
+				<TagsInput tags={tags} setTags={setTags}/>
 				<Notification />
 			</Paper>
 		</Container>
