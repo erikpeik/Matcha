@@ -35,9 +35,8 @@ module.exports = (http) => {
 		})
 
 		socket.on('logOut', (data) => {
-			console.log("data:", data)
 			users = users.filter(user => user.socketID !== data.socketID)
-			console.log("users:", users)
+			console.log("Logged out:", users)
 			socketIO.emit('newUserResponse', users)
 		})
 	})

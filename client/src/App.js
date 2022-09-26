@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import {
 	BrowserRouter as Router,
@@ -17,15 +17,16 @@ import Footer from './components/Footer'
 import Redirect from './components/Redirect'
 import ConfirmMail from './components/login/ConfirmMail'
 import Chat from './components/chat/Chat'
+import Loader from './components/Loader'
 import ResetPassword, { SetNewPassword } from './components/login/ResetPassword'
 import { changeNotification } from './reducers/notificationReducer'
 import { changeSeverity } from './reducers/severityReducer'
 import "./css/App.css"
 
 import socketIO from 'socket.io-client';
-const socket = socketIO.connect('http://localhost:3001');
 
-const Logout = () => {
+
+const Logout = ({ socket }) => {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 
@@ -35,12 +36,26 @@ const Logout = () => {
 		dispatch(getProfileData())
 		dispatch(changeSeverity('success'))
 		dispatch(changeNotification("Logged out. Thank you for using Matcha!"))
+		socket.emit("logOut", {socketID: socket.id})
 		navigate('/login')
-	}, [dispatch, navigate])
+	}, [dispatch, navigate, socket])
 }
 
 const App = () => {
+	const [socket, setSocket] = useState(null)
+	const [socketConnected, setSocketConnected] = useState(false)
 	const dispatch = useDispatch()
+
+	useEffect(() => {
+		setSocket(socketIO('http://localhost:3001'))
+	}, [])
+
+	useEffect(() => {
+		if (!socket) return
+		socket.on('connect', () => {
+			setSocketConnected(true)
+		})
+	}, [socket])
 
 	useEffect(() => {
 		signUpService
@@ -56,7 +71,7 @@ const App = () => {
 			console.log(position.coords.longitude);
 		});
 	}
-
+	if (!socketConnected) return <Loader />
 	return <div className='content-wrap'>
 		<Router>
 			<Redirect />
@@ -72,7 +87,7 @@ const App = () => {
 				<Route path="/profile" element={<Profile />} />
 				<Route path="/browsing" element={<Browsing />} />
 				<Route path="/chat" element={<Chat socket={socket} />} />
-				<Route path="/logout" element={<Logout />} />
+				<Route path="/logout" element={<Logout socket={socket} />} />
 			</Routes>
 		</Router>
 		<Footer />
