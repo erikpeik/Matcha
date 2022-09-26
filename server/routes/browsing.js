@@ -73,13 +73,18 @@ module.exports = (app, pool, session) => {
 									THEN (SELECT COUNT(*) FROM tags WHERE tagged_users @> array[$1,users.id]) END) DESC, username`;
 				var { rows } = await pool.query(sql, variables)
 				// console.log("Browsing Data: ", rows)
-				// var length = rows.length
+				var length = rows.length
 				console.log("Amount of results: ", rows.length)
 				var selectedRows = rows.slice(body.offset, body.offset + body.amount)
-				// selectedRows[0].push({total_results: rows.length})
-				// var returnRows = {...selectedRows, total_results: length}
-				console.log("Browsing Data To Show: ", selectedRows)
-				response.send(selectedRows)
+				selectedRows[0] = {...selectedRows[0], total_results: length}
+				var returnedRows = selectedRows.map(user => {
+					if (!user.profile_pic)
+						return ({...user, profile_pic: "http://localhost:3000/images/default_profilepic.jpeg"})
+					else
+						return (user)
+				})
+				console.log("Browsing Data To Show: ", returnedRows)
+				response.send(returnedRows)
 			} else {
 				response.send(false)
 			}
