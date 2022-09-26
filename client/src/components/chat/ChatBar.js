@@ -5,10 +5,10 @@ import { changeOnlineUsers } from '../../reducers/onlineUsersReducer'
 const ChatBar = ({ socket }) => {
 	const onlineUsers = useSelector(state => state.onlineUsers)
 	const dispatch = useDispatch()
-	useEffect(() => {
-		socket.on('newUserResponse', (data) => dispatch(changeOnlineUsers(data)))
+	// useEffect(() => {
+	// 	socket.on('newUserResponse', (data) => dispatch(changeOnlineUsers(data)))
 		// console.log('users from chat:', onlineUsers)
-	}, [socket, onlineUsers, dispatch])
+	// }, [socket, onlineUsers, dispatch])
 
 	return (
 		<Paper className='chat_sidebar'>

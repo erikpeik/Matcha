@@ -23,7 +23,10 @@ const navbar_theme = createTheme({
 const UserMenu = ({ user }) => {
 	const [anchorElUser, setAnchorElUser] = useState(null);
 	const profileData = useSelector(state => state.profile)
-	const profile_pic = profileData.profile_pic['picture_data']
+	// console.log('profileData:', profileData)
+	if (profileData != null && Object.keys(profileData).length > 0)
+		var profile_pic = profileData.profile_pic['picture_data']
+
 	const handleOpenUserMenu = (event) => {
 		setAnchorElUser(event.currentTarget);
 	};
@@ -38,8 +41,8 @@ const UserMenu = ({ user }) => {
 		'Log Out': '/logout'
 	}
 
-	if (user !== undefined && user !== '') {
-
+	// console.log('profile_pic:', profile_pic)
+	if (user !== undefined && user !== '' && profile_pic !== undefined) {
 		return <Box sx={{ flexGrow: 0 }}>
 			<Menu
 				sx={{ mt: '45px' }}
