@@ -34,6 +34,10 @@ module.exports = (http) => {
 			socket.disconnect()
 		})
 
+		socket.on('typing', (data) => {
+			socket.broadcast.emit('typingResponse', data)
+		})
+
 		socket.on('logOut', (data) => {
 			users = users.filter(user => user.socketID !== data.socketID)
 			console.log("Logged out:", users)

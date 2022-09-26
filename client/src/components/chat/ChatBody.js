@@ -1,6 +1,6 @@
 import { Button, Typography, Box, Paper } from '@mui/material'
 
-const ChatBody = ({ messages, user }) => {
+const ChatBody = ({ messages, user, typingStatus }) => {
 	return (
 		<>
 			<div className='chat_mainHeader'>
@@ -41,9 +41,7 @@ const ChatBody = ({ messages, user }) => {
 					)
 				}
 			})}
-			{/* <div className='message_status'>
-				<p>Someone is typing...</p>
-			</div> */}
+			<Typography>{typingStatus}</Typography>
 		</>
 	)
 }

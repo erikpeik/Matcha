@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux'
 
 const Chat = ({ socket }) => {
 	const [messages, setMessages] = useState([])
-	// const [isLoading, setIsLoading] = useState(true)
+	const [typingStatus, setTypingStatus] = useState('')
 	const matches = useMediaQuery("(max-width:650px)");
 	const user = useSelector(state => state.user)
 
@@ -18,9 +18,9 @@ const Chat = ({ socket }) => {
 		})
 	}, [socket, messages])
 
-	// if (isLoading) {
-	// 	return <Loader />
-	// }
+	useEffect(() => {
+		socket.on('typingResponse', (data) => setTypingStatus(data))
+	}, [typingStatus, socket])
 
 	return (
 		<Container maxWidth='lg' sx={{ pt: 5, pb: 5 }}>
@@ -30,7 +30,7 @@ const Chat = ({ socket }) => {
 				</Grid>
 				<Grid item xs={8} md={8}>
 					<Paper>
-						<ChatBody messages={messages} user={user} />
+						<ChatBody messages={messages} user={user} typingStatus={typingStatus} />
 						<ChatFooter socket={socket} user={user} />
 					</Paper>
 				</Grid>
