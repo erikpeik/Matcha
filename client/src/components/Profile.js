@@ -88,7 +88,8 @@ const Profile = () => {
 		'Gender:': profileData.gender,
 		'Age:': profileData.age,
 		'Sexual preference:': profileData.sexual_pref,
-		'Location:': profileData.user_location
+		'Location:': profileData.user_location,
+		'Tags:': profileData.tags.map(tag => tag + ', ')
 	}
 
 	const deleteImage = async (id) => {
