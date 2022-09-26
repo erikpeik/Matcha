@@ -18,6 +18,8 @@ import Redirect from './components/Redirect'
 import ConfirmMail from './components/login/ConfirmMail'
 import Chat from './components/Chat'
 import ResetPassword, { SetNewPassword } from './components/login/ResetPassword'
+import { changeNotification } from './reducers/notificationReducer'
+import { changeSeverity } from './reducers/severityReducer'
 import "./css/App.css"
 
 import socketIO from 'socket.io-client';
@@ -31,6 +33,8 @@ const Logout = () => {
 		signUpService.logOutUser()
 		dispatch(setUser(""))
 		dispatch(getProfileData())
+		dispatch(changeSeverity('success'))
+		dispatch(changeNotification("Logged out. Thank you for using Matcha!"))
 		navigate('/login')
 	}, [dispatch, navigate])
 }
