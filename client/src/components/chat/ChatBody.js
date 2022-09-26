@@ -9,7 +9,7 @@ const ChatBody = ({ messages, user }) => {
 			</div>
 
 			{messages.map(message => {
-				if (message.name === user.user) {
+				if (message.name === user.name) {
 					return (
 						<Box key={message.id} sx={{ display: 'flex', alignItems: "flex-end", justifyContent: 'flex-end', mb: 1 }}>
 							<ul style={{margin: 0, padding: 0, width: '70%', maxWidth: '500px', marginRight: '10px'}}>

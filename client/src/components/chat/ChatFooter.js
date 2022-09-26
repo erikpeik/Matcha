@@ -11,7 +11,7 @@ const ChatFooter = ({ socket, user }) => {
 			console.log('user:', user)
 			socket.emit('message', {
 				text: message,
-				name: user.user,
+				name: user.name,
 				id: `${socket.id}${Math.random()}`,
 				socketID: socket.id
 			})

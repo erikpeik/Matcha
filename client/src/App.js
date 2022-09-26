@@ -21,6 +21,7 @@ import Loader from './components/Loader'
 import ResetPassword, { SetNewPassword } from './components/login/ResetPassword'
 import { changeNotification } from './reducers/notificationReducer'
 import { changeSeverity } from './reducers/severityReducer'
+import { changeOnlineUsers } from './reducers/onlineUsersReducer'
 import "./css/App.css"
 
 import socketIO from 'socket.io-client';
@@ -52,8 +53,12 @@ const App = () => {
 
 	useEffect(() => {
 		if (!socket) return
+
 		socket.on('connect', () => {
 			setSocketConnected(true)
+		})
+		socket.on('newUserResponse', (data) => {
+			dispatch(changeOnlineUsers(data))
 		})
 	}, [socket])
 
