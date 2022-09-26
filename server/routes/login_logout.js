@@ -44,7 +44,7 @@ module.exports = function (app, pool, session, bcrypt) {
 		var sess = request.session
 		if (sess.username && sess.userid) {
 			console.log("SESSION FOUND!", sess.username)
-			response.send({ user: sess.username, id: sess.userid });
+			response.send({ name: sess.username, id: sess.userid });
 		}
 		else {
 			console.log("SESSION NOT FOUND!")
