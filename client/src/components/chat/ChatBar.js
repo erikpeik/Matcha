@@ -8,7 +8,7 @@ const ChatBar = ({ socket }) => {
 	useEffect(() => {
 		socket.on('newUserResponse', (data) => dispatch(changeOnlineUsers(data)))
 		// console.log('users from chat:', onlineUsers)
-	}, [socket, onlineUsers])
+	}, [socket, onlineUsers, dispatch])
 
 	return (
 		<Paper className='chat_sidebar'>

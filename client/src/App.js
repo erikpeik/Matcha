@@ -60,7 +60,7 @@ const App = () => {
 		socket.on('newUserResponse', (data) => {
 			dispatch(changeOnlineUsers(data))
 		})
-	}, [socket])
+	}, [socket, dispatch])
 
 	useEffect(() => {
 		signUpService
