@@ -498,3 +498,5 @@ insert into users (id, username, firstname, lastname, email, password, verified,
 insert into users (id, username, firstname, lastname, email, password, verified, online) values (498, 'cwasteneydt', 'Cate', 'Wasteney', 'cwasteneydt@desdev.cn', '$2b$10$08NLhGxO4tgfKaZdr9B4auPpvVGhJujqrWJizO7N14tmCJdwty/zG', 'YES', 'YES');
 insert into users (id, username, firstname, lastname, email, password, verified, online) values (499, 'opolledu', 'Orin', 'Polle', 'opolledu@sfgate.com', '$2b$10$08NLhGxO4tgfKaZdr9B4auPpvVGhJujqrWJizO7N14tmCJdwty/zG', 'YES', 'YES');
 insert into users (id, username, firstname, lastname, email, password, verified, online) values (500, 'mdonnelldv', 'Maxie', 'Donnell', 'mdonnelldv@pbs.org', '$2b$10$08NLhGxO4tgfKaZdr9B4auPpvVGhJujqrWJizO7N14tmCJdwty/zG', 'YES', 'YES');
+
+SELECT pg_catalog.setval(pg_get_serial_sequence('users', 'id'), MAX(id)) FROM users;

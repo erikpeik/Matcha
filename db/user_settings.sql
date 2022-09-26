@@ -498,3 +498,5 @@ insert into user_settings (user_id, gender, age, sexual_pref, biography, fame_ra
 insert into user_settings (user_id, gender, age, sexual_pref, biography, fame_rating, user_location, ip_location) values (498, 'other', 107, 'male', 'Account Representative II', 92.05, 'El Paraiso', '(-87.4337425,20.2019487)');
 insert into user_settings (user_id, gender, age, sexual_pref, biography, fame_rating, user_location, ip_location) values (499, 'female', 70, 'male', 'Marketing Manager', 34.3, 'Huaccana', '(-75.762586,-14.0874587)');
 insert into user_settings (user_id, gender, age, sexual_pref, biography, fame_rating, user_location, ip_location) values (500, 'other', 32, 'bisexual', 'Senior Quality Engineer', 98.85, 'Seattle', '(-122.3329957,47.6060781)');
+
+SELECT pg_catalog.setval(pg_get_serial_sequence('user_settings', 'running_id'), MAX(running_id)) FROM user_settings;

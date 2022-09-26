@@ -54,7 +54,10 @@ module.exports = function (app, pool, bcrypt, transporter) {
 			console.log("Hashed password: " + hash)
 			try {
 				var sql = "INSERT INTO users (username, firstname, lastname, email, password) VALUES ($1,$2,$3,$4,$5) RETURNING *";
-				await pool.query(sql, [username, firstname, lastname, email, hash])
+				var {rows} = await pool.query(sql, [username, firstname, lastname, email, hash])
+				console.log(rows)
+				var sql = "INSERT INTO user_pictures (user_id, picture_data, profile_pic) VALUES ($1,$2,'YES') RETURNING *";
+				await pool.query(sql, [rows[0]['id'], 'http://localhost:3000/images/default_profilepic.jpeg'])
 				return
 			} catch (error) {
 				console.log("ERROR :", error)
