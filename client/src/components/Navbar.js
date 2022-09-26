@@ -23,7 +23,8 @@ const navbar_theme = createTheme({
 
 const UserMenu = ({ user }) => {
 	const [anchorElUser, setAnchorElUser] = useState(null);
-
+	const profileData = useSelector(state => state.profile)
+	const profile_pic = profileData.profile_pic['picture_data']
 	const handleOpenUserMenu = (event) => {
 		setAnchorElUser(event.currentTarget);
 	};
@@ -63,7 +64,7 @@ const UserMenu = ({ user }) => {
 			<Tooltip title="Open settings">
 				<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
 					<Avatar
-						src={avatar} />
+						src={profile_pic} />
 				</IconButton>
 			</Tooltip>
 		</Box>
