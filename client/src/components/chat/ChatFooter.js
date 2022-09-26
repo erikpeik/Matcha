@@ -18,6 +18,7 @@ const ChatFooter = ({ socket, user }) => {
 				socketID: socket.id
 			})
 		}
+		socket.emit('typing', '')
 		setMessage('')
 	}
 
