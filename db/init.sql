@@ -95,3 +95,9 @@ CREATE TABLE IF NOT EXISTS connections (
 	user1_id INT NOT NULL,
 	user2_id INT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS tags (
+	tag_id SERIAL NOT NULL PRIMARY KEY,
+	tag_content VARCHAR(255) NOT NULL,
+	tagged_users INT[] DEFAULT array[]::INT[]
+);

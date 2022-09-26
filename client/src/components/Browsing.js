@@ -217,6 +217,7 @@ const Browsing = () => {
 								<p>Location: {user.user_location}</p>
 								<p>Distance: {Math.floor(user.distance)} km</p>
 								<p>Biography: {user.biography}</p>
+								<p>Common tags: {user.common_tags}</p>
 								{button}
 							</div>
 						</div>
