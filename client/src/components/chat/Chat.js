@@ -1,8 +1,8 @@
 import { useEffect, useState} from 'react'
 import { Container, Paper, Grid, useMediaQuery } from '@mui/material'
-import ChatBar from './chat/ChatBar'
-import ChatBody from './chat/ChatBody'
-import ChatFooter from './chat/ChatFooter'
+import ChatBar from './ChatBar'
+import ChatBody from './ChatBody'
+import ChatFooter from './ChatFooter'
 import { useSelector } from 'react-redux'
 // import Loader from './Loader'
 
