@@ -4,6 +4,7 @@ import notificationReducer from './reducers/notificationReducer'
 import severityReducer from './reducers/severityReducer'
 import profileReducer from './reducers/profileReducer'
 import onlineUsersReducer from './reducers/onlineUsersReducer'
+import browsingReducer from './reducers/browsingReducer'
 
 const store = configureStore({
 	reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
 		severity: severityReducer,
 		profile: profileReducer,
 		onlineUsers: onlineUsersReducer,
+		browsingCriteria: browsingReducer,
 	}
 })
 

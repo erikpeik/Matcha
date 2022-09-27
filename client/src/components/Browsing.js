@@ -6,6 +6,8 @@ import {
 import browsingService from '../services/browsingService'
 import Loader from './Loader'
 import { useNavigate } from 'react-router-dom'
+import { setBrowsingCriteria } from '../reducers/browsingReducer'
+import { useDispatch, useSelector } from 'react-redux'
 
 const themelike = createTheme({
 	palette: {
@@ -31,29 +33,18 @@ const themeunlike = createTheme({
 
 const Browsing = () => {
 	const navigate = useNavigate()
+	const dispatch = useDispatch()
 	const [isLoading, setLoading] = useState(true);
 	const [users, setUsers] = useState([])
 	const [likedUsers, setLikedUsers] = useState([])
 	const [connectedUsers, setConnectedUsers] = useState([])
-	var [searchCriteria, setSearchCriteria] = useState({
-		min_age: 18,
-		max_age: 120,
-		min_fame: 0,
-		max_fame: 100,
-		min_distance: 0,
-		max_distance: 20000,
-		location: 'any',
-		sorting: 'age',
-		sort_order: 'asc',
-		amount: 10,
-		page: 1,
-		offset: 0
-	})
-	// const [searchRequest, setSearchRequest] = useState({...searchCriteria})
+
+	const browsingCriteria = useSelector(state => state.browsingCriteria)
+	var [searchCriteria, setSearchCriteria] = useState(browsingCriteria)
 
 	useEffect(() => {
 		const getUsers = async () => {
-			const sortedUsers = await browsingService.getSortedUsers(searchCriteria)
+			const sortedUsers = await browsingService.getSortedUsers(browsingCriteria)
 			if (sortedUsers) {
 				// console.log("Fetched users: ", sortedUsers)
 				setUsers(sortedUsers)
@@ -65,7 +56,7 @@ const Browsing = () => {
 			setConnectedUsers(connectedUsersList)
 		}
 		getUsers()
-	}, [searchCriteria])
+	}, [browsingCriteria])
 
 	// console.log("Liked users: ", likedUsers)
 	// console.log("Connected users: ", connectedUsers)
@@ -80,23 +71,26 @@ const Browsing = () => {
 	const total_results = users[0].total_results
 	const final_page = Math.ceil(total_results / searchCriteria.amount)
 
-	// const submitSearchRequest = () => {
-	// 	setSearchRequest({ ...searchCriteria })
-	// }
-
-	const handleAmount = async (event) => {
-		await setSearchCriteria({ ...searchCriteria, page: 1, amount: event.target.value })
-		// submitSearchRequest()
+	const submitSearchRequest = async () => {
+		const sortedUsers = await browsingService.getSortedUsers(searchCriteria)
+		if (sortedUsers)
+			setUsers(sortedUsers)
+		dispatch(setBrowsingCriteria(searchCriteria))
 	}
 
-	const handleSorting = async (event) => {
-		await setSearchCriteria({ ...searchCriteria, sorting: event.target.value })
-		// submitSearchRequest()
+	const handleAmount = (event) => {
+		setSearchCriteria({ ...searchCriteria, page: 1, amount: event.target.value })
+		dispatch(setBrowsingCriteria({ ...searchCriteria, page: 1, amount: event.target.value }))
+	}
+
+	const handleSorting = (event) => {
+		setSearchCriteria({ ...searchCriteria, sorting: event.target.value })
+		dispatch(setBrowsingCriteria({...searchCriteria, sorting: event.target.value }))
 	}
 
 	const handleSortOrder = async (event) => {
-		await setSearchCriteria({ ...searchCriteria, sort_order: event.target.value })
-		// submitSearchRequest()
+		setSearchCriteria({ ...searchCriteria, sort_order: event.target.value })
+		dispatch(setBrowsingCriteria({...searchCriteria, sort_order: event.target.value }))
 	}
 
 	const handleAgeSlider = (event) => {
@@ -113,11 +107,13 @@ const Browsing = () => {
 
 	const handlePageChange = (page) => {
 		setSearchCriteria({ ...searchCriteria, page: page, offset: (page - 1) * searchCriteria.amount })
+		dispatch(setBrowsingCriteria({...searchCriteria, page: page, offset: (page - 1) * searchCriteria.amount }))
 	}
 
 	const handlePageMinus = (page) => {
 		if (page > 1)
 			setSearchCriteria({ ...searchCriteria, page: page - 1, offset: (page - 1) * searchCriteria.amount })
+
 	}
 
 	const handlePagePlus = (page) => {
@@ -194,7 +190,7 @@ const Browsing = () => {
 					// getAriaValueText={valuetext}
 					/>
 				</Box>
-				{/* <Button onClick={submitSearchRequest}>Search Results</Button> */}
+				<Button onClick={submitSearchRequest}>Search Results</Button>
 				<FormControl sx={{ mb: 2 }}>
 					<FormLabel id='sorted_by'>Results sorted by:</FormLabel>
 					<RadioGroup row aria-labelledby='sorted_by' name='sorted_by' value={searchCriteria.sorting} onChange={handleSorting}>
