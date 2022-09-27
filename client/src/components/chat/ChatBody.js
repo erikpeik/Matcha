@@ -1,12 +1,7 @@
-import { useSelector } from 'react-redux'
-import { Button, Typography, Box, Paper, Avatar, Tooltip } from '@mui/material'
+import { Button, Typography, Box, Paper } from '@mui/material'
+import ChatIcon from './ChatIcon'
 
 const ChatBody = ({ messages, user, typingStatus }) => {
-	const profileData = useSelector(state => state.profile)
-	// console.log('profileData:', profileData)
-	if (profileData != null && Object.keys(profileData).length > 0)
-		var profile_pic = profileData.profile_pic['picture_data']
-
 	return (
 		<>
 			<div className='chat_mainHeader'>
@@ -24,19 +19,15 @@ const ChatBody = ({ messages, user, typingStatus }) => {
 								</Paper>
 							</Box>
 							<Box sx={{ ml: 1, mr: 1 }}>
-								<Tooltip title={message.name}>
-									<Avatar src={profile_pic} alt={message.name} />
-								</Tooltip>
+								<ChatIcon username={message.name} />
 							</Box>
 						</Box>
 					)
 				} else {
 					return (
 						<Box key={message.id} sx={{ display: 'flex', alignItems: "flex-start", justifyContent: 'flex-start', mb: 1 }}>
-							<Box sx={{ ml: 1}}>
-								<Tooltip title={message.name}>
-									<Avatar src={profile_pic} alt={message.name} />
-								</Tooltip>
+							<Box sx={{ ml: 1 }}>
+								<ChatIcon username={message.name} />
 							</Box>
 							<Box sx={{ width: 3 / 4 }}>
 								<Paper sx={{ ml: 1, background: 'rgb(233, 240, 243)' }}>
