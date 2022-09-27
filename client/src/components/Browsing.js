@@ -35,7 +35,7 @@ const Browsing = () => {
 	const [users, setUsers] = useState([])
 	const [likedUsers, setLikedUsers] = useState([])
 	const [connectedUsers, setConnectedUsers] = useState([])
-	const [searchCriteria, setSearchCriteria] = useState({
+	var [searchCriteria, setSearchCriteria] = useState({
 		min_age: 18,
 		max_age: 120,
 		min_fame: 0,
@@ -49,14 +49,13 @@ const Browsing = () => {
 		page: 1,
 		offset: 0
 	})
+	// const [searchRequest, setSearchRequest] = useState({...searchCriteria})
 
 	useEffect(() => {
 		const getUsers = async () => {
 			const sortedUsers = await browsingService.getSortedUsers(searchCriteria)
-			// console.log("Total results: ", sortedUsers[0].total_results)
-			// const sortedUsers = Object.values(sortedUsersObj)
 			if (sortedUsers) {
-				console.log("Fetched users: ", sortedUsers)
+				// console.log("Fetched users: ", sortedUsers)
 				setUsers(sortedUsers)
 				setLoading(false);
 			}
@@ -68,29 +67,36 @@ const Browsing = () => {
 		getUsers()
 	}, [searchCriteria])
 
-	console.log("Liked users: ", likedUsers)
-	console.log("Connected users: ", connectedUsers)
+	// console.log("Liked users: ", likedUsers)
+	// console.log("Connected users: ", connectedUsers)
 
 	if (isLoading) {
 		return <Loader />
 	}
 
-	console.log("amount we got: ", users.length)
-	console.log("amount we wanted: ", searchCriteria.amount)
-	console.log("offset: ", searchCriteria.offset)
+	// console.log("amount we got: ", users.length)
+	// console.log("amount we wanted: ", searchCriteria.amount)
+	// console.log("offset: ", searchCriteria.offset)
 	const total_results = users[0].total_results
 	const final_page = Math.ceil(total_results / searchCriteria.amount)
 
-	const handleAmount = (event) => {
-		setSearchCriteria({ ...searchCriteria, page: 1, amount: event.target.value })
+	// const submitSearchRequest = () => {
+	// 	setSearchRequest({ ...searchCriteria })
+	// }
+
+	const handleAmount = async (event) => {
+		await setSearchCriteria({ ...searchCriteria, page: 1, amount: event.target.value })
+		// submitSearchRequest()
 	}
 
-	const handleSorting = (event) => {
-		setSearchCriteria({ ...searchCriteria, sorting: event.target.value })
+	const handleSorting = async (event) => {
+		await setSearchCriteria({ ...searchCriteria, sorting: event.target.value })
+		// submitSearchRequest()
 	}
 
-	const handleSortOrder = (event) => {
-		setSearchCriteria({ ...searchCriteria, sort_order: event.target.value })
+	const handleSortOrder = async (event) => {
+		await setSearchCriteria({ ...searchCriteria, sort_order: event.target.value })
+		// submitSearchRequest()
 	}
 
 	const handleAgeSlider = (event) => {
@@ -188,6 +194,7 @@ const Browsing = () => {
 					// getAriaValueText={valuetext}
 					/>
 				</Box>
+				{/* <Button onClick={submitSearchRequest}>Search Results</Button> */}
 				<FormControl sx={{ mb: 2 }}>
 					<FormLabel id='sorted_by'>Results sorted by:</FormLabel>
 					<RadioGroup row aria-labelledby='sorted_by' name='sorted_by' value={searchCriteria.sorting} onChange={handleSorting}>
@@ -220,7 +227,7 @@ const Browsing = () => {
 					} else
 						return (<div key={`profile_container${user.id}`} id="profile_container">
 							<div key={`picture_container${user.id}`} id="picture_container">
-								<img key={user.id} alt="profile_picture" src={user.profile_pic} class="userprofilepic"
+								<img key={user.id} alt="profile_picture" src={user.profile_pic} className="userprofilepic"
 									onClick={() => navigate(`/userprofile/${user.id}`)} height="200px"></img>
 							</div>
 							<div key={`profile_data${user.id}`} id="profile_data">

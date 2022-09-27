@@ -163,4 +163,45 @@ module.exports = (app, pool, session) => {
 		}
 	})
 
+	app.get('/api/browsing/userprofile/:id', async (request, response) => {
+		const sess = request.session
+
+		try {
+			const profile_id = request.params.id
+			var sql = `SELECT * FROM users
+						INNER JOIN user_settings ON users.id = user_settings.user_id
+						WHERE users.id = $1`
+			var { rows } = await pool.query(sql, [profile_id])
+			// console.log("Profile Data: ", rows[0])
+			const { password: removed_password, ...profileData } = rows[0]
+			// console.log("Profile Data: ", profileData)
+
+			var sql = `SELECT * FROM tags WHERE tagged_users @> array[$1]::INT[]
+						ORDER BY tag_id`
+			var tags = await pool.query(sql, [profile_id])
+
+			profileData.tags = tags.rows.map(tag => tag.tag_content)
+
+			var sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND profile_pic = 'YES'`
+			var profile_pic = await pool.query(sql, [profile_id])
+
+			if (profile_pic.rows[0]) {
+				profileData.profile_pic = profile_pic.rows[0]
+			} else {
+				profileData.profile_pic = { user_id: sess.userid, picture_data: 'http://localhost:3000/images/default_profilepic.jpeg' }
+			}
+			// console.log(profile_pic.rows[0]['picture_data'])
+
+			var sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND profile_pic = 'NO' ORDER BY picture_id`
+			var other_pictures = await pool.query(sql, [profile_id])
+			// console.log(other_pictures.rows)
+			if (other_pictures.rows) {
+				profileData.other_pictures = other_pictures.rows
+			}
+			response.send(profileData)
+		} catch (error) {
+			response.send(false)
+		}
+	})
+
 }

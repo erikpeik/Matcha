@@ -31,6 +31,11 @@ const getConnectedUsers = () => {
 	return request.then(response => response.data)
 }
 
-const browsingService = { getAll, getSortedUsers, likeUser, unlikeUser, getLikedUsers, getConnectedUsers }
+const getUserProfile = (id) => {
+	const request = axios.get(`${baseUrl}/userprofile/${id}`)
+	return request.then(response => response.data)
+}
+
+const browsingService = { getAll, getSortedUsers, likeUser, unlikeUser, getLikedUsers, getConnectedUsers, getUserProfile }
 
 export default browsingService

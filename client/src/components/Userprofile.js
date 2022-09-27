@@ -1,14 +1,36 @@
 import { useState, useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { useParams } from 'react-router-dom'
 import {
-	Typography, Paper, Box, Grid, Rating, styled
+	Typography, Paper, Box, Grid, Rating, styled, Button, createTheme
 } from '@mui/material'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import { Container } from '@mui/system'
-import { getProfileData } from '../reducers/profileReducer'
+import browsingService from '../services/browsingService'
 import Loader from './Loader'
+
+const themelike = createTheme({
+	palette: {
+		primary: {
+			main: '#4CBB17',
+		},
+		secondary: {
+			main: '#F5F5F5',
+		},
+	}
+})
+
+const themeunlike = createTheme({
+	palette: {
+		primary: {
+			main: '#FF1E56',
+		},
+		secondary: {
+			main: '#F5F5F5',
+		},
+	}
+})
 
 const StyledRating = styled(Rating)({
 	'& .MuiRating-iconFilled': {
@@ -35,19 +57,27 @@ const ProfileInput = ({ text, input }) => {
 const UserProfile = () => {
 	const [isLoading, setLoading] = useState(true);
 	const dispatch = useDispatch()
-	const navigate = useNavigate()
-	const profileData = useSelector(state => state.profile)
+	const [likedUsers, setLikedUsers] = useState([])
+	const [connectedUsers, setConnectedUsers] = useState([])
+	const [userData, setUserData] = useState([])
 	const params = useParams()
 
+	console.log(connectedUsers)
+	console.log(likedUsers)
 	console.log(params.id)
 
 	useEffect(() => {
 		const getData = async () => {
-			await dispatch(getProfileData())
-			setLoading(false);
+			const userProfile = await browsingService.getUserProfile(params.id)
+			setUserData(userProfile)
+			const likedUsersList = await browsingService.getLikedUsers()
+			setLikedUsers(likedUsersList)
+			const connectedUsersList = await browsingService.getConnectedUsers()
+			setConnectedUsers(connectedUsersList)
+			setLoading(false)
 		}
 		getData()
-	}, [dispatch])
+	}, [params, dispatch])
 
 	const profilePicture = {
 		width: '100%',
@@ -60,18 +90,39 @@ const UserProfile = () => {
 		return <Loader />
 	}
 
-	const profile_pic = profileData.profile_pic['picture_data']
-	const other_pictures = profileData.other_pictures
+	const profile_pic = userData.profile_pic['picture_data']
+	const other_pictures = userData.other_pictures
 
 	const ProfileData = {
-		'First name:': profileData.firstname,
-		'Email address:': profileData.email,
-		'Last name:': profileData.lastname,
-		'Gender:': profileData.gender,
-		'Age:': profileData.age,
-		'Sexual preference:': profileData.sexual_pref,
-		'Location:': profileData.user_location,
-		'Tags:': profileData.tags.map(tag => tag + ', ')
+		'First name:': userData.firstname,
+		'Email address:': userData.email,
+		'Last name:': userData.lastname,
+		'Gender:': userData.gender,
+		'Age:': userData.age,
+		'Sexual preference:': userData.sexual_pref,
+		'Location:': userData.user_location,
+		'Tags:': userData.tags.map(tag => tag + ', ')
+	}
+
+	const likeUser = async (user_id) => {
+		browsingService.likeUser(user_id).then((response) => {
+			console.log(response)
+		})
+	}
+
+	const unlikeUser = async (user_id) => {
+		browsingService.unlikeUser(user_id).then((response) => {
+			console.log(response)
+		})
+	}
+
+	var likeButton
+	if (connectedUsers.includes(Number(params.id))) {
+		likeButton = <div><Button theme={themeunlike} onClick={() => { unlikeUser(params.id) }}>Unlike user</Button><Button>Connected</Button></div>
+	} else if (likedUsers.includes(Number(params.id))) {
+		likeButton = <Button theme={themeunlike} onClick={() => { unlikeUser(params.id) }}>Unlike user</Button>
+	} else {
+		likeButton = <Button theme={themelike} onClick={() => { likeUser(params.id) }}>Like user</Button>
 	}
 
 	return (
@@ -93,9 +144,9 @@ const UserProfile = () => {
 					</Box>
 					<Box sx={{ width: 'fit-content', ml: 5 }}>
 						<Typography variant='h2' align='center'>
-							{profileData.username}
+							{userData.username}
 						</Typography>
-						<Typography variant='h5'>Fame Rating: {profileData.fame_rating}</Typography>
+						<Typography variant='h5'>Fame Rating: {userData.fame_rating}</Typography>
 						<StyledRating
 							name="read-only"
 							value={3.453}
@@ -104,6 +155,7 @@ const UserProfile = () => {
 							emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
 							readOnly
 						/>
+						{likeButton}
 					</Box>
 				</Grid>
 				<Grid container spacing={1} direction="row" sx={{ mb: 2 }}>
@@ -117,7 +169,7 @@ const UserProfile = () => {
 					</Typography>
 					<Grid item xs={12} sm={10}>
 						<Typography sx={{ width: 'fit-content' }}>
-							{profileData.biography}
+							{userData.biography}
 						</Typography>
 					</Grid>
 				</Grid>
