@@ -32,11 +32,9 @@ const ChatBody = ({ connectedUsers, messages, user, typingStatus }) => {
 						</Box>
 					)
 				} else {
-					if (usernames.includes(message.name)) {
-						var currentUser = onlineUsers.find(user => user.name === message.name)
-						var userFromConnections = connectedUsers.find(user => user.username === currentUser.name)
-						var profile_pic = userFromConnections.profile_pic
-					}
+					var userFromConnections = connectedUsers.find(user => user.username === message.name)
+					var profile_pic = userFromConnections.profile_pic
+
 					return (
 						<Box key={message.id} sx={{
 							display: 'flex', alignItems: "flex-start",
