@@ -19,6 +19,7 @@ import Chat from './components/chat/Chat'
 import Loader from './components/Loader'
 import ResetPassword, { SetNewPassword } from './components/login/ResetPassword'
 import Logout from './components/Logout'
+import UserProfile from './components/Userprofile'
 import { changeOnlineUsers } from './reducers/onlineUsersReducer'
 import socketIO from 'socket.io-client';
 import "./css/App.css"
@@ -72,6 +73,7 @@ const App = () => {
 				<Route path="/settings" element={<ProfileSettings />} />
 				<Route path="/confirm/:user/:code" element={<ConfirmMail />} />
 				<Route path="/profile" element={<Profile />} />
+				<Route path="/userprofile/:id" element={<UserProfile />} />
 				<Route path="/browsing" element={<Browsing />} />
 				<Route path="/chat" element={<Chat socket={socket} />} />
 				<Route path="/logout" element={<Logout socket={socket} />} />

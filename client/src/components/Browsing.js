@@ -5,6 +5,7 @@ import {
 } from '@mui/material'
 import browsingService from '../services/browsingService'
 import Loader from './Loader'
+import { useNavigate } from 'react-router-dom'
 
 const themelike = createTheme({
 	palette: {
@@ -29,6 +30,7 @@ const themeunlike = createTheme({
 })
 
 const Browsing = () => {
+	const navigate = useNavigate()
 	const [isLoading, setLoading] = useState(true);
 	const [users, setUsers] = useState([])
 	const [likedUsers, setLikedUsers] = useState([])
@@ -218,7 +220,8 @@ const Browsing = () => {
 					} else
 						return (<div key={`profile_container${user.id}`} id="profile_container">
 							<div key={`picture_container${user.id}`} id="picture_container">
-								<img key={user.id} alt="profile_picture" src={user.profile_pic} height="200px"></img>
+								<img key={user.id} alt="profile_picture" src={user.profile_pic} class="userprofilepic"
+									onClick={() => navigate(`/userprofile/${user.id}`)} height="200px"></img>
 							</div>
 							<div key={`profile_data${user.id}`} id="profile_data">
 								<h1>{user.username}</h1>
