@@ -31,14 +31,6 @@ const App = () => {
 	const user = useSelector(state => state.user)
 
 	useEffect(() => {
-		if (user) {
-			if (user.name && socket.id) {
-				socket.emit("newUser", { name: user.name, socketID: socket.id })
-			}
-		}
-	}, [user, socket])
-
-	useEffect(() => {
 		setSocket(socketIO('http://localhost:3001'))
 	}, [])
 
@@ -47,11 +39,19 @@ const App = () => {
 
 		socket.on('connect', () => {
 			setSocketConnected(true)
+			console.log('user connected')
+			console.log("socket id: ", socket.id)
+			if (user) {
+				if (user.name && socket.id) {
+					console.log("Added new user!")
+					socket.emit("newUser", { name: user.name, socketID: socket.id })
+				}
+			}
 		})
 		socket.on('newUserResponse', (data) => {
 			dispatch(changeOnlineUsers(data))
 		})
-	}, [socket, dispatch])
+	}, [socket, dispatch, user])
 
 	useEffect(() => {
 		dispatch(getProfileData())
