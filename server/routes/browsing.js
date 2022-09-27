@@ -49,7 +49,8 @@ module.exports = (app, pool, session) => {
 				const variables = [sess.userid, body.min_age, body.max_age, body.min_fame, body.max_fame, body.sorting, body.sort_order,
 				sess.location[0], sess.location[1], body.min_distance, body.max_distance]
 				console.log("Variables: ", body, sess.location[0], sess.location[1])
-				var sql = `SELECT id, username, firstname, lastname, gender, age, sexual_pref,
+				var sql = `SELECT * FROM
+						(SELECT id, username, firstname, lastname, gender, age, sexual_pref,
 						biography, fame_rating, user_location, picture_data AS profile_pic,
 						calculate_distance($8, $9, ip_location[0], ip_location[1], 'K') AS distance,
 						(SELECT COUNT(*) FROM tags WHERE tagged_users @> array[$1,users.id]) AS common_tags
@@ -58,19 +59,16 @@ module.exports = (app, pool, session) => {
 						LEFT JOIN user_pictures ON users.id = user_pictures.user_id
 						WHERE users.id != $1 AND users.verified = 'YES'
 						AND age BETWEEN $2 and $3 AND fame_rating BETWEEN $4 AND $5
-						AND calculate_distance($8, $9, ip_location[0], ip_location[1], 'K') BETWEEN $10 and $11
+						AND calculate_distance($8, $9, ip_location[0], ip_location[1], 'K') BETWEEN $10 and $11)
+						AS x
 						ORDER BY (CASE WHEN $6 = 'age' AND $7 = 'asc' THEN age END) ASC,
 								(CASE WHEN $6 = 'age' AND $7 = 'desc' THEN age END) DESC,
-								(CASE WHEN $6 = 'distance' AND $7 = 'asc'
-									THEN calculate_distance($8, $9, ip_location[0], ip_location[1], 'K') END) ASC,
-								(CASE WHEN $6 = 'distance' AND $7 = 'desc'
-									THEN calculate_distance($8, $9, ip_location[0], ip_location[1], 'K') END) DESC,
+								(CASE WHEN $6 = 'distance' AND $7 = 'asc' THEN distance END) ASC,
+								(CASE WHEN $6 = 'distance' AND $7 = 'desc' THEN distance END) DESC,
 								(CASE WHEN $6 = 'fame_rating' AND $7 = 'asc' THEN fame_rating END) ASC,
 								(CASE WHEN $6 = 'fame_rating' AND $7 = 'desc' THEN fame_rating END) DESC,
-								(CASE WHEN $6 = 'common_tags' AND $7 = 'asc'
-									THEN (SELECT COUNT(*) FROM tags WHERE tagged_users @> array[$1,users.id]) END) ASC,
-								(CASE WHEN $6 = 'common_tags' AND $7 = 'desc'
-									THEN (SELECT COUNT(*) FROM tags WHERE tagged_users @> array[$1,users.id]) END) DESC, username`;
+								(CASE WHEN $6 = 'common_tags' AND $7 = 'asc' THEN common_tags END) ASC,
+								(CASE WHEN $6 = 'common_tags' AND $7 = 'desc' THEN common_tags END) DESC, username`;
 				var { rows } = await pool.query(sql, variables)
 				// console.log("Browsing Data: ", rows)
 				var length = rows.length
