@@ -28,12 +28,6 @@ const NavBar = ({ socket }) => {
 
 	let pages = {}
 
-	if (user) {
-		if (user.name && socket.id) {
-			socket.emit("newUser", { name: user.name, socketID: socket.id })
-		}
-	}
-
 	if (user === '') {
 		pages = {
 			'Login': '/login',

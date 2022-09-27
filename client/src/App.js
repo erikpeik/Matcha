@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {
 	BrowserRouter as Router, Routes, Route
 } from 'react-router-dom'
@@ -28,6 +28,15 @@ const App = () => {
 	const [socket, setSocket] = useState(null)
 	const [socketConnected, setSocketConnected] = useState(false)
 	const dispatch = useDispatch()
+	const user = useSelector(state => state.user)
+
+	useEffect(() => {
+		if (user) {
+			if (user.name && socket.id) {
+				socket.emit("newUser", { name: user.name, socketID: socket.id })
+			}
+		}
+	}, [user, socket])
 
 	useEffect(() => {
 		setSocket(socketIO('http://localhost:3001'))
@@ -59,7 +68,9 @@ const App = () => {
 			console.log(position.coords.longitude)
 		});
 	}
+
 	if (!socketConnected) return <Loader />
+
 	return <div className='content-wrap'>
 		<Router>
 			<Redirect />
