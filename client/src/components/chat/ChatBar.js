@@ -1,25 +1,22 @@
-import { useSelector } from 'react-redux'
 import { Paper, Typography, Box } from '@mui/material'
+import ChatIcon from './ChatIcon'
 
-const ChatBar = ({ socket }) => {
-	const onlineUsers = useSelector(state => state.onlineUsers)
-	// const dispatch = useDispatch()
-	// useEffect(() => {
-	// 	socket.on('newUserResponse', (data) => dispatch(changeOnlineUsers(data)))
-		// console.log('users from chat:', onlineUsers)
-	// }, [socket, onlineUsers, dispatch])
-
+const ChatBar = ({ connectedUsers }) => {
 	return (
 		<Paper className='chat_sidebar'>
-			<Typography variant='h5' align='center' sx={{ pt: 2 }}>Open Chat</Typography>
+			<Typography variant='h5' align='center' sx={{ pt: 2 }}>Messages</Typography>
 			<Box>
-				<Typography sx={{ fontWeight: 'bold' }}>Online Users</Typography>
 				<Box>
-					{onlineUsers.map(user =>
-						<Typography key={user.socketID}>
-							{user.name}
-						</Typography>
-					)}
+					{connectedUsers.map(user => {
+						return (
+							<Box key={user.id}>
+								<ChatIcon username={user.username} image={user.profile_pic} />
+								<Typography key={user.id}>
+									{user.username}
+								</Typography>
+							</Box>
+						)
+					})}
 				</Box>
 			</Box>
 		</Paper>

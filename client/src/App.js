@@ -40,13 +40,6 @@ const App = () => {
 		socket.on('connect', () => {
 			setSocketConnected(true)
 			console.log('user connected')
-			console.log("socket id: ", socket.id)
-			if (user) {
-				if (user.name && socket.id) {
-					console.log("Added new user!")
-					socket.emit("newUser", { name: user.name, socketID: socket.id })
-				}
-			}
 		})
 		socket.on('newUserResponse', (data) => {
 			dispatch(changeOnlineUsers(data))
@@ -68,6 +61,15 @@ const App = () => {
 			console.log(position.coords.longitude)
 		});
 	}
+	
+	useEffect(() => {
+		if (user && socketConnected) {
+			if (user.name && socket.id) {
+				console.log("Added new user!", user.name, socket.id)
+				socket.emit("newUser", { name: user.name, socketID: socket.id })
+			}
+		}
+	}, [user, socket, socketConnected])
 
 	if (!socketConnected) return <Loader />
 

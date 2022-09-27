@@ -57,6 +57,7 @@ require('./routes/resetpassword.js')(app, pool, bcrypt, transporter)
 require('./routes/profile.js')(app, pool, session, upload, fs, path)
 require('./routes/browsing.js')(app, pool, session)
 require('./routes/chat.js')(http)
+require('./routes/chat_api.js')(app, pool, session)
 
 const PORT = process.env.PORT || 3001
 

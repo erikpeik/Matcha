@@ -1,10 +1,9 @@
 import { useSelector } from 'react-redux'
 import { Avatar, Tooltip, styled, Badge } from '@mui/material'
 
-const ChatIcon = ({ username }) => {
+const ChatIcon = ({ username, image }) => {
 	const onlineUsers = useSelector(state => state.onlineUsers)
 	const usernames = onlineUsers.map(user => user.name)
-	const profileData = useSelector(state => state.profile)
 
 	const StyledBadge = styled(Badge)(({ theme }) => ({
 		'& .MuiBadge-badge': {
@@ -35,9 +34,6 @@ const ChatIcon = ({ username }) => {
 		},
 	}));
 
-	if (profileData != null && Object.keys(profileData).length > 0)
-		var profile_pic = profileData.profile_pic['picture_data']
-
 	if (usernames.includes(username)) {
 		return (
 			<StyledBadge
@@ -46,14 +42,14 @@ const ChatIcon = ({ username }) => {
 				variant="dot"
 			>
 				<Tooltip title={username}>
-					<Avatar src={profile_pic} alt={username} />
+					<Avatar src={image} alt={username} />
 				</Tooltip>
 			</StyledBadge>
 		)
 	} else {
 		return (
 			<Tooltip title={username}>
-				<Avatar src={profile_pic} alt={username} />
+				<Avatar src={image} alt={username} />
 			</Tooltip>
 		)
 	}

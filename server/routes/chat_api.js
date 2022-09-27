@@ -1,0 +1,39 @@
+module.exports = (app, pool, session) => {
+	app.post('/api/chat/usernames', async (request, response) => {
+		const body = request.body
+		const sess = request.session
+
+		try {
+			if (sess.userid) {
+				const variables = [sess.userid, sess.location[0], sess.location[1]]
+				// console.log("Variables: ", body, sess.location[0], sess.location[1])
+				var sql = `SELECT * FROM
+						(SELECT id, username, firstname, lastname, gender, age, sexual_pref,
+						biography, fame_rating, user_location, picture_data AS profile_pic,
+						calculate_distance($2, $3, ip_location[0], ip_location[1], 'K') AS distance,
+						(SELECT COUNT(*) FROM tags WHERE tagged_users @> array[$1,users.id]) AS common_tags
+						FROM users
+						LEFT JOIN user_settings ON users.id = user_settings.user_id
+						LEFT JOIN user_pictures ON users.id = user_pictures.user_id
+						WHERE users.id != $1 AND users.verified = 'YES')AS x`
+
+				var { rows } = await pool.query(sql, variables)
+				// console.log("Browsing Data: ", rows)
+				var length = rows.length
+				// console.log("Amount of results: ", rows.length)
+				var returnedRows = rows.map(user => {
+					if (!user.profile_pic)
+						return ({...user, profile_pic: "http://localhost:3000/images/default_profilepic.jpeg"})
+					else
+						return (user)
+				})
+				// console.log("Browsing Data To Show: ", returnedRows)
+				response.send(returnedRows)
+			} else {
+				response.send(false)
+			}
+		} catch (error) {
+			response.send(error)
+		}
+	})
+}
