@@ -4,8 +4,6 @@ import ChatIcon from './ChatIcon'
 
 const ChatBody = ({ connectedUsers, messages, user, typingStatus }) => {
 	const profileData = useSelector(state => state.profile)
-	const onlineUsers = useSelector(state => state.onlineUsers)
-	const usernames = onlineUsers.map(user => user.name)
 
 	return (
 		<>
