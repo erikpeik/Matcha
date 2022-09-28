@@ -68,29 +68,40 @@ const Browsing = () => {
 	// console.log("amount we got: ", users.length)
 	// console.log("amount we wanted: ", searchCriteria.amount)
 	// console.log("offset: ", searchCriteria.offset)
-	const total_results = users[0].total_results
-	const final_page = Math.ceil(total_results / searchCriteria.amount)
+	if (users.length === 0)
+		var total_results = 0
+	else
+		var total_results = users[0].total_results
+	if (total_results === 0)
+		var final_page = 1
+	else
+		var final_page = Math.ceil(total_results / searchCriteria.amount)
 
 	const submitSearchRequest = async () => {
-		const sortedUsers = await browsingService.getSortedUsers(searchCriteria)
+		const newCriteria = { ...searchCriteria, page: 1, offset: 0 }
+		const sortedUsers = await browsingService.getSortedUsers(newCriteria)
 		if (sortedUsers)
 			setUsers(sortedUsers)
-		dispatch(setBrowsingCriteria(searchCriteria))
+		setSearchCriteria(newCriteria)
+		dispatch(setBrowsingCriteria(newCriteria))
 	}
 
 	const handleAmount = (event) => {
-		setSearchCriteria({ ...searchCriteria, page: 1, amount: event.target.value })
-		dispatch(setBrowsingCriteria({ ...searchCriteria, page: 1, amount: event.target.value }))
+		const newCriteria = { ...searchCriteria, page: 1, amount: event.target.value }
+		setSearchCriteria(newCriteria)
+		dispatch(setBrowsingCriteria(newCriteria))
 	}
 
 	const handleSorting = (event) => {
-		setSearchCriteria({ ...searchCriteria, sorting: event.target.value })
-		dispatch(setBrowsingCriteria({...searchCriteria, sorting: event.target.value }))
+		const newCriteria = { ...searchCriteria, sorting: event.target.value }
+		setSearchCriteria(newCriteria)
+		dispatch(setBrowsingCriteria(newCriteria))
 	}
 
 	const handleSortOrder = async (event) => {
-		setSearchCriteria({ ...searchCriteria, sort_order: event.target.value })
-		dispatch(setBrowsingCriteria({...searchCriteria, sort_order: event.target.value }))
+		const newCriteria = { ...searchCriteria, sort_order: event.target.value }
+		setSearchCriteria(newCriteria)
+		dispatch(setBrowsingCriteria(newCriteria))
 	}
 
 	const handleAgeSlider = (event) => {
@@ -106,19 +117,31 @@ const Browsing = () => {
 	}
 
 	const handlePageChange = (page) => {
-		setSearchCriteria({ ...searchCriteria, page: page, offset: (page - 1) * searchCriteria.amount })
-		dispatch(setBrowsingCriteria({...searchCriteria, page: page, offset: (page - 1) * searchCriteria.amount }))
+		if (final_page > 1) {
+			const newCriteria = { ...searchCriteria, page: page, offset: (page - 1) * searchCriteria.amount }
+			setSearchCriteria(newCriteria)
+			dispatch(setBrowsingCriteria(newCriteria))
+		}
 	}
 
 	const handlePageMinus = (page) => {
-		if (page > 1)
-			setSearchCriteria({ ...searchCriteria, page: page - 1, offset: (page - 1) * searchCriteria.amount })
-
+		if (page > 1) {
+			const newCriteria = { ...searchCriteria, page: page - 1, offset: (page - 2) * searchCriteria.amount }
+			setSearchCriteria(newCriteria)
+			dispatch(setBrowsingCriteria(newCriteria))
+		}
 	}
 
 	const handlePagePlus = (page) => {
-		if (page < final_page)
-			setSearchCriteria({ ...searchCriteria, page: page + 1, offset: (page - 1) * searchCriteria.amount })
+		if (page < final_page) {
+			if (page === 1)
+				var offset = searchCriteria.amount
+			else
+				var offset = (page - 2) * searchCriteria.amount
+			const newCriteria = { ...searchCriteria, page: page + 1, offset: offset }
+			setSearchCriteria(newCriteria)
+			dispatch(setBrowsingCriteria(newCriteria))
+		}
 	}
 
 	const likeUser = async (user_id) => {
@@ -156,6 +179,24 @@ const Browsing = () => {
 						<MenuItem value={500} key={500}>{500}</MenuItem>
 					</Select>
 				</FormControl>
+				<FormControl sx={{ mb: 2 }}>
+					<FormLabel id='sorted_by'>Results sorted by:</FormLabel>
+					<RadioGroup row aria-labelledby='sorted_by' name='sorted_by' value={searchCriteria.sorting} onChange={handleSorting}>
+						<FormControlLabel value='age' control={<Radio />} label='Age' />
+						<FormControlLabel value='distance' control={<Radio />} label='Distance' />
+						<FormControlLabel value='fame_rating' control={<Radio />} label='Fame Rating' />
+						<FormControlLabel value='common_tags' control={<Radio />} label='Common tags' />
+					</RadioGroup>
+				</FormControl>
+				<Box>
+					<FormControl sx={{ mb: 2 }}>
+						<FormLabel id='asc_desc'></FormLabel>
+						<RadioGroup row aria-labelledby='asc_desc' name='asc_desc' value={searchCriteria.sort_order} onChange={handleSortOrder}>
+							<FormControlLabel value='asc' control={<Radio />} label='Ascending' />
+							<FormControlLabel value='desc' control={<Radio />} label='Descending' />
+						</RadioGroup>
+					</FormControl>
+				</Box>
 				<Box sx={{ width: 300 }}>
 					<InputLabel id='ageslider'>Filter by age:</InputLabel>
 					<Slider
@@ -191,24 +232,6 @@ const Browsing = () => {
 					/>
 				</Box>
 				<Button onClick={submitSearchRequest}>Search Results</Button>
-				<FormControl sx={{ mb: 2 }}>
-					<FormLabel id='sorted_by'>Results sorted by:</FormLabel>
-					<RadioGroup row aria-labelledby='sorted_by' name='sorted_by' value={searchCriteria.sorting} onChange={handleSorting}>
-						<FormControlLabel value='age' control={<Radio />} label='Age' />
-						<FormControlLabel value='distance' control={<Radio />} label='Distance' />
-						<FormControlLabel value='fame_rating' control={<Radio />} label='Fame Rating' />
-						<FormControlLabel value='common_tags' control={<Radio />} label='Common tags' />
-					</RadioGroup>
-				</FormControl>
-				<Box>
-					<FormControl sx={{ mb: 2 }}>
-						<FormLabel id='asc_desc'></FormLabel>
-						<RadioGroup row aria-labelledby='asc_desc' name='asc_desc' value={searchCriteria.sort_order} onChange={handleSortOrder}>
-							<FormControlLabel value='asc' control={<Radio />} label='Ascending' />
-							<FormControlLabel value='desc' control={<Radio />} label='Descending' />
-						</RadioGroup>
-					</FormControl>
-				</Box>
 				{users.map(user => {
 					var button
 					if (connectedUsers.includes(user.id)) {
@@ -219,7 +242,7 @@ const Browsing = () => {
 						button = <Button theme={themelike} onClick={() => { likeUser(user.id) }}>Like user</Button>
 					}
 					if (!user.id) {
-						return (<></>)
+						return (<div key="emptyusers"></div>)
 					} else
 						return (<div key={`profile_container${user.id}`} id="profile_container">
 							<div key={`picture_container${user.id}`} id="picture_container">

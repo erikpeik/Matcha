@@ -47,9 +47,9 @@ module.exports = (app, pool, session) => {
 		try {
 			if (sess.userid) {
 				const variables = [sess.userid, body.min_age, body.max_age, body.min_fame, body.max_fame, body.sorting, body.sort_order,
-				sess.location[0], sess.location[1], body.min_distance, body.max_distance]
+				sess.location[0], sess.location[1], body.min_distance, body.max_distance, body.amount, body.offset]
 				console.log("Variables: ", body, sess.location[0], sess.location[1])
-				var sql = `SELECT * FROM
+				var sql = `SELECT *, COUNT(*) OVER() as total_results FROM
 						(SELECT id, username, firstname, lastname, gender, age, sexual_pref,
 						biography, fame_rating, user_location, picture_data AS profile_pic,
 						calculate_distance($8, $9, ip_location[0], ip_location[1], 'K') AS distance,
@@ -68,14 +68,11 @@ module.exports = (app, pool, session) => {
 								(CASE WHEN $6 = 'fame_rating' AND $7 = 'asc' THEN fame_rating END) ASC,
 								(CASE WHEN $6 = 'fame_rating' AND $7 = 'desc' THEN fame_rating END) DESC,
 								(CASE WHEN $6 = 'common_tags' AND $7 = 'asc' THEN common_tags END) ASC,
-								(CASE WHEN $6 = 'common_tags' AND $7 = 'desc' THEN common_tags END) DESC, username`;
+								(CASE WHEN $6 = 'common_tags' AND $7 = 'desc' THEN common_tags END) DESC, username
+						LIMIT $12 OFFSET $13`;
 				var { rows } = await pool.query(sql, variables)
-				// console.log("Browsing Data: ", rows)
-				var length = rows.length
-				console.log("Amount of results: ", rows.length)
-				var selectedRows = rows.slice(body.offset, body.offset + body.amount)
-				selectedRows[0] = {...selectedRows[0], total_results: length}
-				var returnedRows = selectedRows.map(user => {
+
+				var returnedRows = rows.map(user => {
 					if (!user.profile_pic)
 						return ({...user, profile_pic: "http://localhost:3000/images/default_profilepic.jpeg"})
 					else
