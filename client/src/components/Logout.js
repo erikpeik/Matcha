@@ -6,6 +6,8 @@ import { changeSeverity } from '../reducers/severityReducer'
 import signUpService from '../services/signUpService'
 import { setUser } from '../reducers/userReducer'
 import { getProfileData } from '../reducers/profileReducer'
+import { resetUserLists } from '../reducers/userListsReducer'
+import { resetBrowsingCriteria } from '../reducers/browsingReducer'
 
 const Logout = ({ socket }) => {
 	const dispatch = useDispatch()
@@ -14,6 +16,8 @@ const Logout = ({ socket }) => {
 	useEffect(() => {
 		signUpService.logOutUser()
 		dispatch(setUser(""))
+		dispatch(resetUserLists())
+		dispatch(resetBrowsingCriteria())
 		dispatch(getProfileData())
 		dispatch(changeSeverity('success'))
 		dispatch(changeNotification("Logged out. Thank you for using Matcha!"))

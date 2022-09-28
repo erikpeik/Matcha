@@ -22,9 +22,12 @@ const userSlice = createSlice({
 		setBrowsingCriteria(state, action) {
 			const content = action.payload
 			return content
+		},
+		resetBrowsingCriteria() {
+			return initialState
 		}
 	},
 })
 
-export const { setBrowsingCriteria } = userSlice.actions
+export const { setBrowsingCriteria, resetBrowsingCriteria } = userSlice.actions
 export default userSlice.reducer

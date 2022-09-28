@@ -6,6 +6,7 @@ import {
 import signUpService from './services/signUpService'
 import { setUser } from './reducers/userReducer'
 import { getProfileData } from './reducers/profileReducer'
+import { getUserLists } from './reducers/userListsReducer'
 import Login from './components/Login'
 import Signup from './components/Signup'
 import Profile from './components/Profile'
@@ -48,6 +49,7 @@ const App = () => {
 
 	useEffect(() => {
 		dispatch(getProfileData())
+		dispatch(getUserLists())
 		signUpService
 			.getSessionUser()
 			.then(result => {
@@ -61,7 +63,7 @@ const App = () => {
 			console.log(position.coords.longitude)
 		});
 	}
-	
+
 	useEffect(() => {
 		if (user && socketConnected) {
 			if (user.name && socket.id) {

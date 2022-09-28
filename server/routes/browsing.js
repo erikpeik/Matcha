@@ -74,7 +74,7 @@ module.exports = (app, pool, session) => {
 
 				var returnedRows = rows.map(user => {
 					if (!user.profile_pic)
-						return ({...user, profile_pic: "http://localhost:3000/images/default_profilepic.jpeg"})
+						return ({ ...user, profile_pic: "http://localhost:3000/images/default_profilepic.jpeg" })
 					else
 						return (user)
 				})
@@ -126,6 +126,26 @@ module.exports = (app, pool, session) => {
 		}
 	})
 
+	app.post('/api/browsing/blockuser/:id', async (request, response) => {
+		const sess = request.session
+
+		if (sess.userid) {
+			const blocked_person_id = request.params.id
+
+			var sql = `INSERT INTO blocks (blocker_id, target_id) VALUES ($1, $2)`
+			await pool.query(sql, [sess.userid, blocked_person_id])
+
+			var sql = `DELETE FROM likes WHERE (liker_id = $1 AND target_id = $2) OR (liker_id = $2 AND target_id = $1)`
+			await pool.query(sql, [sess.userid, blocked_person_id])
+
+			var sql = `DELETE FROM connections
+					WHERE (user1_id = $1 AND user2_id = $2) OR (user1_id = $2 AND user2_id = $1)`
+			await pool.query(sql, [sess.userid, blocked_person_id])
+
+			response.status(200).send("Blocked user!")
+		}
+	})
+
 	app.get('/api/browsing/likedusers', async (request, response) => {
 		const sess = request.session
 
@@ -157,6 +177,35 @@ module.exports = (app, pool, session) => {
 			})
 			console.log(connectedUserIds)
 			response.send(connectedUserIds)
+		}
+	})
+
+	app.get('/api/browsing/userlists', async (request, response) => {
+		const sess = request.session
+		if (sess.userid) {
+			var sql = `SELECT target_id FROM likes WHERE liker_id = $1`
+			const likedusers = await pool.query(sql, [sess.userid])
+			const likedUserIds = likedusers.rows.map(user => user.target_id)
+
+			var sql = `SELECT user2_id FROM connections WHERE user1_id = $1`
+			var results1 = await pool.query(sql, [sess.userid])
+			var sql = `SELECT user1_id FROM connections WHERE user2_id = $1`
+			var results2 = await pool.query(sql, [sess.userid])
+			const connectedusers = results1.rows.concat(results2.rows)
+			const connectedUserIds = connectedusers.map(result => {
+				if (result.user1_id)
+					return (result.user1_id)
+				else if (result.user2_id)
+					return (result.user2_id)
+			})
+
+			var sql = `SELECT target_id FROM blocks WHERE blocker_id = $1`
+			const blockedusers = await pool.query(sql, [sess.userid])
+			const blockedUserIds = blockedusers.rows.map(user => user.target_id)
+
+			const userLists = {liked: likedUserIds, connected: connectedUserIds, blocked: blockedUserIds}
+			console.log("Userlists: ", userLists)
+			response.send(userLists)
 		}
 	})
 

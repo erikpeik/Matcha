@@ -5,6 +5,7 @@ import severityReducer from './reducers/severityReducer'
 import profileReducer from './reducers/profileReducer'
 import onlineUsersReducer from './reducers/onlineUsersReducer'
 import browsingReducer from './reducers/browsingReducer'
+import userListsReducer from './reducers/userListsReducer'
 
 const store = configureStore({
 	reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
 		profile: profileReducer,
 		onlineUsers: onlineUsersReducer,
 		browsingCriteria: browsingReducer,
+		userLists: userListsReducer
 	}
 })
 

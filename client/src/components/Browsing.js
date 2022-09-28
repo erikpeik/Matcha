@@ -8,6 +8,7 @@ import Loader from './Loader'
 import { useNavigate } from 'react-router-dom'
 import { setBrowsingCriteria } from '../reducers/browsingReducer'
 import { useDispatch, useSelector } from 'react-redux'
+import { getUserLists } from '../reducers/userListsReducer'
 
 const themelike = createTheme({
 	palette: {
@@ -36,8 +37,7 @@ const Browsing = () => {
 	const dispatch = useDispatch()
 	const [isLoading, setLoading] = useState(true);
 	const [users, setUsers] = useState([])
-	const [likedUsers, setLikedUsers] = useState([])
-	const [connectedUsers, setConnectedUsers] = useState([])
+	const userLists = useSelector(state => state.userLists)
 
 	const browsingCriteria = useSelector(state => state.browsingCriteria)
 	var [searchCriteria, setSearchCriteria] = useState(browsingCriteria)
@@ -50,16 +50,10 @@ const Browsing = () => {
 				setUsers(sortedUsers)
 				setLoading(false);
 			}
-			const likedUsersList = await browsingService.getLikedUsers()
-			setLikedUsers(likedUsersList)
-			const connectedUsersList = await browsingService.getConnectedUsers()
-			setConnectedUsers(connectedUsersList)
+			await dispatch(getUserLists())
 		}
 		getUsers()
-	}, [browsingCriteria])
-
-	// console.log("Liked users: ", likedUsers)
-	// console.log("Connected users: ", connectedUsers)
+	}, [dispatch, browsingCriteria])
 
 	if (isLoading) {
 		return <Loader />
@@ -68,14 +62,16 @@ const Browsing = () => {
 	// console.log("amount we got: ", users.length)
 	// console.log("amount we wanted: ", searchCriteria.amount)
 	// console.log("offset: ", searchCriteria.offset)
+	var total_results
+	var final_page
 	if (users.length === 0)
-		var total_results = 0
+		total_results = 0
 	else
-		var total_results = users[0].total_results
+		total_results = users[0].total_results
 	if (total_results === 0)
-		var final_page = 1
+		final_page = 1
 	else
-		var final_page = Math.ceil(total_results / searchCriteria.amount)
+		final_page = Math.ceil(total_results / searchCriteria.amount)
 
 	const submitSearchRequest = async () => {
 		const newCriteria = { ...searchCriteria, page: 1, offset: 0 }
@@ -133,11 +129,12 @@ const Browsing = () => {
 	}
 
 	const handlePagePlus = (page) => {
+		var offset
 		if (page < final_page) {
 			if (page === 1)
-				var offset = searchCriteria.amount
+				offset = searchCriteria.amount
 			else
-				var offset = (page - 2) * searchCriteria.amount
+				offset = (page - 2) * searchCriteria.amount
 			const newCriteria = { ...searchCriteria, page: page + 1, offset: offset }
 			setSearchCriteria(newCriteria)
 			dispatch(setBrowsingCriteria(newCriteria))
@@ -153,6 +150,13 @@ const Browsing = () => {
 
 	const unlikeUser = async (user_id) => {
 		browsingService.unlikeUser(user_id).then((response) => {
+			console.log(response)
+		})
+		setSearchCriteria({ ...searchCriteria })
+	}
+
+	const blockUser = async (user_id) => {
+		browsingService.blockUser(user_id).then((response) => {
 			console.log(response)
 		})
 		setSearchCriteria({ ...searchCriteria })
@@ -234,9 +238,9 @@ const Browsing = () => {
 				<Button onClick={submitSearchRequest}>Search Results</Button>
 				{users.map(user => {
 					var button
-					if (connectedUsers.includes(user.id)) {
+					if (userLists.connected.includes(user.id)) {
 						button = <div><Button theme={themeunlike} onClick={() => { unlikeUser(user.id) }}>Unlike user</Button><Button>Connected</Button></div>
-					} else if (likedUsers.includes(user.id)) {
+					} else if (userLists.liked.includes(user.id)) {
 						button = <Button theme={themeunlike} onClick={() => { unlikeUser(user.id) }}>Unlike user</Button>
 					} else {
 						button = <Button theme={themelike} onClick={() => { likeUser(user.id) }}>Like user</Button>
@@ -263,6 +267,7 @@ const Browsing = () => {
 								<p>Biography: {user.biography}</p>
 								<p>Common tags: {user.common_tags}</p>
 								{button}
+								<Button theme={themeunlike} onClick={() => { blockUser(user.id) }}>Block user</Button>
 							</div>
 						</div>
 						)
