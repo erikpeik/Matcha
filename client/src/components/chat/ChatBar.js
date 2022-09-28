@@ -1,4 +1,6 @@
 import { Paper, Typography, Box, Button, createTheme } from '@mui/material'
+import { changeRoom } from '../../reducers/roomReducer'
+import { useDispatch, useSelector } from 'react-redux'
 import ChatIcon from './ChatIcon'
 
 const theme = createTheme({
@@ -12,22 +14,62 @@ const theme = createTheme({
 	}
 })
 
-const ChatBar = ({ connections }) => {
+const ChatBar = ({ connections, socket }) => {
+	const dispatch = useDispatch()
+
+	const room = useSelector(state => state.room)
+	const user = useSelector(state => state.user)
+
+	if (connections.length > 0 && room === '' && user !== null) {
+		dispatch(changeRoom(connections[0].connection_id))
+		socket.emit('join_room', {
+			room: connections[0].connection_id,
+			user_id: user.id, username: user.name
+		})
+	}
+
+	const joinRoom = (connection_id) => {
+		socket.emit('leave_room', { room })
+		if (connection_id !== '') {
+			dispatch(changeRoom(connection_id))
+			socket.emit('join_room', {
+				room: connection_id, user_id: user.id, username: user.name
+			})
+		}
+	}
+
+	const textColor = {
+		true: 'white',
+		false: 'black'
+	}
+
+	const statusColor = {
+		true: 'rgb(255, 78, 104)',
+		false: '#f7f7f7'
+	}
+
 	return (
-		<Paper className='chat_sidebar' theme={theme}>
+		<Paper className='chat_sidebar' theme={theme} color='gray'>
 			<Typography variant='h5' align='center' sx={{ pt: 1 }}>Messages</Typography>
 			<Box sx={{ p: 1 }} >
 				<Box>
 					{connections.map(user => {
 						return (
-							<Button key={user.id} theme={theme}
+							<Button
+								key={user.id}
+								theme={theme}
+								onClick={() => joinRoom(user.connection_id)}
 								sx={{
+									mb: 1,
 									width: 1,
+									backgroundColor: statusColor[user.connection_id === room],
+									color: textColor[user.connection_id === room],
 									':hover': {
 										backgroundColor: 'rgb(255, 78, 104, 0.95)',
 										color: 'white'
 									}
-								}} >
+								}}
+							>
 								<Box key={user.id} sx={{
 									display: 'flex',
 									borderBottom: '1px solid #e0e0e0',

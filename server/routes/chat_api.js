@@ -10,19 +10,27 @@ module.exports = (app, pool, session) => {
 				// console.log(rows)
 				var connected_user = []
 				for (var i = 0; i < rows.length; i++) {
-					if (rows[i].user1_id === sess.userid) {
-						connected_user.push(rows[i].user2_id)
+					var row = rows[i]
+					if (row.user1_id === sess.userid) {
+						connected_user.push({
+							connection_id: row.connection_id,
+							user_id: row.user2_id
+						})
 					} else {
-						connected_user.push(rows[i].user1_id)
+						connected_user.push({
+							connection_id: row.connection_id,
+							user_id: row.user1_id
+						})
 					}
 				}
 				// console.log('connected_users:', connected_user)
 				for (var i = 0; i < connected_user.length; i++) {
-					variables = [connected_user[i]]
+					variables = [connected_user[i].user_id]
 					sql = `SELECT id, username, picture_data from users
 					LEFT JOIN user_pictures ON user_pictures.user_id = users.id
 					WHERE users.id = $1 AND profile_pic = 'YES'`
 					var { rows } = await pool.query(sql, variables)
+					rows[0].connection_id = connected_user[i].connection_id
 					connected_user[i] = rows[0]
 					// console.log(connected_user[i])
 				}

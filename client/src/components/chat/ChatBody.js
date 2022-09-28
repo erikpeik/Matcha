@@ -1,15 +1,25 @@
 import { useSelector } from 'react-redux'
-import { Button, Typography, Box, Paper } from '@mui/material'
+import { Typography, Box, Paper } from '@mui/material'
 import ChatIcon from './ChatIcon'
 
 const ChatBody = ({ connections, messages, user, typingStatus }) => {
 	const profileData = useSelector(state => state.profile)
+	const room = useSelector(state => state.room)
+
+	if (room === '') return (
+		<Typography
+			variant='h4'
+			align='center'
+			sx={{p: 2}}
+		>
+			Choose your Matcha!
+		</Typography>
+	)
 
 	return (
 		<>
 			<div className='chat_mainHeader'>
 				<Typography variant='h5'>Find your true love</Typography>
-				<Button>Leave Chat</Button>
 			</div>
 
 			{messages.map(message => {

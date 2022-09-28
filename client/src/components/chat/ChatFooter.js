@@ -1,24 +1,25 @@
 import { Button, Input } from '@mui/material'
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
 
 
 const ChatFooter = ({ socket, user }) => {
 	const [message, setMessage] = useState('')
+	const room = useSelector(state => state.room)
 
-	const handleTyping = () => socket.emit('typing', `${user.name} is typing...`)
+	if (room === '') return null
 
 	const handleSendMessage = (e) => {
 		e.preventDefault()
 		if (message.trim() && user) {
 			console.log('user:', user)
-			socket.emit('message', {
+			socket.emit('send_message', {
 				text: message,
 				name: user.name,
-				id: `${socket.id}${Math.random()}`,
-				socketID: socket.id
+				room: room,
+				// socketID: socket.id
 			})
 		}
-		socket.emit('typing', '')
 		setMessage('')
 	}
 
@@ -30,7 +31,6 @@ const ChatFooter = ({ socket, user }) => {
 					placeholder='Type a message'
 					value={message}
 					onChange={(e) => setMessage(e.target.value)}
-					onKeyDown={handleTyping}
 				/>
 				<Button type='submit'>Send</Button>
 			</form>

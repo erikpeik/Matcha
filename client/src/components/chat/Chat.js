@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Container, Paper, Grid, useMediaQuery, Box, Typography, Button } from '@mui/material'
+import { Container, Paper, Grid, useMediaQuery, Typography, Button } from '@mui/material'
 import chatService from '../../services/chatService'
 import ChatBar from './ChatBar'
 import ChatBody from './ChatBody'
@@ -18,7 +18,7 @@ const NoConnections = () => {
 			justifyContent="center"
 			style={{ minHeight: '50vh' }}
 		>
-			<Paper sx={{p: 2, mt: 2, pl: 5, pr: 5, display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
+			<Paper sx={{ p: 2, mt: 2, pl: 5, pr: 5, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
 				<Typography variant='h1'>😔</Typography>
 				<Typography variant='h5' color='#1c1c1c'>No Connections</Typography>
 				<Button component={Link} to='/browsing'>Browse more</Button>
@@ -44,9 +44,11 @@ const Chat = ({ socket }) => {
 	}, [])
 
 	useEffect(() => {
-		socket.on('messageResponse', (data) => {
+		socket.on('receive_message', (data) => {
+			console.log('message received:', data)
 			setMessages([...messages, data])
 		})
+		return () => socket.off('receive_message')
 	}, [socket, messages])
 
 	useEffect(() => {
@@ -60,12 +62,22 @@ const Chat = ({ socket }) => {
 		<Container maxWidth='lg' sx={{ pt: 5, pb: 5 }}>
 			<Grid container spacing={2} direction={matches ? 'column' : 'row'}>
 				<Grid item xs={4} md={4} >
-					<ChatBar connections={connections} />
+					<ChatBar
+						connections={connections}
+						socket={socket} />
 				</Grid>
 				<Grid item xs={8} md={8}>
 					<Paper>
-						<ChatBody connections={connections} messages={messages} user={user} typingStatus={typingStatus} />
-						<ChatFooter socket={socket} user={user} />
+						<ChatBody
+							connections={connections}
+							messages={messages}
+							user={user}
+							typingStatus={typingStatus}
+						/>
+						<ChatFooter
+							socket={socket}
+							user={user}
+						/>
 					</Paper>
 				</Grid>
 			</Grid>

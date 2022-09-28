@@ -10,8 +10,19 @@ module.exports = (http) => {
 	socketIO.on('connection', (socket) => {
 		console.log('socket connected:', socket.id);
 
-		socket.on('message', (data) => {
-			socketIO.emit('messageResponse', data)
+		socket.on('join_room', (data) => {
+			console.log('join_room', data);
+			socket.join(data.room);
+		})
+
+		socket.on('leave_room', (data) => {
+			socket.leave(data.room);
+		})
+
+		socket.on('send_message', (data) => {
+			const { text, name, room } = data
+			console.log('send_message', data);
+			socket.in(room).emit('receive_message', data)
 		})
 
 		socket.on('newUser', (data) => {
@@ -33,10 +44,6 @@ module.exports = (http) => {
 			console.log('users:', users)
 			socketIO.emit('newUserResponse', users)
 			socket.disconnect()
-		})
-
-		socket.on('typing', (data) => {
-			socket.broadcast.emit('typingResponse', data)
 		})
 
 		socket.on('logOut', (data) => {
