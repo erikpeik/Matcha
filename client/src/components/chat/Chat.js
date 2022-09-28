@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Container, Paper, Grid, useMediaQuery, Typography, Button } from '@mui/material'
+import { addMessage } from '../../reducers/messagesReducer'
 import chatService from '../../services/chatService'
 import ChatBar from './ChatBar'
 import ChatBody from './ChatBody'
 import ChatFooter from './ChatFooter'
-import { useSelector } from 'react-redux'
 import Loader from '../Loader'
 
 const NoConnections = () => {
@@ -28,11 +29,9 @@ const NoConnections = () => {
 }
 
 const Chat = ({ socket }) => {
-	const [messages, setMessages] = useState([])
-	const [typingStatus, setTypingStatus] = useState('')
 	const matches = useMediaQuery("(max-width:650px)");
-	const user = useSelector(state => state.user)
 	const [connections, setConnections] = useState(undefined)
+	const dispatch = useDispatch()
 
 	useEffect(() => {
 		const getConnections = async () => {
@@ -46,14 +45,10 @@ const Chat = ({ socket }) => {
 	useEffect(() => {
 		socket.on('receive_message', (data) => {
 			console.log('message received:', data)
-			setMessages([...messages, data])
+			dispatch(addMessage(data))
 		})
 		return () => socket.off('receive_message')
-	}, [socket, messages])
-
-	useEffect(() => {
-		socket.on('typingResponse', (data) => setTypingStatus(data))
-	}, [typingStatus, socket])
+	}, [socket, dispatch])
 
 	if (!connections) return <Loader />
 	if (connections.length === 0) return <NoConnections />
@@ -70,13 +65,9 @@ const Chat = ({ socket }) => {
 					<Paper>
 						<ChatBody
 							connections={connections}
-							messages={messages}
-							user={user}
-							typingStatus={typingStatus}
 						/>
 						<ChatFooter
 							socket={socket}
-							user={user}
 						/>
 					</Paper>
 				</Grid>

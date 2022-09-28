@@ -8,6 +8,7 @@ import browsingReducer from './reducers/browsingReducer'
 import userListsReducer from './reducers/userListsReducer'
 import displaySettingsReducer from './reducers/displaySettingsReducer'
 import roomReducer from './reducers/roomReducer'
+import messagesReducer from './reducers/messagesReducer'
 
 const store = configureStore({
 	reducer: {
@@ -19,7 +20,8 @@ const store = configureStore({
 		browsingCriteria: browsingReducer,
 		displaySettings: displaySettingsReducer,
 		userLists: userListsReducer,
-		room: roomReducer
+		room: roomReducer,
+		messages: messagesReducer,
 	}
 })
 

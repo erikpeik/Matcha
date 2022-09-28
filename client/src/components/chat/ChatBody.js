@@ -2,9 +2,11 @@ import { useSelector } from 'react-redux'
 import { Typography, Box, Paper } from '@mui/material'
 import ChatIcon from './ChatIcon'
 
-const ChatBody = ({ connections, messages, user, typingStatus }) => {
+const ChatBody = ({ connections }) => {
 	const profileData = useSelector(state => state.profile)
 	const room = useSelector(state => state.room)
+	const user = useSelector(state => state.user)
+	const messages = useSelector(state => state.messages)
 
 	if (room === '') return (
 		<Typography
@@ -59,7 +61,6 @@ const ChatBody = ({ connections, messages, user, typingStatus }) => {
 					)
 				}
 			})}
-			<Typography>{typingStatus}</Typography>
 		</>
 	)
 }
