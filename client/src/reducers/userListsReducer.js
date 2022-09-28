@@ -3,7 +3,7 @@ import browsingService from '../services/browsingService'
 
 const initialState = { liked: [], connected: [], blocked: [] }
 
-const userSlice = createSlice({
+const userListSlice = createSlice({
 	name: 'userLists',
 	initialState,
 	reducers: {
@@ -17,7 +17,7 @@ const userSlice = createSlice({
 	},
 })
 
-export const { setUserLists, resetUserLists } = userSlice.actions
+export const { setUserLists, resetUserLists } = userListSlice.actions
 
 export const getUserLists = () => {
 	return async dispatch => {
@@ -28,4 +28,4 @@ export const getUserLists = () => {
 	}
 }
 
-export default userSlice.reducer
+export default userListSlice.reducer

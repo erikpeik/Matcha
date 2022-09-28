@@ -9,13 +9,10 @@ const initialState = {
 	max_distance: 20000,
 	location: 'any',
 	sorting: 'age',
-	sort_order: 'asc',
-	amount: 10,
-	page: 1,
-	offset: 0
+	sort_order: 'asc'
 }
 
-const userSlice = createSlice({
+const browsingSlice = createSlice({
 	name: 'browsingCriteria',
 	initialState,
 	reducers: {
@@ -29,5 +26,5 @@ const userSlice = createSlice({
 	},
 })
 
-export const { setBrowsingCriteria, resetBrowsingCriteria } = userSlice.actions
-export default userSlice.reducer
+export const { setBrowsingCriteria, resetBrowsingCriteria } = browsingSlice.actions
+export default browsingSlice.reducer

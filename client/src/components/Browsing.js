@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getUserLists } from '../reducers/userListsReducer'
 import { changeNotification, resetNotification } from '../reducers/notificationReducer'
 import { changeSeverity } from '../reducers/severityReducer'
+import { setDisplaySettings } from '../reducers/displaySettingsReducer'
 import Notification from './Notification'
 
 const themelike = createTheme({
@@ -43,6 +44,7 @@ const Browsing = () => {
 	const userLists = useSelector(state => state.userLists)
 
 	const browsingCriteria = useSelector(state => state.browsingCriteria)
+	const displaySettings = useSelector(state => state.displaySettings)
 	const [searchCriteria, setSearchCriteria] = useState(browsingCriteria)
 
 	useEffect(() => {
@@ -71,21 +73,20 @@ const Browsing = () => {
 	if (total_results === 0)
 		final_page = 1
 	else
-		final_page = Math.ceil(total_results / searchCriteria.amount)
+		final_page = Math.ceil(total_results / displaySettings.amount)
 
 	const submitSearchRequest = async () => {
-		const newCriteria = { ...searchCriteria, page: 1, offset: 0 }
+		const newCriteria = { ...searchCriteria }
 		const sortedUsers = await browsingService.getSortedUsers(newCriteria)
 		if (sortedUsers)
 			setUsers(sortedUsers)
 		setSearchCriteria(newCriteria)
 		dispatch(setBrowsingCriteria(newCriteria))
+		dispatch(setDisplaySettings({ ...displaySettings, page: 1, offset: 0 }))
 	}
 
 	const handleAmount = (event) => {
-		const newCriteria = { ...searchCriteria, page: 1, amount: event.target.value }
-		setSearchCriteria(newCriteria)
-		dispatch(setBrowsingCriteria(newCriteria))
+		dispatch(setDisplaySettings({ ...displaySettings, page: 1, amount: event.target.value }))
 	}
 
 	const handleSorting = (event) => {
@@ -112,32 +113,26 @@ const Browsing = () => {
 		setSearchCriteria({ ...searchCriteria, min_distance: event.target.value[0], max_distance: event.target.value[1] })
 	}
 
-	const handlePageChange = (page) => {
+	const handlePageChange = (newPage) => {
 		if (final_page > 1) {
-			const newCriteria = { ...searchCriteria, page: page, offset: (page - 1) * searchCriteria.amount }
-			setSearchCriteria(newCriteria)
-			dispatch(setBrowsingCriteria(newCriteria))
+			dispatch(setDisplaySettings({ ...displaySettings, page: newPage, offset: (newPage - 1) * displaySettings.amount }))
 		}
 	}
 
-	const handlePageMinus = (page) => {
-		if (page > 1) {
-			const newCriteria = { ...searchCriteria, page: page - 1, offset: (page - 2) * searchCriteria.amount }
-			setSearchCriteria(newCriteria)
-			dispatch(setBrowsingCriteria(newCriteria))
+	const handlePageMinus = (newPage) => {
+		if (newPage > 0) {
+			dispatch(setDisplaySettings({ ...displaySettings, page: newPage, offset: (newPage - 1) * displaySettings.amount }))
 		}
 	}
 
-	const handlePagePlus = (page) => {
+	const handlePagePlus = (newPage) => {
 		var offset
-		if (page < final_page) {
-			if (page === 1)
-				offset = searchCriteria.amount
+		if (newPage <= final_page) {
+			if (newPage === 1)
+				offset = displaySettings.amount
 			else
-				offset = (page - 2) * searchCriteria.amount
-			const newCriteria = { ...searchCriteria, page: page + 1, offset: offset }
-			setSearchCriteria(newCriteria)
-			dispatch(setBrowsingCriteria(newCriteria))
+				offset = (newPage - 1) * displaySettings.amount
+			dispatch(setDisplaySettings({ ...displaySettings, page: newPage, offset: offset }))
 		}
 	}
 
@@ -162,20 +157,22 @@ const Browsing = () => {
 		dispatch(setBrowsingCriteria({ ...searchCriteria }))
 	}
 
+	var pageUsers = users.slice(displaySettings.offset, displaySettings.offset + displaySettings.amount)
+
 	return (
 		<Container maxWidth='md' sx={{ pt: 5, pb: 5 }}>
 			<Paper elevation={10} sx={{ p: 3 }}>
 				<div className="pagination">
 					<button onClick={() => handlePageChange(1)}>First</button>
-					<button onClick={() => handlePageMinus(searchCriteria.page)}>&laquo;</button>
-					<>		Page {searchCriteria.page} / {final_page}		</>
-					<button onClick={() => handlePagePlus(searchCriteria.page)}>&raquo;</button>
+					<button onClick={() => handlePageMinus(displaySettings.page - 1)}>&laquo;</button>
+					<>		Page {displaySettings.page} / {final_page}		</>
+					<button onClick={() => handlePagePlus(displaySettings.page + 1)}>&raquo;</button>
 					<button onClick={() => handlePageChange(final_page)}>Last</button>
 				</div>
 				<br></br>
 				<FormControl fullWidth sx={{ mb: 2 }}>
 					<InputLabel id='amount'>Amount of results per page:</InputLabel>
-					<Select labelId='amount' id='amount' name='amount' value={searchCriteria.amount} onChange={handleAmount} required>
+					<Select labelId='amount' id='amount' name='amount' value={displaySettings.amount} onChange={handleAmount} required>
 						<MenuItem value={10} key={10}>{10}</MenuItem>
 						<MenuItem value={50} key={50}>{50}</MenuItem>
 						<MenuItem value={100} key={100}>{100}</MenuItem>
@@ -236,7 +233,7 @@ const Browsing = () => {
 					/>
 				</Box>
 				<Button onClick={submitSearchRequest}>Search Results</Button>
-				{users.map(user => {
+				{pageUsers.map(user => {
 					var button
 					if (userLists.connected.includes(user.id)) {
 						button = <div><Button theme={themeunlike} onClick={() => { unlikeUser(user.id) }}>Unlike user</Button><Button>Connected</Button></div>

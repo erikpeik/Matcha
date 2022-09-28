@@ -47,7 +47,7 @@ module.exports = (app, pool, session) => {
 		try {
 			if (sess.userid) {
 				const variables = [sess.userid, body.min_age, body.max_age, body.min_fame, body.max_fame, body.sorting, body.sort_order,
-				sess.location[0], sess.location[1], body.min_distance, body.max_distance, body.amount, body.offset]
+				sess.location[0], sess.location[1], body.min_distance, body.max_distance]
 				console.log("Variables: ", body, sess.location[0], sess.location[1])
 				var sql = `SELECT *, COUNT(*) OVER() as total_results FROM
 						(SELECT id, username, firstname, lastname, gender, age, sexual_pref,
@@ -70,8 +70,7 @@ module.exports = (app, pool, session) => {
 								(CASE WHEN $6 = 'fame_rating' AND $7 = 'asc' THEN fame_rating END) ASC,
 								(CASE WHEN $6 = 'fame_rating' AND $7 = 'desc' THEN fame_rating END) DESC,
 								(CASE WHEN $6 = 'common_tags' AND $7 = 'asc' THEN common_tags END) ASC,
-								(CASE WHEN $6 = 'common_tags' AND $7 = 'desc' THEN common_tags END) DESC, username
-						LIMIT $12 OFFSET $13`;
+								(CASE WHEN $6 = 'common_tags' AND $7 = 'desc' THEN common_tags END) DESC, username`;
 				var { rows } = await pool.query(sql, variables)
 
 				var returnedRows = rows.map(user => {

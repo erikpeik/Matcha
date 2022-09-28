@@ -19,6 +19,7 @@ const TagsInput = ({ tags, setTags }) => {
 	const handleTagChange = (event) => {
 		if (event.key !== 'Enter' || event.target.value === '')
 			return
+		event.preventDefault()
 		setTags([...tags, event.target.value])
 		event.target.value = ''
 	}
@@ -204,13 +205,13 @@ const ProfileSettings = () => {
 						onChange={handleBiography}
 						placeholder='Short description of you here...'
 					/>
+					<FormLabel id='tags' >Tags</FormLabel>
+					<TagsInput tags={tags} setTags={setTags} />
 					<Button type="submit" variant='contained' theme={theme}
 						size='large' sx={{ mt: 1 }}>
 						Save settings
 					</Button>
 				</form>
-				<FormLabel id='tags' >Tags</FormLabel>
-				<TagsInput tags={tags} setTags={setTags} />
 				<Notification />
 			</Paper>
 		</Container>
