@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux'
 import { Button, Typography, Box, Paper } from '@mui/material'
 import ChatIcon from './ChatIcon'
 
-const ChatBody = ({ connectedUsers, messages, user, typingStatus }) => {
+const ChatBody = ({ connections, messages, user, typingStatus }) => {
 	const profileData = useSelector(state => state.profile)
 
 	return (
@@ -30,9 +30,8 @@ const ChatBody = ({ connectedUsers, messages, user, typingStatus }) => {
 						</Box>
 					)
 				} else {
-					var userFromConnections = connectedUsers.find(user => user.username === message.name)
-					var profile_pic = userFromConnections.profile_pic
-
+					var userFromConnections = connections.find(user => user.username === message.name)
+					var profile_pic = userFromConnections.picture_data
 					return (
 						<Box key={message.id} sx={{
 							display: 'flex', alignItems: "flex-start",

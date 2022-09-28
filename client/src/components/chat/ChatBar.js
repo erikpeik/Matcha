@@ -12,13 +12,13 @@ const theme = createTheme({
 	}
 })
 
-const ChatBar = ({ connectedUsers }) => {
+const ChatBar = ({ connections }) => {
 	return (
 		<Paper className='chat_sidebar' theme={theme}>
 			<Typography variant='h5' align='center' sx={{ pt: 1 }}>Messages</Typography>
 			<Box sx={{ p: 1 }} >
 				<Box>
-					{connectedUsers.map(user => {
+					{connections.map(user => {
 						return (
 							<Button key={user.id} theme={theme}
 								sx={{
@@ -40,7 +40,7 @@ const ChatBar = ({ connectedUsers }) => {
 									}}>
 										<ChatIcon
 											username={user.username}
-											image={user.profile_pic}
+											image={user.picture_data}
 										/>
 										<Typography theme={theme}
 											key={user.id} variant='h6'

@@ -1,5 +1,6 @@
-import { useEffect, useState} from 'react'
-import { Container, Paper, Grid, useMediaQuery } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Container, Paper, Grid, useMediaQuery, Box, Typography, Button } from '@mui/material'
 import chatService from '../../services/chatService'
 import ChatBar from './ChatBar'
 import ChatBody from './ChatBody'
@@ -7,18 +8,37 @@ import ChatFooter from './ChatFooter'
 import { useSelector } from 'react-redux'
 import Loader from '../Loader'
 
+const NoConnections = () => {
+	return (
+		<Grid
+			container
+			spacing={0}
+			direction="column"
+			alignItems="center"
+			justifyContent="center"
+			style={{ minHeight: '50vh' }}
+		>
+			<Paper sx={{p: 2, mt: 2, pl: 5, pr: 5, display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
+				<Typography variant='h1'>😔</Typography>
+				<Typography variant='h5' color='#1c1c1c'>No Connections</Typography>
+				<Button component={Link} to='/browsing'>Browse more</Button>
+			</Paper>
+		</Grid>
+	)
+}
+
 const Chat = ({ socket }) => {
 	const [messages, setMessages] = useState([])
 	const [typingStatus, setTypingStatus] = useState('')
 	const matches = useMediaQuery("(max-width:650px)");
 	const user = useSelector(state => state.user)
-	const [connectedUsers, setConnectedUsers] = useState([])
+	const [connections, setConnections] = useState(undefined)
 
 	useEffect(() => {
 		const getConnections = async () => {
-			const users = await chatService.getUsernames()
-			console.log("Usernames:", users)
-			setConnectedUsers(users)
+			const connections = await chatService.chat_connections()
+			console.log('connections:', connections)
+			setConnections(connections)
 		}
 		getConnections()
 	}, [])
@@ -33,17 +53,18 @@ const Chat = ({ socket }) => {
 		socket.on('typingResponse', (data) => setTypingStatus(data))
 	}, [typingStatus, socket])
 
-	if (connectedUsers.length === 0) return <Loader />
+	if (!connections) return <Loader />
+	if (connections.length === 0) return <NoConnections />
 
 	return (
 		<Container maxWidth='lg' sx={{ pt: 5, pb: 5 }}>
 			<Grid container spacing={2} direction={matches ? 'column' : 'row'}>
 				<Grid item xs={4} md={4} >
-					<ChatBar connectedUsers={connectedUsers} />
+					<ChatBar connections={connections} />
 				</Grid>
 				<Grid item xs={8} md={8}>
 					<Paper>
-						<ChatBody connectedUsers={connectedUsers} messages={messages} user={user} typingStatus={typingStatus} />
+						<ChatBody connections={connections} messages={messages} user={user} typingStatus={typingStatus} />
 						<ChatFooter socket={socket} user={user} />
 					</Paper>
 				</Grid>

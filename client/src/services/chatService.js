@@ -6,5 +6,10 @@ const getUsernames = () => {
 	return request.then(response => response.data)
 }
 
-const chatService = { getUsernames }
+const chat_connections = () => {
+	const request = axios.get(`${baseUrl}/chat_connections`)
+	return request.then(response => response.data)
+}
+
+const chatService = { getUsernames, chat_connections }
 export default chatService
