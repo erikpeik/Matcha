@@ -20,9 +20,7 @@ module.exports = (http) => {
 		})
 
 		socket.on('send_message', (data) => {
-			const { text, name, room } = data
-			console.log('send_message', data);
-			socket.in(room).emit('receive_message', data)
+			socketIO.in(data.room).emit('receive_message', data)
 		})
 
 		socket.on('newUser', (data) => {
