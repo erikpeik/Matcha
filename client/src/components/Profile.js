@@ -9,6 +9,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import { Container } from '@mui/system'
 import Notification from './Notification'
+import { resetNotification } from '../reducers/notificationReducer'
 import { changeSeverity } from '../reducers/severityReducer'
 import { getProfileData } from '../reducers/profileReducer'
 import profileService from '../services/profileService'
@@ -55,6 +56,7 @@ const Profile = () => {
 	const profileData = useSelector(state => state.profile)
 
 	useEffect(() => {
+		dispatch(resetNotification())
 		const getData = async () => {
 			await dispatch(getProfileData())
 			setLoading(false);

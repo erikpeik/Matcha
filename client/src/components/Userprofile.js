@@ -8,7 +8,11 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import { Container } from '@mui/system'
 import browsingService from '../services/browsingService'
+import { getUserLists } from '../reducers/userListsReducer'
+import Notification from './Notification'
 import Loader from './Loader'
+import { changeSeverity } from '../reducers/severityReducer'
+import { changeNotification } from '../reducers/notificationReducer'
 
 const themelike = createTheme({
 	palette: {
@@ -66,6 +70,7 @@ const UserProfile = () => {
 			const userProfile = await browsingService.getUserProfile(params.id)
 			setUserData(userProfile)
 			setLoading(false)
+			dispatch(changeNotification(''))
 		}
 		getData()
 	}, [params, dispatch])
@@ -96,21 +101,26 @@ const UserProfile = () => {
 	}
 
 	const likeUser = async (user_id) => {
-		browsingService.likeUser(user_id).then((response) => {
-			console.log(response)
-		})
+		const result = await browsingService.likeUser(user_id)
+		if (result === 'No profile picture') {
+			dispatch(changeSeverity('error'))
+			dispatch(changeNotification('You must set a profile picture before you can like other users.'))
+		} else {
+			dispatch(getUserLists())
+		}
 	}
 
 	const unlikeUser = async (user_id) => {
-		browsingService.unlikeUser(user_id).then((response) => {
-			console.log(response)
-		})
+		await browsingService.unlikeUser(user_id)
+		dispatch(getUserLists())
 	}
 
 	const blockUser = async (user_id) => {
-		browsingService.blockUser(user_id).then((response) => {
-			console.log(response)
-		})
+		browsingService.blockUser(user_id)
+		dispatch(changeSeverity('success'))
+		dispatch(changeNotification(`This user has been blocked and will not show up in your search results.
+		Neither can they see you or like you anymore.`))
+		dispatch(getUserLists())
 	}
 
 	var likeButton
@@ -177,6 +187,7 @@ const UserProfile = () => {
 					)}
 				</div>
 			</Paper>
+			<Notification />
 		</Container>
 	)
 }

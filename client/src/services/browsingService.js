@@ -26,16 +26,6 @@ const blockUser = user_id => {
 	return request.then(response => response.data)
 }
 
-const getLikedUsers = () => {
-	const request = axios.get(`${baseUrl}/likedusers`)
-	return request.then(response => response.data)
-}
-
-const getConnectedUsers = () => {
-	const request = axios.get(`${baseUrl}/connectedusers`)
-	return request.then(response => response.data)
-}
-
 const getUserLists = () => {
 	const request = axios.get(`${baseUrl}/userlists`)
 	return request.then(response => response.data)
@@ -47,8 +37,7 @@ const getUserProfile = (id) => {
 }
 
 const browsingService = {
-	getAll, getSortedUsers, likeUser, unlikeUser, blockUser, getLikedUsers, getConnectedUsers, getUserLists,
-	getUserProfile
+	getAll, getSortedUsers, likeUser, unlikeUser, blockUser, getUserLists, getUserProfile
 }
 
 export default browsingService

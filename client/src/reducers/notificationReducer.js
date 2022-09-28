@@ -9,11 +9,14 @@ const notificationSlice = createSlice({
 		changeNotification(state, action) {
 			const content = action.payload
 			return content
+		},
+		resetNotification() {
+			return initialState
 		}
 	},
 })
 
-export const { changeNotification } = notificationSlice.actions
+export const { changeNotification, resetNotification } = notificationSlice.actions
 
 export const setNotification = (content, duration) => {
 	return async dispatch => {

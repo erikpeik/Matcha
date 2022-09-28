@@ -51,13 +51,15 @@ module.exports = (app, pool, session) => {
 				console.log("Variables: ", body, sess.location[0], sess.location[1])
 				var sql = `SELECT *, COUNT(*) OVER() as total_results FROM
 						(SELECT id, username, firstname, lastname, gender, age, sexual_pref,
-						biography, fame_rating, user_location, picture_data AS profile_pic,
+						biography, fame_rating, user_location, picture_data AS profile_pic, blocker_id, target_id,
 						calculate_distance($8, $9, ip_location[0], ip_location[1], 'K') AS distance,
 						(SELECT COUNT(*) FROM tags WHERE tagged_users @> array[$1,users.id]) AS common_tags
 						FROM users
 						LEFT JOIN user_settings ON users.id = user_settings.user_id
 						LEFT JOIN user_pictures ON users.id = user_pictures.user_id
-						WHERE users.id != $1 AND users.verified = 'YES'
+						LEFT JOIN blocks ON (users.id = blocks.target_id AND blocks.blocker_id = $1) OR
+											(users.id = blocks.blocker_id AND blocks.target_id = $1)
+						WHERE users.id != $1 AND blocker_id IS NULL AND target_id IS NULL AND users.verified = 'YES'
 						AND age BETWEEN $2 and $3 AND fame_rating BETWEEN $4 AND $5
 						AND calculate_distance($8, $9, ip_location[0], ip_location[1], 'K') BETWEEN $10 and $11)
 						AS x
@@ -92,20 +94,28 @@ module.exports = (app, pool, session) => {
 		const sess = request.session
 
 		if (sess.userid) {
-			const liked_person_id = request.params.id
+			var sql = `SELECT picture_data FROM user_pictures WHERE user_id = $1 AND profile_pic = 'YES'`
+			const { rows } = await pool.query(sql, [sess.userid])
 
-			var sql = `INSERT INTO likes (liker_id, target_id) VALUES ($1, $2)`
-			await pool.query(sql, [sess.userid, liked_person_id])
+			if (rows[0]['picture_data'] === 'http://localhost:3000/images/default_profilepic.jpeg') {
+				return response.send('No profile picture')
+			} else {
 
-			var sql = `SELECT * FROM likes WHERE liker_id = $2 AND target_id = $1`
-			const { rows } = await pool.query(sql, [sess.userid, liked_person_id])
+				const liked_person_id = request.params.id
 
-			if (rows.length !== 0) {
-				var sql = `INSERT INTO connections (user1_id, user2_id) VALUES ($1, $2)`
+				var sql = `INSERT INTO likes (liker_id, target_id) VALUES ($1, $2);`
 				await pool.query(sql, [sess.userid, liked_person_id])
-			}
 
-			response.status(200).send("Liked user!")
+				var sql = `SELECT * FROM likes WHERE liker_id = $2 AND target_id = $1`
+				const reverseliked = await pool.query(sql, [sess.userid, liked_person_id])
+
+				if (reverseliked.rows.length !== 0) {
+					var sql = `INSERT INTO connections (user1_id, user2_id) VALUES ($1, $2)`
+					await pool.query(sql, [sess.userid, liked_person_id])
+				}
+
+				response.status(200).send("Liked user!")
+			}
 		}
 	})
 
@@ -146,48 +156,16 @@ module.exports = (app, pool, session) => {
 		}
 	})
 
-	app.get('/api/browsing/likedusers', async (request, response) => {
-		const sess = request.session
-
-		if (sess.userid) {
-			var sql = `SELECT target_id FROM likes WHERE liker_id = $1`
-			const { rows } = await pool.query(sql, [sess.userid])
-			const likedUserIds = rows.map(user => user.target_id)
-			console.log(likedUserIds)
-			response.send(likedUserIds)
-		}
-	})
-
-	app.get('/api/browsing/connectedusers', async (request, response) => {
-		const sess = request.session
-
-		if (sess.userid) {
-			var sql = `SELECT user2_id FROM connections WHERE user1_id = $1`
-			var results1 = await pool.query(sql, [sess.userid])
-
-			var sql = `SELECT user1_id FROM connections WHERE user2_id = $1`
-			var results2 = await pool.query(sql, [sess.userid])
-
-			const results = results1.rows.concat(results2.rows)
-			const connectedUserIds = results.map(result => {
-				if (result.user1_id)
-					return (result.user1_id)
-				else if (result.user2_id)
-					return (result.user2_id)
-			})
-			console.log(connectedUserIds)
-			response.send(connectedUserIds)
-		}
-	})
-
 	app.get('/api/browsing/userlists', async (request, response) => {
 		const sess = request.session
 		if (sess.userid) {
 			var sql = `SELECT target_id FROM likes WHERE liker_id = $1`
+			console.log("Getting likes...")
 			const likedusers = await pool.query(sql, [sess.userid])
 			const likedUserIds = likedusers.rows.map(user => user.target_id)
 
 			var sql = `SELECT user2_id FROM connections WHERE user1_id = $1`
+			console.log("Getting connections...")
 			var results1 = await pool.query(sql, [sess.userid])
 			var sql = `SELECT user1_id FROM connections WHERE user2_id = $1`
 			var results2 = await pool.query(sql, [sess.userid])
@@ -200,10 +178,11 @@ module.exports = (app, pool, session) => {
 			})
 
 			var sql = `SELECT target_id FROM blocks WHERE blocker_id = $1`
+			console.log("Getting blocks...")
 			const blockedusers = await pool.query(sql, [sess.userid])
 			const blockedUserIds = blockedusers.rows.map(user => user.target_id)
 
-			const userLists = {liked: likedUserIds, connected: connectedUserIds, blocked: blockedUserIds}
+			const userLists = { liked: likedUserIds, connected: connectedUserIds, blocked: blockedUserIds }
 			console.log("Userlists: ", userLists)
 			response.send(userLists)
 		}

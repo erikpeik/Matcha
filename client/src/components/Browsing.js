@@ -9,6 +9,9 @@ import { useNavigate } from 'react-router-dom'
 import { setBrowsingCriteria } from '../reducers/browsingReducer'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUserLists } from '../reducers/userListsReducer'
+import { changeNotification, resetNotification } from '../reducers/notificationReducer'
+import { changeSeverity } from '../reducers/severityReducer'
+import Notification from './Notification'
 
 const themelike = createTheme({
 	palette: {
@@ -40,13 +43,13 @@ const Browsing = () => {
 	const userLists = useSelector(state => state.userLists)
 
 	const browsingCriteria = useSelector(state => state.browsingCriteria)
-	var [searchCriteria, setSearchCriteria] = useState(browsingCriteria)
+	const [searchCriteria, setSearchCriteria] = useState(browsingCriteria)
 
 	useEffect(() => {
+		dispatch(resetNotification())
 		const getUsers = async () => {
 			const sortedUsers = await browsingService.getSortedUsers(browsingCriteria)
 			if (sortedUsers) {
-				// console.log("Fetched users: ", sortedUsers)
 				setUsers(sortedUsers)
 				setLoading(false);
 			}
@@ -59,9 +62,6 @@ const Browsing = () => {
 		return <Loader />
 	}
 
-	// console.log("amount we got: ", users.length)
-	// console.log("amount we wanted: ", searchCriteria.amount)
-	// console.log("offset: ", searchCriteria.offset)
 	var total_results
 	var final_page
 	if (users.length === 0)
@@ -142,24 +142,24 @@ const Browsing = () => {
 	}
 
 	const likeUser = async (user_id) => {
-		browsingService.likeUser(user_id).then((response) => {
-			console.log(response)
-		})
-		setSearchCriteria({ ...searchCriteria })
+		const result = await browsingService.likeUser(user_id)
+		if (result === 'No profile picture') {
+			dispatch(changeSeverity('error'))
+			dispatch(changeNotification('You must set a profile picture before you can like other users.'))
+		} else {
+			dispatch(getUserLists())
+		}
 	}
 
 	const unlikeUser = async (user_id) => {
-		browsingService.unlikeUser(user_id).then((response) => {
-			console.log(response)
-		})
-		setSearchCriteria({ ...searchCriteria })
+		await browsingService.unlikeUser(user_id)
+		dispatch(getUserLists())
 	}
 
 	const blockUser = async (user_id) => {
-		browsingService.blockUser(user_id).then((response) => {
-			console.log(response)
-		})
-		setSearchCriteria({ ...searchCriteria })
+		await browsingService.blockUser(user_id)
+		dispatch(getUserLists())
+		dispatch(setBrowsingCriteria({ ...searchCriteria }))
 	}
 
 	return (
@@ -274,6 +274,7 @@ const Browsing = () => {
 				}
 				)}
 			</Paper>
+			<Notification />
 		</Container >
 	)
 
