@@ -43,6 +43,25 @@ module.exports = (app, pool, session) => {
 		}
 	})
 
+	app.post('/api/chat/room_messages', async (request, response) => {
+		const sess = request.session
+		const connection_id = request.body.room
+		try {
+			if (sess.userid) {
+				var variables = [connection_id]
+				var sql = `SELECT message as text, sender_id, username as name, connection_id as room, chat_id as key FROM chat
+				INNER JOIN users ON users.id = chat.sender_id
+				WHERE connection_id = $1`
+				var { rows } = await pool.query(sql, variables)
+				response.send(rows)
+			} else {
+				response.send(false)
+			}
+		} catch (err) {
+			console.log(err)
+		}
+	})
+
 	app.post('/api/chat/usernames', async (request, response) => {
 		const body = request.body
 		const sess = request.session

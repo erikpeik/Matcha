@@ -113,3 +113,13 @@ CREATE TABLE IF NOT EXISTS tags (
 	tag_content VARCHAR(255) NOT NULL,
 	tagged_users INT[] DEFAULT array[]::INT[]
 );
+
+CREATE TABLE IF NOT EXISTS chat (
+	chat_id SERIAL NOT NULL PRIMARY KEY,
+	connection_id INT NOT NULL,
+	sender_id INT NOT NULL,
+	message TEXT NOT NULL,
+	time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (connection_id) REFERENCES connections (connection_id) ON DELETE CASCADE,
+	FOREIGN KEY (sender_id) REFERENCES users (id) ON DELETE CASCADE
+);

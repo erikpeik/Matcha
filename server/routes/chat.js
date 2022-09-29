@@ -1,4 +1,4 @@
-module.exports = (http) => {
+module.exports = (http, pool) => {
 	const socketIO = require('socket.io')(http, {
 		cors: {
 			origin: "http://localhost:3000"
@@ -20,7 +20,14 @@ module.exports = (http) => {
 		})
 
 		socket.on('send_message', (data) => {
+			const sendToDatabase = (data) => {
+				var variables = [data.room, data.sender_id, data.text]
+				var sql = `INSERT INTO chat (connection_id, sender_id, message)
+				VALUES ($1, $2, $3)`
+				pool.query(sql, variables)
+			}
 			socketIO.in(data.room).emit('receive_message', data)
+			sendToDatabase(data)
 		})
 
 		socket.on('newUser', (data) => {

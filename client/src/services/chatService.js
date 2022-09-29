@@ -11,5 +11,10 @@ const chat_connections = () => {
 	return request.then(response => response.data)
 }
 
-const chatService = { getUsernames, chat_connections }
+const getRoomMessages = (room) => {
+	const request = axios.post(`${baseUrl}/room_messages`, { room })
+	return request.then(response => response.data)
+}
+
+const chatService = { getUsernames, chat_connections, getRoomMessages }
 export default chatService

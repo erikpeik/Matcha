@@ -2,7 +2,6 @@ import { Paper, Typography, Box, Button, createTheme } from '@mui/material'
 import { changeRoom } from '../../reducers/roomReducer'
 import { useDispatch, useSelector } from 'react-redux'
 import ChatIcon from './ChatIcon'
-import { resetMessage } from '../../reducers/messagesReducer'
 
 const theme = createTheme({
 	palette: {
@@ -22,7 +21,6 @@ const ChatBar = ({ connections, socket }) => {
 	const user = useSelector(state => state.user)
 
 	if (connections.length > 0 && room === '' && user !== null) {
-		dispatch(resetMessage())
 		dispatch(changeRoom(connections[0].connection_id))
 		socket.emit('join_room', {
 			room: connections[0].connection_id,
@@ -32,7 +30,6 @@ const ChatBar = ({ connections, socket }) => {
 
 	const joinRoom = (connection_id) => {
 		socket.emit('leave_room', { room })
-		dispatch(resetMessage())
 		if (connection_id !== '') {
 			dispatch(changeRoom(connection_id))
 			socket.emit('join_room', {

@@ -13,12 +13,12 @@ const ChatFooter = ({ socket }) => {
 	const handleSendMessage = (e) => {
 		e.preventDefault()
 		if (message.trim() && user) {
-			console.log('user:', user)
 			socket.emit('send_message', {
 				text: message,
+				sender_id: user.id,
 				name: user.name,
 				room: room,
-				// socketID: socket.id
+				key: `${user.id}-${room}-${Date.now()}`
 			})
 		}
 		setMessage('')

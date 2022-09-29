@@ -1,18 +1,32 @@
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { Typography, Box, Paper } from '@mui/material'
 import ChatIcon from './ChatIcon'
+import chatService from '../../services/chatService'
+import { useEffect } from 'react'
+import { setMessages } from '../../reducers/messagesReducer'
 
 const ChatBody = ({ connections }) => {
 	const profileData = useSelector(state => state.profile)
 	const room = useSelector(state => state.room)
 	const user = useSelector(state => state.user)
 	const messages = useSelector(state => state.messages)
+	const dispatch = useDispatch()
+
+	useEffect(() => {
+		console.log('room:', room)
+		chatService.getRoomMessages(room)
+			.then(data => {
+				// console.log('data:', data)
+				dispatch(setMessages(data))
+			}
+			)
+	}, [room, dispatch])
 
 	if (room === '') return (
 		<Typography
 			variant='h4'
 			align='center'
-			sx={{p: 2}}
+			sx={{ p: 2 }}
 		>
 			Choose your Matcha!
 		</Typography>
@@ -27,7 +41,7 @@ const ChatBody = ({ connections }) => {
 			{messages.map(message => {
 				if (message.name === user.name) {
 					return (
-						<Box key={message.id} sx={{
+						<Box key={message.key} sx={{
 							display: 'flex', alignItems: "flex-start",
 							justifyContent: 'flex-end', mb: 1
 						}}>
@@ -45,7 +59,7 @@ const ChatBody = ({ connections }) => {
 					var userFromConnections = connections.find(user => user.username === message.name)
 					var profile_pic = userFromConnections.picture_data
 					return (
-						<Box key={message.id} sx={{
+						<Box key={message.key} sx={{
 							display: 'flex', alignItems: "flex-start",
 							justifyContent: 'flex-start', mb: 1
 						}}>
