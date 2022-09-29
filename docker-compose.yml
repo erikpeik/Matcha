@@ -8,12 +8,15 @@ services:
       - postgres-db
     env_file:
       - .env
+    environment:
+      WAIT_HOSTS: postgres-db:5432
     ports:
       - 3001:3001
     volumes:
       - /app/node_modules
       - ./server:/app
     command: npm run dev
+    restart: on-failure
 
   client:
     build: ./client
