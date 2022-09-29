@@ -32,15 +32,15 @@ const filterUsers = (users, filters, profileData) => {
 	const filterSex = () => {
 		switch (true) {
 			case (profileData.gender === 'male' && profileData.sexual_pref === 'male'):
-				return filteredUsers.filter(user => user.gender === 'male' && user.sexual_pref === 'male')
+				return filteredUsers.filter(user => user.gender === 'male' && (user.sexual_pref === 'male' || user.sexual_pref === 'bisexual'))
 			case (profileData.gender === 'male' && profileData.sexual_pref === 'female'):
-				return filteredUsers.filter(user => user.gender === 'female' && user.sexual_pref === 'male')
+				return filteredUsers.filter(user => user.gender === 'female' && (user.sexual_pref === 'male' || user.sexual_pref === 'bisexual'))
 			case (profileData.gender === 'male' && profileData.sexual_pref === 'bisexual'):
 				return filteredUsers.filter(user => user.sexual_pref === 'male' || user.sexual_pref === 'bisexual')
 			case (profileData.gender === 'female' && profileData.sexual_pref === 'male'):
-				return filteredUsers.filter(user => user.gender === 'male' && user.sexual_pref === 'female')
+				return filteredUsers.filter(user => user.gender === 'male' && (user.sexual_pref === 'female' || user.sexual_pref === 'bisexual'))
 			case (profileData.gender === 'female' && profileData.sexual_pref === 'female'):
-				return filteredUsers.filter(user => user.gender === 'female' && user.sexual_pref === 'female')
+				return filteredUsers.filter(user => user.gender === 'female' && (user.sexual_pref === 'female' || user.sexual_pref === 'bisexual'))
 			case (profileData.gender === 'female' && profileData.sexual_pref === 'bisexual'):
 				return filteredUsers.filter(user => user.sexual_pref === 'female' || user.sexual_pref === 'bisexual')
 			case (profileData.gender === 'other' && profileData.sexual_pref === 'male'):
@@ -101,7 +101,7 @@ const Browsing = () => {
 	useEffect(() => {
 		dispatch(resetNotification())
 		const getUsers = async () => {
-			const allUsers = await browsingService.getSortedUsers(browsingCriteria)
+			const allUsers = await browsingService.getUsers(browsingCriteria)
 			if (allUsers) {
 				setUsers(allUsers)
 				setLoading(false);

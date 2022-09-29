@@ -1,45 +1,5 @@
 module.exports = (app, pool, session) => {
 
-	app.get('/api/browsing', async (request, response) => {
-		const sess = request.session
-
-		try {
-			if (sess.userid) {
-				var sql = `SELECT id, username, firstname, lastname, gender, age, sexual_pref,
-						biography, fame_rating, user_location, picture_data AS profile_pic,
-						calculate_distance($2, $3, ip_location[0], ip_location[1], 'K') AS distance
-						FROM users
-						LEFT JOIN user_settings ON users.id = user_settings.user_id
-						LEFT JOIN user_pictures ON users.id = user_pictures.user_id
-						WHERE users.id != $1`
-				var { rows } = await pool.query(sql, [sess.userid, sess.location[0], sess.location[1]])
-				// console.log("Browsing Data: ", rows)
-				const browsingData = rows
-				// console.log("Browsing Data: ", browsingData)
-
-				// var sql = `SELECT * FROM user_pictures WHERE user_id != $1 AND profile_pic = 'YES'`
-				// var profile_pic = await pool.query(sql, [sess.userid])
-
-				// if (profile_pic.rows[0]) {
-				// 	profileData.profile_pic = profile_pic.rows[0]['picture_data']
-				// }
-				// // console.log(profile_pic.rows[0]['picture_data'])
-
-				// var sql = `SELECT * FROM user_pictures WHERE user_id != $1 AND profile_pic = 'NO'`
-				// var other_pictures = await pool.query(sql, [sess.userid])
-				// // console.log(other_pictures.rows)
-				// if (other_pictures.rows) {
-				// 	profileData.other_pictures = other_pictures.rows
-				// }
-				response.send(browsingData)
-			} else {
-				response.send(false)
-			}
-		} catch (error) {
-			response.send(error)
-		}
-	})
-
 	app.post('/api/browsing/sorted', async (request, response) => {
 		const body = request.body
 		const sess = request.session
@@ -47,18 +7,18 @@ module.exports = (app, pool, session) => {
 		try {
 			if (sess.userid) {
 				const variables = [sess.userid, body.min_age, body.max_age, body.min_fame, body.max_fame,
-								sess.location[0], sess.location[1], body.min_distance, body.max_distance]
+				sess.location[0], sess.location[1], body.min_distance, body.max_distance]
 				console.log("Variables: ", body, sess.location[0], sess.location[1])
 				var sql = `SELECT id, username, firstname, lastname, gender, age, sexual_pref,
 						biography, fame_rating, user_location, picture_data AS profile_pic, blocker_id, target_id,
 						calculate_distance($6, $7, ip_location[0], ip_location[1], 'K') AS distance,
 						(SELECT COUNT(*) FROM tags WHERE tagged_users @> array[$1,users.id]) AS common_tags
 						FROM users
-						LEFT JOIN user_settings ON users.id = user_settings.user_id
-						LEFT JOIN user_pictures ON users.id = user_pictures.user_id
+						INNER JOIN user_settings ON users.id = user_settings.user_id
+						INNER JOIN user_pictures ON users.id = user_pictures.user_id AND user_pictures.profile_pic = 'YES'
 						LEFT JOIN blocks ON (users.id = blocks.target_id AND blocks.blocker_id = $1) OR
 											(users.id = blocks.blocker_id AND blocks.target_id = $1)
-						WHERE users.id != $1 AND blocker_id IS NULL AND target_id IS NULL AND users.verified = 'YES'
+						WHERE users.id != $1 AND users.verified = 'YES' AND blocker_id IS NULL AND target_id IS NULL
 						AND age BETWEEN $2 and $3 AND fame_rating BETWEEN $4 AND $5
 						AND calculate_distance($6, $7, ip_location[0], ip_location[1], 'K') BETWEEN $8 and $9
 						ORDER BY username`;
@@ -182,47 +142,53 @@ module.exports = (app, pool, session) => {
 	app.get('/api/browsing/userprofile/:id', async (request, response) => {
 		const sess = request.session
 
-		try {
-			const profile_id = request.params.id
-			var sql = `SELECT * FROM users
+		if (sess.userid) {
+			try {
+				const profile_id = request.params.id
+				var sql = `SELECT * FROM users
 						INNER JOIN user_settings ON users.id = user_settings.user_id
 						WHERE users.id = $1`
-			var { rows } = await pool.query(sql, [profile_id])
-			// console.log("Profile Data: ", rows[0])
-			const { password: removed_password, ...profileData } = rows[0]
-			// console.log("Profile Data: ", profileData)
+				var { rows } = await pool.query(sql, [profile_id])
+				// console.log("Profile Data: ", rows[0])
+				const { password: removed_password, ...profileData } = rows[0]
+				// console.log("Profile Data: ", profileData)
 
-			var sql = `SELECT * FROM tags WHERE tagged_users @> array[$1]::INT[]
+				var sql = `SELECT * FROM tags WHERE tagged_users @> array[$1]::INT[]
 						ORDER BY tag_id`
-			var tags = await pool.query(sql, [profile_id])
+				var tags = await pool.query(sql, [profile_id])
 
-			profileData.tags = tags.rows.map(tag => tag.tag_content)
+				profileData.tags = tags.rows.map(tag => tag.tag_content)
 
-			var sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND profile_pic = 'YES'`
-			var profile_pic = await pool.query(sql, [profile_id])
+				var sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND profile_pic = 'YES'`
+				var profile_pic = await pool.query(sql, [profile_id])
 
-			if (profile_pic.rows[0]) {
-				profileData.profile_pic = profile_pic.rows[0]
-			} else {
-				profileData.profile_pic = { user_id: sess.userid, picture_data: 'http://localhost:3000/images/default_profilepic.jpeg' }
+				if (profile_pic.rows[0]) {
+					profileData.profile_pic = profile_pic.rows[0]
+				} else {
+					profileData.profile_pic = { user_id: sess.userid, picture_data: 'http://localhost:3000/images/default_profilepic.jpeg' }
+				}
+				// console.log(profile_pic.rows[0]['picture_data'])
+
+				var sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND profile_pic = 'NO' ORDER BY picture_id`
+				var other_pictures = await pool.query(sql, [profile_id])
+				// console.log(other_pictures.rows)
+				if (other_pictures.rows) {
+					profileData.other_pictures = other_pictures.rows
+				}
+
+				var sql = `INSERT INTO watches (watcher_id, target_id) VALUES ($1,$2)`
+				pool.query(sql, [sess.userid, profile_id])
+
+				response.send(profileData)
+			} catch (error) {
+				response.send(false)
 			}
-			// console.log(profile_pic.rows[0]['picture_data'])
-
-			var sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND profile_pic = 'NO' ORDER BY picture_id`
-			var other_pictures = await pool.query(sql, [profile_id])
-			// console.log(other_pictures.rows)
-			if (other_pictures.rows) {
-				profileData.other_pictures = other_pictures.rows
-			}
-			response.send(profileData)
-		} catch (error) {
-			response.send(false)
 		}
 	})
 
 	app.get('/api/browsing/tags', async (request, response) => {
 		var sql = "SELECT * FROM tags ORDER BY tag_content"
-		const {rows} = await pool.query(sql)
+		const { rows } = await pool.query(sql)
 
 		response.send(rows)
 	})
