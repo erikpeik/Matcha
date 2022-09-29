@@ -84,6 +84,7 @@ module.exports = (app, pool, session) => {
 		const sess = request.session
 
 		if (sess.userid) {
+			console.log("Liking user...")
 			var sql = `SELECT picture_data FROM user_pictures WHERE user_id = $1 AND profile_pic = 'YES'`
 			const { rows } = await pool.query(sql, [sess.userid])
 
@@ -103,7 +104,7 @@ module.exports = (app, pool, session) => {
 					var sql = `INSERT INTO connections (user1_id, user2_id) VALUES ($1, $2)`
 					await pool.query(sql, [sess.userid, liked_person_id])
 				}
-
+				console.log("Liked user!")
 				response.status(200).send("Liked user!")
 			}
 		}

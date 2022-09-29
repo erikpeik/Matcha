@@ -91,7 +91,6 @@ const UserProfile = () => {
 
 	const ProfileData = {
 		'First name:': userData.firstname,
-		'Email address:': userData.email,
 		'Last name:': userData.lastname,
 		'Gender:': userData.gender,
 		'Age:': userData.age,
