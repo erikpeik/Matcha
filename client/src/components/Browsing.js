@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-	FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, InputLabel,
+	FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, InputLabel, TextField,
 	Select, MenuItem, Box, Slider, Container, Paper, Button, createTheme
 } from '@mui/material'
 import browsingService from '../services/browsingService'
@@ -13,6 +13,7 @@ import { changeNotification, resetNotification } from '../reducers/notificationR
 import { changeSeverity } from '../reducers/severityReducer'
 import { setDisplaySettings } from '../reducers/displaySettingsReducer'
 import Notification from './Notification'
+import TagFilter from './browsing/TagFilter'
 
 const themelike = createTheme({
 	palette: {
@@ -41,6 +42,8 @@ const Browsing = () => {
 	const dispatch = useDispatch()
 	const [isLoading, setLoading] = useState(true);
 	const [users, setUsers] = useState([])
+	const [nameFilter, setNameFilter] = useState()
+	const [tagFilter, setTagFilter] = useState([])
 	const userLists = useSelector(state => state.userLists)
 
 	const browsingCriteria = useSelector(state => state.browsingCriteria)
@@ -50,9 +53,9 @@ const Browsing = () => {
 	useEffect(() => {
 		dispatch(resetNotification())
 		const getUsers = async () => {
-			const sortedUsers = await browsingService.getSortedUsers(browsingCriteria)
-			if (sortedUsers) {
-				setUsers(sortedUsers)
+			const allUsers = await browsingService.getSortedUsers(browsingCriteria)
+			if (allUsers) {
+				setUsers(allUsers)
 				setLoading(false);
 			}
 			await dispatch(getUserLists())
@@ -64,16 +67,54 @@ const Browsing = () => {
 		return <Loader />
 	}
 
+	var filteredUsers = users
+	if (nameFilter)
+		filteredUsers = users.filter(user => user.username.includes(nameFilter))
+
+	if (tagFilter) {
+		filteredUsers = filteredUsers.filter(user => {
+			return tagFilter.every(tag => {
+				return tag.tagged_users.includes(user.id)
+			})
+		})
+	}
+
 	var total_results
 	var final_page
-	if (users.length === 0)
+	if (filteredUsers.length === 0)
 		total_results = 0
 	else
-		total_results = users[0].total_results
+		total_results = filteredUsers.length
 	if (total_results === 0)
 		final_page = 1
 	else
 		final_page = Math.ceil(total_results / displaySettings.amount)
+
+	const sortUsers = () => {
+		const sorting = displaySettings.sorting
+		const sort_order = displaySettings.sort_order
+		switch (true) {
+			case (sorting === 'age' && sort_order === 'asc'):
+				return filteredUsers.sort((a, b) => (a.age > b.age ? 1 : -1))
+			case (sorting === 'age' && sort_order === 'desc'):
+				return filteredUsers.sort((a, b) => (a.age > b.age ? -1 : 1))
+			case (sorting === 'distance' && sort_order === 'asc'):
+				return filteredUsers.sort((a, b) => (a.distance > b.distance ? 1 : -1))
+			case (sorting === 'distance' && sort_order === 'desc'):
+				return filteredUsers.sort((a, b) => (a.distance > b.distance ? -1 : 1))
+			case (sorting === 'fame_rating' && sort_order === 'asc'):
+				return filteredUsers.sort((a, b) => (a.fame_rating > b.fame_rating ? 1 : -1))
+			case (sorting === 'fame_rating' && sort_order === 'desc'):
+				return filteredUsers.sort((a, b) => (a.fame_rating > b.fame_rating ? -1 : 1))
+			case (sorting === 'common_tags' && sort_order === 'asc'):
+				return filteredUsers.sort((a, b) => (a.common_tags > b.common_tags ? 1 : -1))
+			case (sorting === 'common_tags' && sort_order === 'desc'):
+				return filteredUsers.sort((a, b) => (a.common_tags > b.common_tags ? -1 : 1))
+			default:
+				return filteredUsers
+		}
+	}
+	var sortedUsers = sortUsers()
 
 	const submitSearchRequest = async () => {
 		const newCriteria = { ...searchCriteria }
@@ -90,15 +131,11 @@ const Browsing = () => {
 	}
 
 	const handleSorting = (event) => {
-		const newCriteria = { ...searchCriteria, sorting: event.target.value }
-		setSearchCriteria(newCriteria)
-		dispatch(setBrowsingCriteria(newCriteria))
+		dispatch(setDisplaySettings({ ...displaySettings, sorting: event.target.value }))
 	}
 
 	const handleSortOrder = async (event) => {
-		const newCriteria = { ...searchCriteria, sort_order: event.target.value }
-		setSearchCriteria(newCriteria)
-		dispatch(setBrowsingCriteria(newCriteria))
+		dispatch(setDisplaySettings({ ...displaySettings, sort_order: event.target.value }))
 	}
 
 	const handleAgeSlider = (event) => {
@@ -157,7 +194,12 @@ const Browsing = () => {
 		dispatch(setBrowsingCriteria({ ...searchCriteria }))
 	}
 
-	var pageUsers = users.slice(displaySettings.offset, displaySettings.offset + displaySettings.amount)
+	var pageUsers = sortedUsers.slice(displaySettings.offset, displaySettings.offset + displaySettings.amount)
+
+	const handleNameFilter = (event) => {
+		setNameFilter(event.target.value)
+		dispatch(setDisplaySettings({ ...displaySettings, page: 1, offset: 0 }))
+	}
 
 	return (
 		<Container maxWidth='md' sx={{ pt: 5, pb: 5 }}>
@@ -180,9 +222,9 @@ const Browsing = () => {
 						<MenuItem value={500} key={500}>{500}</MenuItem>
 					</Select>
 				</FormControl>
-				<FormControl sx={{ mb: 2 }}>
+				<FormControl>
 					<FormLabel id='sorted_by'>Results sorted by:</FormLabel>
-					<RadioGroup row aria-labelledby='sorted_by' name='sorted_by' value={searchCriteria.sorting} onChange={handleSorting}>
+					<RadioGroup row aria-labelledby='sorted_by' name='sorted_by' value={displaySettings.sorting} onChange={handleSorting}>
 						<FormControlLabel value='age' control={<Radio />} label='Age' />
 						<FormControlLabel value='distance' control={<Radio />} label='Distance' />
 						<FormControlLabel value='fame_rating' control={<Radio />} label='Fame Rating' />
@@ -192,11 +234,19 @@ const Browsing = () => {
 				<Box>
 					<FormControl sx={{ mb: 2 }}>
 						<FormLabel id='asc_desc'></FormLabel>
-						<RadioGroup row aria-labelledby='asc_desc' name='asc_desc' value={searchCriteria.sort_order} onChange={handleSortOrder}>
+						<RadioGroup row aria-labelledby='asc_desc' name='asc_desc' value={displaySettings.sort_order} onChange={handleSortOrder}>
 							<FormControlLabel value='asc' control={<Radio />} label='Ascending' />
 							<FormControlLabel value='desc' control={<Radio />} label='Descending' />
 						</RadioGroup>
 					</FormControl>
+				</Box>
+				<Box>
+					<InputLabel id='namefilter'>Filter by:</InputLabel>
+					<Box sx={{ display: 'flex', alignItems: 'center' }}>
+						<TextField fullWidth margin='normal' name="location" label='Username includes' onChange={handleNameFilter}
+							placeholder="Username" sx={{ mb: 2, width: 300 }} ></TextField>
+						<TagFilter setTagFilter={setTagFilter} setDisplaySettings={setDisplaySettings} />
+					</Box>
 				</Box>
 				<Box sx={{ width: 300 }}>
 					<InputLabel id='ageslider'>Filter by age:</InputLabel>

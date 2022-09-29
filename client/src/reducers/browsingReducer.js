@@ -7,9 +7,7 @@ const initialState = {
 	max_fame: 100,
 	min_distance: 0,
 	max_distance: 20000,
-	location: 'any',
-	sorting: 'age',
-	sort_order: 'asc'
+	location: 'any'
 }
 
 const browsingSlice = createSlice({

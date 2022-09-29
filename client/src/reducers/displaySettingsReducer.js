@@ -1,6 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
+	sorting: 'age',
+	sort_order: 'asc',
 	amount: 10,
 	page: 1,
 	offset: 0
