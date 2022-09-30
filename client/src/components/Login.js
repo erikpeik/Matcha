@@ -7,6 +7,7 @@ import { changeNotification } from '../reducers/notificationReducer'
 import { changeSeverity } from '../reducers/severityReducer'
 import { getProfileData } from '../reducers/profileReducer'
 import { getUserLists } from '../reducers/userListsReducer'
+import { getUserNotifications } from '../reducers/userNotificationsReducer'
 import { Typography, Button, Paper, TextField } from '@mui/material'
 import { Container } from '@mui/system';
 import { createTheme } from '@mui/material/styles'
@@ -34,6 +35,7 @@ const Login = ({ socket }) => {
 				const sessionUser = { name: result.username, id: result.userid }
 				dispatch(setUser(sessionUser))
 				dispatch(getUserLists())
+				dispatch(getUserNotifications())
 				dispatch(getProfileData())
 				dispatch(changeNotification(""))
 				socket.emit("newUser", {name: result.username, socketID: socket.id})

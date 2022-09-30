@@ -9,6 +9,7 @@ import userListsReducer from './reducers/userListsReducer'
 import displaySettingsReducer from './reducers/displaySettingsReducer'
 import roomReducer from './reducers/roomReducer'
 import messagesReducer from './reducers/messagesReducer'
+import userNotificationsReducer from './reducers/userNotificationsReducer'
 
 const store = configureStore({
 	reducer: {
@@ -22,6 +23,7 @@ const store = configureStore({
 		userLists: userListsReducer,
 		room: roomReducer,
 		messages: messagesReducer,
+		userNotifications: userNotificationsReducer,
 	}
 })
 

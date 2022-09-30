@@ -1,25 +1,20 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-	Box, IconButton, Menu, MenuItem, Tooltip, Avatar, Button,
+	Box, IconButton, Menu, MenuItem, Tooltip, Avatar, Button, Typography,
 } from '@mui/material'
 import { useSelector } from 'react-redux'
 import NotificationsIcon from '@mui/icons-material/Notifications'
-import profileService from '../../services/profileService'
 
 const UserMenu = ({ user }) => {
 	const [anchorElUser, setAnchorElUser] = useState(null);
 	const [anchorElNotifications, setAnchorElNotifications] = useState(null);
+	const unreadNotifications = useSelector(state => state.userNotifications)
+
 	const profileData = useSelector(state => state.profile)
 	// console.log('profileData:', profileData)
 	if (profileData != null && Object.keys(profileData).length > 0)
 		var profile_pic = profileData.profile_pic['picture_data']
-
-	const getNotifications = async () => {
-		const unreadNotifications = await profileService.getNotifications()
-		console.log("Unread notifications", unreadNotifications)
-	}
-	getNotifications()
 
 	const handleOpenUserMenu = (event) => {
 		setAnchorElUser(event.currentTarget);
@@ -48,8 +43,27 @@ const UserMenu = ({ user }) => {
 				open={Boolean(anchorElNotifications)}
 				onClose={() => setAnchorElNotifications(null)}
 			>
-				{"Hello world!"}<br></br>
-				{"Well hello there!"}
+				{unreadNotifications.map((notification, i) => {
+					if (notification.redirect_path) {
+						return (
+							<Box>
+								<Typography key={i} onClick={() => setAnchorElNotifications(null)}
+									component={Link} to={notification.redirect_path}>
+									{notification.notification_text}
+								</Typography>
+							</Box>
+						)
+					} else {
+						return (
+							<Box>
+								<Typography key={i}>
+									{notification.notification_text}
+								</Typography>
+							</Box>
+						)
+					}
+				})}
+				<Button>Clear notifications</Button>
 			</Menu>
 			<Button onClick={(event) => setAnchorElNotifications(event.currentTarget)}
 				sx={{

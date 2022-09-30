@@ -9,6 +9,7 @@ import { getProfileData } from '../reducers/profileReducer'
 import { resetUserLists } from '../reducers/userListsReducer'
 import { resetBrowsingCriteria } from '../reducers/browsingReducer'
 import { resetDisplaySettings } from '../reducers/displaySettingsReducer'
+import { resetUserNotifications } from '../reducers/userNotificationsReducer'
 
 const Logout = ({ socket }) => {
 	const dispatch = useDispatch()
@@ -18,6 +19,7 @@ const Logout = ({ socket }) => {
 		signUpService.logOutUser()
 		dispatch(setUser(""))
 		dispatch(resetUserLists())
+		dispatch(resetUserNotifications())
 		dispatch(resetBrowsingCriteria())
 		dispatch(resetDisplaySettings())
 		dispatch(getProfileData())

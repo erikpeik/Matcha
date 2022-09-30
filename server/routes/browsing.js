@@ -59,8 +59,8 @@ module.exports = (app, pool, transporter, session) => {
 				await pool.query(sql, [sess.userid, liked_person_id])
 
 				var notification = `You have been liked by user ${sess.username}`
-				var sql = `INSERT INTO notifications (user_id, notification_text) VALUES ($1,$2)`
-				pool.query(sql, [liked_person_id, notification])
+				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path) VALUES ($1,$2,$3)`
+				pool.query(sql, [liked_person_id, notification, `/userprofile/${sess.userid}`])
 
 				var sql = `SELECT * FROM likes WHERE liker_id = $2 AND target_id = $1`
 				const reverseliked = await pool.query(sql, [sess.userid, liked_person_id])
@@ -71,8 +71,8 @@ module.exports = (app, pool, transporter, session) => {
 
 					var notification = `You have been liked back by user ${sess.username}!
 										You are now connected and are able to chat with each other.`
-					var sql = `INSERT INTO notifications (user_id, notification_text) VALUES ($1,$2)`
-					pool.query(sql, [liked_person_id, notification])
+					var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path) VALUES ($1,$2, $3)`
+					pool.query(sql, [liked_person_id, notification, '/chat'])
 				}
 				console.log("Liked user!")
 				response.status(200).send("Liked user!")
@@ -251,8 +251,8 @@ module.exports = (app, pool, transporter, session) => {
 				pool.query(sql, [sess.userid, profile_id])
 
 				var notification = `The user ${sess.username} just checked your profile`
-				var sql = `INSERT INTO notifications (user_id, notification_text) VALUES ($1,$2)`
-				pool.query(sql, [profile_id, notification])
+				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path) VALUES ($1,$2, $3)`
+				pool.query(sql, [profile_id, notification, `/userprofile/${sess.userid}`])
 
 				response.send(profileData)
 			} catch (error) {

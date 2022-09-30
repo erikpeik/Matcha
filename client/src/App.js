@@ -6,6 +6,7 @@ import {
 import signUpService from './services/signUpService'
 import { setUser } from './reducers/userReducer'
 import { getProfileData } from './reducers/profileReducer'
+import { getUserNotifications } from './reducers/userNotificationsReducer'
 import { getUserLists } from './reducers/userListsReducer'
 import Login from './components/Login'
 import Signup from './components/Signup'
@@ -50,6 +51,7 @@ const App = () => {
 	useEffect(() => {
 		dispatch(getProfileData())
 		dispatch(getUserLists())
+		dispatch(getUserNotifications())
 		signUpService
 			.getSessionUser()
 			.then(result => {

@@ -145,6 +145,7 @@ CREATE TABLE IF NOT EXISTS notifications (
 	notification_id SERIAL NOT NULL PRIMARY KEY,
 	user_id INT NOT NULL,
 	notification_text VARCHAR(255) NOT NULL,
+	redirect_path VARCHAR(255) NOT NULL,
 	read enum_yesno DEFAULT 'NO',
 	time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
