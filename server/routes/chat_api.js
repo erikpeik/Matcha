@@ -51,7 +51,7 @@ module.exports = (app, pool, session) => {
 				var variables = [connection_id]
 				var sql = `SELECT message as text, sender_id, username as name, connection_id as room, chat_id as key FROM chat
 				INNER JOIN users ON users.id = chat.sender_id
-				WHERE connection_id = $1`
+				WHERE connection_id = $1 ORDER BY time_stamp ASC`
 				var { rows } = await pool.query(sql, variables)
 				response.send(rows)
 			} else {
