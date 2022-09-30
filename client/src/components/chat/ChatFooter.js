@@ -2,7 +2,6 @@ import { Button, Input } from '@mui/material'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 
-
 const ChatFooter = ({ socket }) => {
 	const [message, setMessage] = useState('')
 	const room = useSelector(state => state.room)
