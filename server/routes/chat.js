@@ -11,12 +11,12 @@ module.exports = (http, pool) => {
 		console.log('socket connected:', socket.id);
 
 		socket.on('join_room', (data) => {
-			console.log('join_room', data);
-			socket.join(data.room);
+			console.log('join_room', `room-${data.room}`);
+			socket.join(`room-${data.room}`);
 		})
 
 		socket.on('leave_room', (data) => {
-			socket.leave(data.room);
+			socket.leave(`room-${data.room}`);
 		})
 
 		socket.on('send_message', (data) => {
@@ -30,7 +30,7 @@ module.exports = (http, pool) => {
 				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path) VALUES ($1,$2,$3)`
 				pool.query(sql, [data.receiver_id, notification, '/chat'])
 			}
-			socketIO.in(data.room).emit('receive_message', data)
+			socketIO.in(`room-${data.room}`).emit('receive_message', data)
 			sendToDatabase(data)
 		})
 
