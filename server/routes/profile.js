@@ -17,7 +17,8 @@ module.exports = (app, pool, session, upload, fs, path) => {
 
 	app.post('/api/profile/editsettings', async (request, response) => {
 		var sess = request.session
-		const { username, firstname, lastname, email, gender, age, location, sexual_pref, biography, tags } = request.body
+		const { username, firstname, lastname, email, gender, age,
+			location, gps_lat, gps_lon, sexual_pref, biography, tags } = request.body
 
 		// MUST CREATE CHECKS FOR ALL THE VARIABLES FIRST
 		if (sess.userid) {
@@ -27,9 +28,9 @@ module.exports = (app, pool, session, upload, fs, path) => {
 				await pool.query(sql, [username, firstname, lastname, email, sess.userid])
 
 				var sql = `UPDATE user_settings
-						SET gender = $1, age = $2, user_location = $3, sexual_pref = $4, biography = $5
-						WHERE user_id = $6`
-				await pool.query(sql, [gender, age, location, sexual_pref, biography, sess.userid])
+						SET gender = $1, age = $2, user_location = $3, sexual_pref = $4,
+						biography = $5, ip_location = point($6,$7) WHERE user_id = $8`
+				await pool.query(sql, [gender, age, location, sexual_pref, biography, gps_lat, gps_lon, sess.userid])
 
 				var sql = `UPDATE tags SET tagged_users = array_remove(tagged_users, $1)
 							WHERE (array[LOWER($2)] @> array[LOWER(tag_content)]::TEXT[]) IS NOT TRUE`

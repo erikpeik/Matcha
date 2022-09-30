@@ -91,7 +91,8 @@ const Profile = () => {
 		'Age:': profileData.age,
 		'Sexual preference:': profileData.sexual_pref,
 		'Location:': profileData.user_location,
-		'Tags:': profileData.tags.map(tag => tag + ', ')
+		'GPS:': Object.values(profileData.ip_location).map((value, i) => ((i ? ', ': '') + value )),
+		'Tags:': profileData.tags.map((tag, i) => ((i ? ', ': '') + tag ))
 	}
 
 	const deleteImage = async (id) => {

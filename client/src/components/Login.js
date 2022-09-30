@@ -27,7 +27,8 @@ const Login = ({ socket }) => {
 		const signedUpUser = {
 			username: event.target.username.value,
 			password: event.target.password.value,
-			location: [locationData.data.latitude, locationData.data.longitude]
+			location: [locationData.data.latitude, locationData.data.longitude],
+			city: `${locationData.data.city}, ${locationData.data.country_name}`
 		}
 
 		signUpService.logInUser(signedUpUser).then((result) => {

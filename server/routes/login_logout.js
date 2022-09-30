@@ -1,7 +1,7 @@
 module.exports = function (app, pool, session, bcrypt) {
 
 	app.post('/api/login', (request, response) => {
-		const { username, password, location } = request.body
+		const { username, password, location, city } = request.body
 
 		const verifyUser = async () => {
 			var sql = "SELECT * FROM users WHERE username = $1";
@@ -20,8 +20,9 @@ module.exports = function (app, pool, session, bcrypt) {
 					sess.location = location
 
 					try {
-						var sql = `UPDATE user_settings SET ip_location = point($1,$2) WHERE user_id = $3`
-						await pool.query(sql, [location[0], location[1], rows[0]['id']])
+						var sql = `UPDATE user_settings SET ip_location = point($1,$2),
+									user_location = $3 WHERE user_id = $4`
+						await pool.query(sql, [location[0], location[1], city, sess.userid])
 						return (sess)
 					} catch (error) {
 						throw (error)

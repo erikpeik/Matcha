@@ -59,6 +59,8 @@ const ProfileSettings = () => {
 				gender: profileData.gender,
 				age: profileData.age,
 				location: profileData.user_location,
+				gps_lat: profileData.ip_location.x,
+				gps_lon: profileData.ip_location.y,
 				sexual_pref: profileData.sexual_pref,
 				biography: profileData.biography,
 				tags: profileData.tags
@@ -137,6 +139,14 @@ const ProfileSettings = () => {
 		changeSettings({ ...settings, location: event.target.value })
 	}
 
+	const handleGPSLat = (event) => {
+		changeSettings({ ...settings, gps_lat: event.target.value })
+	}
+
+	const handleGPSLon = (event) => {
+		changeSettings({ ...settings, gps_lon: event.target.value })
+	}
+
 	const handleSexpref = (event) => {
 		changeSettings({ ...settings, sexual_pref: event.target.value })
 	}
@@ -186,6 +196,10 @@ const ProfileSettings = () => {
 					</FormControl>
 					<TextField fullWidth margin='normal' name="location" label='Location' value={settings.location} onChange={handleLocation}
 						placeholder="Location" sx={{ mb: 2 }} required></TextField>
+					<TextField fullWidth margin='normal' name="gps_at" label='GPS latitude' value={settings.gps_lat} onChange={handleGPSLat}
+						placeholder="GPS latitude" sx={{ mb: 2, width: 300 }} required></TextField>
+					<TextField fullWidth margin='normal' name="gps_lon" label='GPS longitude' value={settings.gps_lon} onChange={handleGPSLon}
+						placeholder="GPS longitude" sx={{ ml:2, mb: 2, width: 300 }} required></TextField>
 					<FormControl sx={{ mb: 2 }}>
 						<FormLabel id='sexual_pref'>Sexual Preference</FormLabel>
 						<RadioGroup row aria-labelledby='sexual_pref' name='sexual_pref' value={settings.sexual_pref} onChange={handleSexpref} >
