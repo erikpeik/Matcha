@@ -45,17 +45,22 @@ module.exports = (app, pool, transporter, session) => {
 
 		if (sess.userid) {
 			console.log("Liking user...")
-			var sql = `SELECT picture_data FROM user_pictures WHERE user_id = $1 AND profile_pic = 'YES'`
+			var sql = `SELECT picture_data FROM user_pictures
+						INNER JOIN users ON user_pictures.user_id = users.id
+						WHERE user_pictures.user_id = $1 AND user_pictures.profile_pic = 'YES'`
 			const { rows } = await pool.query(sql, [sess.userid])
 
 			if (rows[0]['picture_data'] === 'http://localhost:3000/images/default_profilepic.jpeg') {
 				return response.send('No profile picture')
 			} else {
-
 				const liked_person_id = request.params.id
 
 				var sql = `INSERT INTO likes (liker_id, target_id) VALUES ($1, $2);`
 				await pool.query(sql, [sess.userid, liked_person_id])
+
+				var notification = `You have been liked by user ${sess.username}`
+				var sql = `INSERT INTO notifications (user_id, notification_text) VALUES ($1,$2)`
+				pool.query(sql, [liked_person_id, notification])
 
 				var sql = `SELECT * FROM likes WHERE liker_id = $2 AND target_id = $1`
 				const reverseliked = await pool.query(sql, [sess.userid, liked_person_id])
@@ -63,6 +68,11 @@ module.exports = (app, pool, transporter, session) => {
 				if (reverseliked.rows.length !== 0) {
 					var sql = `INSERT INTO connections (user1_id, user2_id) VALUES ($1, $2)`
 					await pool.query(sql, [sess.userid, liked_person_id])
+
+					var notification = `You have been liked back by user ${sess.username}!
+										You are now connected and are able to chat with each other.`
+					var sql = `INSERT INTO notifications (user_id, notification_text) VALUES ($1,$2)`
+					pool.query(sql, [liked_person_id, notification])
 				}
 				console.log("Liked user!")
 				response.status(200).send("Liked user!")
@@ -74,14 +84,22 @@ module.exports = (app, pool, transporter, session) => {
 		const sess = request.session
 
 		if (sess.userid) {
-			const liked_person_id = request.params.id
+			const unliked_person_id = request.params.id
 
 			var sql = `DELETE FROM likes WHERE liker_id = $1 AND target_id = $2`
-			await pool.query(sql, [sess.userid, liked_person_id])
+			await pool.query(sql, [sess.userid, unliked_person_id])
 
 			var sql = `DELETE FROM connections
-					WHERE (user1_id = $1 AND user2_id = $2) OR (user1_id = $2 AND user2_id = $1)`
-			const { rows } = await pool.query(sql, [sess.userid, liked_person_id])
+					WHERE (user1_id = $1 AND user2_id = $2) OR (user1_id = $2 AND user2_id = $1)
+					RETURNING *`
+			const { rows } = await pool.query(sql, [sess.userid, unliked_person_id])
+
+			if (rows.length !== 0) {
+				var notification = `The user ${sess.username} just unliked you.
+					This means your connection has been lost and you can no longer chat with each other. :(`
+				var sql = `INSERT INTO notifications (user_id, notification_text) VALUES ($1,$2)`
+				pool.query(sql, [unliked_person_id, notification])
+			}
 
 			response.status(200).send("Unliked user!")
 		}
@@ -231,6 +249,10 @@ module.exports = (app, pool, transporter, session) => {
 
 				var sql = `INSERT INTO watches (watcher_id, target_id) VALUES ($1,$2)`
 				pool.query(sql, [sess.userid, profile_id])
+
+				var notification = `The user ${sess.username} just checked your profile`
+				var sql = `INSERT INTO notifications (user_id, notification_text) VALUES ($1,$2)`
+				pool.query(sql, [profile_id, notification])
 
 				response.send(profileData)
 			} catch (error) {

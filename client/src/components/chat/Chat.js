@@ -67,7 +67,7 @@ const Chat = ({ socket }) => {
 							connections={connections}
 						/>
 						<ChatFooter
-							socket={socket}
+							socket={socket} connections={connections}
 						/>
 					</Paper>
 				</Grid>

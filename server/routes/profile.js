@@ -201,4 +201,15 @@ module.exports = (app, pool, session, upload, fs, path) => {
 			response.status(200).send("Picture deleted")
 		}
 	})
+
+	app.get('/api/profile/notifications', async (request, response) => {
+		const sess = request.session
+
+		if (sess.userid) {
+			var sql = `SELECT * FROM notifications WHERE user_id = $1 AND read = 'NO'`
+			const {rows} = await pool.query(sql, [sess.userid])
+
+			response.send(rows)
+		}
+	})
 }
