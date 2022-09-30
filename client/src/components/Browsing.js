@@ -96,7 +96,6 @@ const Browsing = () => {
 	const profileData = useSelector(state => state.profile)
 	const browsingCriteria = useSelector(state => state.browsingCriteria)
 	const displaySettings = useSelector(state => state.displaySettings)
-	const [searchCriteria, setSearchCriteria] = useState(browsingCriteria)
 
 	useEffect(() => {
 		dispatch(resetNotification())
@@ -127,8 +126,8 @@ const Browsing = () => {
 			<Paper elevation={10} sx={{ p: 3 }}>
 				<Pagination filteredUsers={filteredUsers} />
 				<SortAndFilterOptions setLocationFilter={setLocationFilter} setNameFilter={setNameFilter} setTagFilter={setTagFilter}
-					searchCriteria={searchCriteria} setSearchCriteria={setSearchCriteria} setUsers={setUsers} />
-				<UserPreviews pageUsers={pageUsers} searchCriteria={searchCriteria} />
+					browsingCriteria={browsingCriteria} setUsers={setUsers} />
+				<UserPreviews pageUsers={pageUsers} browsingCriteria={browsingCriteria} />
 			</Paper>
 			<Notification />
 		</Container >

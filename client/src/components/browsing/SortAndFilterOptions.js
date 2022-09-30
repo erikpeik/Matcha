@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
 	FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, InputLabel, TextField,
@@ -9,18 +10,18 @@ import { setBrowsingCriteria } from '../../reducers/browsingReducer'
 import browsingService from '../../services/browsingService'
 
 const SortAndFilterOptions = ({ setLocationFilter, setNameFilter, setTagFilter,
-	searchCriteria, setSearchCriteria, setUsers }) => {
+	browsingCriteria, setUsers }) => {
 
+	const [sliderStatus, setSliderStatus] = useState(browsingCriteria)
 	const displaySettings = useSelector(state => state.displaySettings)
 
 	const dispatch = useDispatch()
 
 	const submitSearchRequest = async () => {
-		const newCriteria = { ...searchCriteria }
-		const sortedUsers = await browsingService.getSortedUsers(newCriteria)
+		const newCriteria = { ...sliderStatus }
+		const sortedUsers = await browsingService.getUsers(newCriteria)
 		if (sortedUsers)
 			setUsers(sortedUsers)
-		setSearchCriteria(newCriteria)
 		dispatch(setBrowsingCriteria(newCriteria))
 		dispatch(setDisplaySettings({ ...displaySettings, page: 1, offset: 0 }))
 	}
@@ -38,15 +39,15 @@ const SortAndFilterOptions = ({ setLocationFilter, setNameFilter, setTagFilter,
 	}
 
 	const handleAgeSlider = (event) => {
-		setSearchCriteria({ ...searchCriteria, min_age: event.target.value[0], max_age: event.target.value[1] })
+		setSliderStatus({ ...sliderStatus, min_age: event.target.value[0], max_age: event.target.value[1] })
 	}
 
 	const handleFameSlider = (event) => {
-		setSearchCriteria({ ...searchCriteria, min_fame: event.target.value[0], max_fame: event.target.value[1] })
+		setSliderStatus({ ...sliderStatus, min_fame: event.target.value[0], max_fame: event.target.value[1] })
 	}
 
 	const handleDistanceSlider = (event) => {
-		setSearchCriteria({ ...searchCriteria, min_distance: event.target.value[0], max_distance: event.target.value[1] })
+		setSliderStatus({ ...sliderStatus, min_distance: event.target.value[0], max_distance: event.target.value[1] })
 	}
 
 	const handleNameFilter = (event) => {
@@ -105,7 +106,7 @@ const SortAndFilterOptions = ({ setLocationFilter, setNameFilter, setTagFilter,
 					min={18}
 					max={120}
 					aria-labelledby='age range'
-					value={[searchCriteria.min_age, searchCriteria.max_age]}
+					value={[sliderStatus.min_age, sliderStatus.max_age]}
 					onChange={handleAgeSlider}
 					valueLabelDisplay="auto"
 				// getAriaValueText={valuetext}
@@ -115,7 +116,7 @@ const SortAndFilterOptions = ({ setLocationFilter, setNameFilter, setTagFilter,
 				<InputLabel id='fameslider'>Filter by fame rating:</InputLabel>
 				<Slider
 					aria-labelledby='fame range'
-					value={[searchCriteria.min_fame, searchCriteria.max_fame]}
+					value={[sliderStatus.min_fame, sliderStatus.max_fame]}
 					onChange={handleFameSlider}
 					valueLabelDisplay="auto"
 				// getAriaValueText={valuetext}
@@ -127,7 +128,7 @@ const SortAndFilterOptions = ({ setLocationFilter, setNameFilter, setTagFilter,
 					min={0}
 					max={20000}
 					aria-labelledby='distance range'
-					value={[searchCriteria.min_distance, searchCriteria.max_distance]}
+					value={[sliderStatus.min_distance, sliderStatus.max_distance]}
 					onChange={handleDistanceSlider}
 					valueLabelDisplay="auto"
 				// getAriaValueText={valuetext}

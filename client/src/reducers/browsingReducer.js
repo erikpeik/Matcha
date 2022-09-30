@@ -6,8 +6,7 @@ const initialState = {
 	min_fame: 0,
 	max_fame: 100,
 	min_distance: 0,
-	max_distance: 20000,
-	location: 'any'
+	max_distance: 20000
 }
 
 const browsingSlice = createSlice({

@@ -29,7 +29,7 @@ const themeunlike = createTheme({
 	}
 })
 
-const UserPreviews = ({ pageUsers, searchCriteria }) => {
+const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 	const userLists = useSelector(state => state.userLists)
 	const navigate = useNavigate()
 	const dispatch = useDispatch()
@@ -52,7 +52,7 @@ const UserPreviews = ({ pageUsers, searchCriteria }) => {
 	const blockUser = async (user_id) => {
 		await browsingService.blockUser(user_id)
 		dispatch(getUserLists())
-		dispatch(setBrowsingCriteria({ ...searchCriteria }))
+		dispatch(setBrowsingCriteria({ ...browsingCriteria }))
 	}
 
 	return (
