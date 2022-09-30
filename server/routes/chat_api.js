@@ -62,6 +62,20 @@ module.exports = (app, pool, session) => {
 		}
 	})
 
+	app.post('/api/chat/check_username', async (request, response) => {
+		const sess = request.session
+		const username = request.body.username
+		if (sess.username) {
+			if (sess.username === username) {
+				response.send(true)
+			} else {
+				response.send(false)
+			}
+		} else {
+			response.send(false)
+		}
+	})
+
 	app.post('/api/chat/usernames', async (request, response) => {
 		const body = request.body
 		const sess = request.session

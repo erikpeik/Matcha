@@ -16,5 +16,10 @@ const getRoomMessages = (room) => {
 	return request.then(response => response.data)
 }
 
-const chatService = { getUsernames, chat_connections, getRoomMessages }
+const checkUsername = (username) => {
+	const request = axios.post(`${baseUrl}/check_username`, { username })
+	return request.then(response => response.data)
+}
+
+const chatService = { getUsernames, chat_connections, getRoomMessages, checkUsername }
 export default chatService
