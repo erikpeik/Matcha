@@ -55,7 +55,7 @@ require('./routes/signup.js')(app, pool, bcrypt, transporter);
 require('./routes/login_logout.js')(app, pool, session, bcrypt)
 require('./routes/resetpassword.js')(app, pool, bcrypt, transporter)
 require('./routes/profile.js')(app, pool, session, upload, fs, path)
-require('./routes/browsing.js')(app, pool, session)
+require('./routes/browsing.js')(app, pool, transporter, session)
 require('./routes/chat.js')(http, pool)
 require('./routes/chat_api.js')(app, pool, session)
 

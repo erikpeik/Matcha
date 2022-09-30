@@ -26,6 +26,11 @@ const blockUser = user_id => {
 	return request.then(response => response.data)
 }
 
+const reportUser = user_id => {
+	const request = axios.post(`${baseUrl}/reportuser/${user_id}`)
+	return request.then(response => response.data)
+}
+
 const getUserLists = () => {
 	const request = axios.get(`${baseUrl}/userlists`)
 	return request.then(response => response.data)
@@ -42,7 +47,7 @@ const getUserProfile = (id) => {
 }
 
 const browsingService = {
-	getUsers, likeUser, unlikeUser, blockUser, getUserLists, getAllTags, getUserProfile
+	getUsers, likeUser, unlikeUser, blockUser, reportUser, getUserLists, getAllTags, getUserProfile
 }
 
 export default browsingService

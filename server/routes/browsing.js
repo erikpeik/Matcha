@@ -1,4 +1,4 @@
-module.exports = (app, pool, session) => {
+module.exports = (app, pool, transporter, session) => {
 
 	app.post('/api/browsing/sorted', async (request, response) => {
 		const body = request.body
@@ -104,6 +104,59 @@ module.exports = (app, pool, session) => {
 			await pool.query(sql, [sess.userid, blocked_person_id])
 
 			response.status(200).send("Blocked user!")
+		}
+	})
+
+	app.post('/api/browsing/reportuser/:id', async (request, response) => {
+		const sess = request.session
+
+		if (sess.userid) {
+			try {
+				const reported_person_id = request.params.id
+
+				var sql = `SELECT * FROM reports WHERE sender_id = $1 AND target_id = $2`
+				var reports = await pool.query(sql, [sess.userid, reported_person_id])
+
+				if (reports.rows.length === 0) {
+
+					var sql = `INSERT INTO reports (sender_id, target_id) VALUES ($1, $2)`
+					await pool.query(sql, [sess.userid, reported_person_id])
+
+					var sql = `SELECT username FROM users WHERE id = $1`
+					var { rows } = await pool.query(sql, [reported_person_id])
+
+					const sendReportMail = (username, id, sender_id) => {
+
+						var mailOptions = {
+							from: process.env.EMAIL_ADDRESS,
+							to: 'matchamail4u@gmail.com',
+							subject: 'Matcha user reported as fake account',
+							html: `<h1>Hello!</h1>
+								<p>Bad news, admin. Someone on Matcha just reported a user as a fake account.</p>
+								<p>The reported person's username is ${username} and user_id is ${id}.</p>
+								<p>The person who reported this has the user_id ${sender_id}.</p>
+								<p>Please investigate.</p>
+								<p>Love, Matcha Mail</p>`
+						};
+
+						transporter.sendMail(mailOptions, function (error, info) {
+							if (error) {
+								console.log(error);
+							} else {
+								console.log('Email sent: ' + info.response);
+							}
+						});
+					}
+
+					sendReportMail(rows[0]['username'], reported_person_id, sess.userid)
+
+					response.status(200).send("Reported user!")
+				} else {
+					response.send("You have already reported this user. Our staff is dealing with the matter.")
+				}
+			} catch (error) {
+				console.log(error)
+			}
 		}
 	})
 

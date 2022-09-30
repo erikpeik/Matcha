@@ -119,6 +119,7 @@ CREATE TABLE IF NOT EXISTS chat (
 	connection_id INT NOT NULL,
 	sender_id INT NOT NULL,
 	message TEXT NOT NULL,
+	read enum_yesno DEFAULT 'NO',
 	time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (connection_id) REFERENCES connections (connection_id) ON DELETE CASCADE,
 	FOREIGN KEY (sender_id) REFERENCES users (id) ON DELETE CASCADE
@@ -131,4 +132,19 @@ CREATE TABLE IF NOT EXISTS watches (
 	time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (watcher_id) REFERENCES users (id) ON DELETE CASCADE,
 	FOREIGN KEY (target_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS reports (
+	report_id SERIAL NOT NULL PRIMARY KEY,
+	sender_id INT NOT NULL,
+	target_id INT NOT NULL,
+	time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS notifications (
+	notification_id SERIAL NOT NULL PRIMARY KEY,
+	user_id INT NOT NULL,
+	notification_text VARCHAR(255) NOT NULL,
+	read enum_yesno DEFAULT 'NO',
+	time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

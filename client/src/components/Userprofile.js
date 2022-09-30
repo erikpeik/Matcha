@@ -115,11 +115,23 @@ const UserProfile = () => {
 	}
 
 	const blockUser = async (user_id) => {
-		browsingService.blockUser(user_id)
+		await browsingService.blockUser(user_id)
 		dispatch(changeSeverity('success'))
 		dispatch(changeNotification(`This user has been blocked and will not show up in your search results.
 		Neither can they see you or like you anymore.`))
 		dispatch(getUserLists())
+	}
+
+	const reportUser = async (user_id) => {
+		const result = await browsingService.reportUser(user_id)
+		if (result === 'Reported user!') {
+			dispatch(changeSeverity('success'))
+			dispatch(changeNotification(`The user has been reported as a fake account.
+						Our admin will deal with the matter as soon as possible.`))
+		} else {
+			dispatch(changeSeverity('error'))
+			dispatch(changeNotification(result))
+		}
 	}
 
 	var likeButton
@@ -161,8 +173,11 @@ const UserProfile = () => {
 							emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
 							readOnly
 						/>
-						{likeButton}
-						<Button theme={themeunlike} onClick={() => { blockUser(params.id) }}>Block user</Button>
+						<Box>
+							{likeButton}
+							<Button theme={themeunlike} onClick={() => { blockUser(params.id) }}>Block user</Button>
+							<Button theme={themeunlike} onClick={() => { reportUser(params.id) }}>Report as fake account</Button>
+						</Box>
 					</Box>
 				</Grid>
 				<Grid container spacing={1} direction="row" sx={{ mb: 2 }}>
