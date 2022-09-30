@@ -14,7 +14,7 @@ const filterUsers = (users, filters, profileData) => {
 
 	var filteredUsers = users
 	if (filters.nameFilter)
-		filteredUsers = users.filter(user => user.username.includes(filters.nameFilter))
+		filteredUsers = users.filter(user => user.username.toLowerCase().includes(filters.nameFilter.toLowerCase()))
 
 	if (filters.locationFilter) {
 		filteredUsers = filteredUsers.filter(user =>

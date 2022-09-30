@@ -46,7 +46,7 @@ const UserMenu = ({ user }) => {
 				{unreadNotifications.map((notification, i) => {
 					if (notification.redirect_path) {
 						return (
-							<Box>
+							<Box key={`box${i}`}>
 								<Typography key={i} onClick={() => setAnchorElNotifications(null)}
 									component={Link} to={notification.redirect_path}>
 									{notification.notification_text}
@@ -55,7 +55,7 @@ const UserMenu = ({ user }) => {
 						)
 					} else {
 						return (
-							<Box>
+							<Box key={`box${i}`}>
 								<Typography key={i}>
 									{notification.notification_text}
 								</Typography>
