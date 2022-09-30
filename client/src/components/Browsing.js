@@ -5,7 +5,7 @@ import Loader from './Loader'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUserLists } from '../reducers/userListsReducer'
 import { resetNotification } from '../reducers/notificationReducer'
-import Notification from './Notification'
+import NotificationSnackbar from './NotificationSnackbar'
 import Pagination from './browsing/Pagination'
 import SortAndFilterOptions from './browsing/SortAndFilterOptions'
 import UserPreviews from './browsing/UserPreviews'
@@ -123,14 +123,23 @@ const Browsing = () => {
 
 	return (
 		<Container maxWidth='md' sx={{ pt: 5, pb: 5 }}>
-			<Paper elevation={10} sx={{ p: 3 }}>
+			<NotificationSnackbar />
+			<Paper sx={{ p: 3, mb: 2 }}>
 				<Pagination filteredUsers={filteredUsers} />
-				<SortAndFilterOptions setLocationFilter={setLocationFilter} setNameFilter={setNameFilter} setTagFilter={setTagFilter}
-					browsingCriteria={browsingCriteria} setUsers={setUsers} />
-				<UserPreviews pageUsers={pageUsers} browsingCriteria={browsingCriteria} />
+				<SortAndFilterOptions
+					setLocationFilter={setLocationFilter}
+					setNameFilter={setNameFilter}
+					setTagFilter={setTagFilter}
+					browsingCriteria={browsingCriteria}
+					setUsers={setUsers} />
 			</Paper>
-			<Notification />
-		</Container >
+			<Paper>
+				<UserPreviews
+					pageUsers={pageUsers}
+					browsingCriteria={browsingCriteria}
+				/>
+			</Paper>
+		</Container>
 	)
 
 }
