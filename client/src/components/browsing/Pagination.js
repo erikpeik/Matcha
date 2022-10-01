@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { setDisplaySettings } from '../../reducers/displaySettingsReducer'
+import { Box, Typography, TablePagination } from '@mui/material'
 
 const Pagination = ({ filteredUsers }) => {
 	const dispatch = useDispatch()
@@ -40,18 +41,24 @@ const Pagination = ({ filteredUsers }) => {
 	}
 
 	return (
-		<>
-			<div className="pagination">
-				<button onClick={() => handlePageChange(1)}>First</button>
-				<button onClick={() => handlePageMinus(displaySettings.page - 1)}>&laquo;</button>
-				<>		Page {displaySettings.page} / {final_page}		</>
-				<button onClick={() => handlePagePlus(displaySettings.page + 1)}>&raquo;</button>
-				<button onClick={() => handlePageChange(final_page)}>Last</button>
-			</div>
-			<br></br>
-		</>
-
+		<TablePagination
+			component='div'
+			count={total_results}
+			page={displaySettings.page - 1}
+			onChangePage={(event, newPage) => handlePageChange(newPage + 1)}
+			rowsPerPage={displaySettings.amount}
+			rowsPerPageOptions={[10, 50, 100, 250, 500]}
+			onRowsPerPageChange={(event) => dispatch(setDisplaySettings({ ...displaySettings, amount: parseInt(event.target.value), page: 1, offset: 0 }))}
+		/>
 	)
+
+	// return <Box>
+	// 	<button onClick={() => handlePageChange(1)}>First</button>
+	// 	<button onClick={() => handlePageMinus(displaySettings.page - 1)}>&laquo;</button>
+	// 	<Typography>Page {displaySettings.page} / {final_page}</Typography>
+	// 	<button onClick={() => handlePagePlus(displaySettings.page + 1)}>&raquo;</button>
+	// 	<button onClick={() => handlePageChange(final_page)}>Last</button>
+	// </Box>
 }
 
 export default Pagination
