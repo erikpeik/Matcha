@@ -2,15 +2,6 @@ import { Alert, Snackbar } from "@mui/material";
 import { useSelector, useDispatch } from 'react-redux'
 import { useEffect, useState } from "react";
 import { changeNotification } from '../reducers/notificationReducer'
-import { styled } from '@mui/material/styles'
-
-const StyledSnackbar = styled((props) => <Snackbar {...props} />)(
-	({ theme }) => ({
-		"& .MuiSnackbarContent-root": {
-			bottom: theme.spacing('150px')
-		}
-	})
-)
 
 const NotificationSnackbar = () => {
 	const dispatch = useDispatch()
@@ -34,15 +25,19 @@ const NotificationSnackbar = () => {
 	}, [notification])
 
 	return (
-		<StyledSnackbar
+		<Snackbar
 			open={open}
 			autoHideDuration={6000}
 			anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
 			onClose={handleClose}>
-			<Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }}>
+			<Alert
+				elevation={2}
+				onClose={handleClose}
+				severity={severity}
+			>
 				{notification}
 			</Alert>
-		</StyledSnackbar>
+		</Snackbar>
 	)
 }
 
