@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Container, Paper } from '@mui/material'
+import { Container, Paper, Typography } from '@mui/material'
 import browsingService from '../services/browsingService'
 import Loader from './Loader'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUserLists } from '../reducers/userListsReducer'
 import { resetNotification } from '../reducers/notificationReducer'
 import NotificationSnackbar from './NotificationSnackbar'
-import Pagination from './browsing/Pagination'
+import PaginationRow from './browsing/Pagination'
 import SortAndFilterOptions from './browsing/SortAndFilterOptions'
 import UserPreviews from './browsing/UserPreviews'
 
@@ -125,7 +125,10 @@ const Browsing = () => {
 		<Container maxWidth='md' sx={{ pt: 5, pb: 5 }}>
 			<NotificationSnackbar />
 			<Paper sx={{ p: 3, mb: 2 }}>
-				<Pagination filteredUsers={filteredUsers} />
+				<Typography variant='h5' component='h1' sx={{ mb: 2 }}>
+					Browsing
+				</Typography>
+				<PaginationRow filteredUsers={filteredUsers} />
 				<SortAndFilterOptions
 					setLocationFilter={setLocationFilter}
 					setNameFilter={setNameFilter}

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-	FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, InputLabel, TextField,
-	Select, MenuItem, Box, Slider, Button
+	FormControl, FormLabel, RadioGroup, FormControlLabel, 
+	Radio, InputLabel, TextField, Box, Slider, Button, Grid
 } from '@mui/material'
 import { setDisplaySettings } from '../../reducers/displaySettingsReducer'
 import TagFilter from './TagFilter'
@@ -26,14 +26,12 @@ const SortAndFilterOptions = ({ setLocationFilter, setNameFilter, setTagFilter,
 		dispatch(setDisplaySettings({ ...displaySettings, page: 1, offset: 0 }))
 	}
 
-	const handleAmount = (event) => {
-		dispatch(setDisplaySettings({ ...displaySettings, page: 1, amount: event.target.value }))
-	}
+
 
 	const handleSorting = (event) => {
 		dispatch(setDisplaySettings({ ...displaySettings, sorting: event.target.value }))
 	}
-
+	
 	const handleSortOrder = async (event) => {
 		dispatch(setDisplaySettings({ ...displaySettings, sort_order: event.target.value }))
 	}
@@ -62,16 +60,6 @@ const SortAndFilterOptions = ({ setLocationFilter, setNameFilter, setTagFilter,
 
 	return (
 		<>
-			<FormControl fullWidth sx={{ mb: 2 }}>
-				<InputLabel id='amount'>Amount of results per page:</InputLabel>
-				<Select labelId='amount' id='amount' name='amount' value={displaySettings.amount} onChange={handleAmount} required>
-					<MenuItem value={10} key={10}>{10}</MenuItem>
-					<MenuItem value={50} key={50}>{50}</MenuItem>
-					<MenuItem value={100} key={100}>{100}</MenuItem>
-					<MenuItem value={250} key={250}>{250}</MenuItem>
-					<MenuItem value={500} key={500}>{500}</MenuItem>
-				</Select>
-			</FormControl>
 			<FormControl>
 				<FormLabel id='sorted_by'>Results sorted by:</FormLabel>
 				<RadioGroup row aria-labelledby='sorted_by' name='sorted_by' value={displaySettings.sorting} onChange={handleSorting}>
@@ -92,13 +80,19 @@ const SortAndFilterOptions = ({ setLocationFilter, setNameFilter, setTagFilter,
 			</Box>
 			<Box>
 				<InputLabel id='namefilter'>Filter by:</InputLabel>
-				<Box sx={{ display: 'flex', alignItems: 'center' }}>
-					<TextField fullWidth margin='normal' name="username" label='Username' onChange={handleNameFilter}
-						placeholder="Username" sx={{ mb: 2, width: 300 }} ></TextField>
-					<TextField fullWidth margin='normal' name="location" label='Location' onChange={handleLocationFilter}
-						placeholder="Location" sx={{ ml: 2, mb: 2, width: 300 }} ></TextField>
-					<TagFilter setTagFilter={setTagFilter} setDisplaySettings={setDisplaySettings} />
-				</Box>
+				<Grid display="flex">
+					<Grid item xs={6} sx={{m: 0, mr: 1}}>
+						<TextField fullWidth margin='normal' name="username" label='Username' onChange={handleNameFilter}
+						placeholder="Username" sx={{m: 0}}/>
+					</Grid>
+					<Grid item xs={6} sx={{m: 0, mr: 1}}>
+						<TextField fullWidth margin='normal' name="location" label='Location' onChange={handleLocationFilter}
+						placeholder="Location" sx={{m: 0}}/>
+					</Grid>
+					<Grid item xs={6} sx={{m: 0, width: '50%'}}>
+						<TagFilter setTagFilter={setTagFilter} setDisplaySettings={setDisplaySettings} />
+					</Grid>
+				</Grid>
 			</Box>
 			<Box sx={{ width: 300 }}>
 				<InputLabel id='ageslider'>Filter by age:</InputLabel>

@@ -28,7 +28,6 @@ const TagFilter = ({ setTagFilter, setDisplaySettings }) => {
 
 	return (
 		<Autocomplete
-			sx={{ ml: 2, width: 300 }}
 			multiple
 			id="tags"
 			options={menuTags}
@@ -38,7 +37,6 @@ const TagFilter = ({ setTagFilter, setDisplaySettings }) => {
 			renderInput={(params) => (
 				<TextField
 					{...params}
-					sx={{ width: 300 }}
 					label="Tags"
 					placeholder="Tags"
 				/>
