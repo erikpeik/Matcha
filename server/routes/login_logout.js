@@ -18,15 +18,6 @@ module.exports = function (app, pool, session, bcrypt) {
 					sess.userid = rows[0]['id']
 					sess.username = rows[0]['username']
 					sess.location = location
-
-					try {
-						var sql = `UPDATE user_settings SET ip_location = point($1,$2),
-									user_location = $3 WHERE user_id = $4`
-						await pool.query(sql, [location[0], location[1], city, sess.userid])
-						return (sess)
-					} catch (error) {
-						throw (error)
-					}
 				} else
 					throw ("Wrong password!")
 			}

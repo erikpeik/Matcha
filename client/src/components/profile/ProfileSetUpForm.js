@@ -13,16 +13,20 @@ import Notification from '../Notification'
 import { changeSeverity } from '../../reducers/severityReducer'
 import { getProfileData } from '../../reducers/profileReducer'
 import profileService from '../../services/profileService'
+import Loader from '../Loader'
 
 const ProfileSetUpForm = () => {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
+	const [age, setAge] = useState('');
+	const [sexual_pref, setSexpref] = useState('bisexual');
 	const [GPSlocation, setGPSLocation] = useState({
 		latitude: 0,
 		longitude: 0,
 		city: '',
 		country_name: ''
 	})
+	const [isLoading, setLoading] = useState(true)
 
 	const theme = createTheme({
 		palette: {
@@ -38,19 +42,29 @@ const ProfileSetUpForm = () => {
 	useEffect(() => {
 		const getLocationData = async () => {
 			var locationData = await axios.get('https://geolocation-db.com/json/')
-			if (navigator.geolocation) {
+			const result = await navigator.permissions.query({ name: "geolocation" });
+			if (result.state === 'granted') {
+				console.log(navigator.geolocation)
 				await navigator.geolocation.getCurrentPosition(position => {
 					console.log(position.coords.latitude)
 					console.log(position.coords.longitude)
 					locationData.data.latitude = position.coords.latitude
 					locationData.data.longitude = position.coords.longitude
+					setGPSLocation(locationData.data)
+					setLoading(false)
 				})
 				console.log(locationData.data)
+			} else {
+				setGPSLocation(locationData.data)
+				setLoading(false)
 			}
-			setGPSLocation(locationData.data)
 		}
 		getLocationData()
-	}, [])
+	}, [setLoading])
+
+	if (isLoading) {
+		return <Loader />
+	}
 
 	const submitUserInfo = (event) => {
 		event.preventDefault()
@@ -85,9 +99,6 @@ const ProfileSetUpForm = () => {
 		transform: 'translate(-50%)',
 		filter: 'drop-shadow(0px 0px 3px rgb(241 25 38 / 0.8))',
 	}
-
-	const [age, setAge] = useState('');
-	const [sexual_pref, setSexpref] = useState('bisexual');
 
 	const handleAge = (event) => {
 		setAge(event.target.value);
@@ -128,7 +139,7 @@ const ProfileSetUpForm = () => {
 					<TextField fullWidth margin='normal' name="gps_lat" label='GPS latitude' value={GPSlocation.latitude}
 						placeholder="GPS latitude" sx={{ mb: 2, width: 300 }} required></TextField>
 					<TextField fullWidth margin='normal' name="gps_lon" label='GPS longitude' value={GPSlocation.longitude}
-						placeholder="GPS longitude" sx={{ ml:2, mb: 2, width: 300 }} required></TextField>
+						placeholder="GPS longitude" sx={{ ml: 2, mb: 2, width: 300 }} required></TextField>
 					<FormControl sx={{ mb: 2 }}>
 						<FormLabel id='sexual_pref'>Sexual Preference</FormLabel>
 						<RadioGroup row aria-labelledby='sexual_pref' name='sexual_pref' value={sexual_pref} onChange={handleSexpref} >

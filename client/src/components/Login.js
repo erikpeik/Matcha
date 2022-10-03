@@ -1,4 +1,3 @@
-import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import signUpService from '../services/signUpService'
@@ -21,14 +20,9 @@ const Login = ({ socket }) => {
 	const submitUser = async (event) => {
 		event.preventDefault()
 
-		const locationData = await axios.get('https://geolocation-db.com/json/')
-		console.log(locationData.data);
-
 		const signedUpUser = {
 			username: event.target.username.value,
-			password: event.target.password.value,
-			location: [locationData.data.latitude, locationData.data.longitude],
-			city: `${locationData.data.city}, ${locationData.data.country_name}`
+			password: event.target.password.value
 		}
 
 		signUpService.logInUser(signedUpUser).then((result) => {
@@ -39,7 +33,7 @@ const Login = ({ socket }) => {
 				dispatch(getUserNotifications())
 				dispatch(getProfileData())
 				dispatch(changeNotification(""))
-				socket.emit("newUser", {name: result.username, socketID: socket.id})
+				socket.emit("newUser", { name: result.username, socketID: socket.id })
 			} else {
 				dispatch(changeSeverity('error'))
 				dispatch(changeNotification(result))
