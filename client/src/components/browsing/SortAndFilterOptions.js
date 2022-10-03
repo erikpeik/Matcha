@@ -68,8 +68,8 @@ const SortAndFilterOptions = ({ setLocationFilter, setNameFilter, setTagFilter,
 				</RadioGroup>
 			</FormControl>
 			<Box>
-				<FormControl sx={{ mb: 2 }}>
-					<FormLabel id='asc_desc'></FormLabel>
+				<FormControl>
+					<FormLabel id='asc_desc'>Sort order:</FormLabel>
 					<RadioGroup row aria-labelledby='asc_desc' name='asc_desc' value={displaySettings.sort_order} onChange={handleSortOrder}>
 						<FormControlLabel value='asc' control={<Radio />} label='Ascending' />
 						<FormControlLabel value='desc' control={<Radio />} label='Descending' />
@@ -78,21 +78,21 @@ const SortAndFilterOptions = ({ setLocationFilter, setNameFilter, setTagFilter,
 			</Box>
 			<Box>
 				<InputLabel id='namefilter'>Filter by:</InputLabel>
-				<Grid display="flex">
-					<Grid item xs={6} sx={{m: 0, mr: 1}}>
+				<Grid display="flex" sx={{ mb: 1 }}>
+					<Grid item xs={6} sx={{ m: 0, mr: 1 }}>
 						<TextField fullWidth margin='normal' name="username" label='Username' onChange={handleNameFilter}
-						placeholder="Username" sx={{m: 0}}/>
+							placeholder="Username" sx={{ m: 0 }} />
 					</Grid>
-					<Grid item xs={6} sx={{m: 0, mr: 1}}>
+					<Grid item xs={6} sx={{ m: 0, mr: 1 }}>
 						<TextField fullWidth margin='normal' name="location" label='Location' onChange={handleLocationFilter}
-						placeholder="Location" sx={{m: 0}}/>
+							placeholder="Location" sx={{ m: 0 }} />
 					</Grid>
-					<Grid item xs={6} sx={{m: 0, width: '50%'}}>
+					<Grid item xs={6} sx={{ m: 0, width: '50%' }}>
 						<TagFilter setTagFilter={setTagFilter} setDisplaySettings={setDisplaySettings} />
 					</Grid>
 				</Grid>
 			</Box>
-			<Box sx={{ width: 300 }}>
+			<Box>
 				<InputLabel id='ageslider'>Filter by age:</InputLabel>
 				<Slider
 					min={18}
@@ -101,20 +101,18 @@ const SortAndFilterOptions = ({ setLocationFilter, setNameFilter, setTagFilter,
 					value={[sliderStatus.min_age, sliderStatus.max_age]}
 					onChange={handleAgeSlider}
 					valueLabelDisplay="auto"
-				// getAriaValueText={valuetext}
 				/>
 			</Box>
-			<Box sx={{ width: 300 }}>
+			<Box>
 				<InputLabel id='fameslider'>Filter by fame rating:</InputLabel>
 				<Slider
 					aria-labelledby='fame range'
 					value={[sliderStatus.min_fame, sliderStatus.max_fame]}
 					onChange={handleFameSlider}
 					valueLabelDisplay="auto"
-				// getAriaValueText={valuetext}
 				/>
 			</Box>
-			<Box sx={{ width: 300 }}>
+			<Box>
 				<InputLabel id='distanceslider'>Filter by distance:</InputLabel>
 				<Slider
 					min={0}
@@ -123,7 +121,6 @@ const SortAndFilterOptions = ({ setLocationFilter, setNameFilter, setTagFilter,
 					value={[sliderStatus.min_distance, sliderStatus.max_distance]}
 					onChange={handleDistanceSlider}
 					valueLabelDisplay="auto"
-				// getAriaValueText={valuetext}
 				/>
 			</Box>
 			<Button onClick={submitSearchRequest}>Search Results</Button>
