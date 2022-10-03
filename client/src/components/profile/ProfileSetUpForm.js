@@ -20,12 +20,7 @@ const ProfileSetUpForm = () => {
 	const navigate = useNavigate()
 	const [age, setAge] = useState('');
 	const [sexual_pref, setSexpref] = useState('bisexual');
-	const [GPSlocation, setGPSLocation] = useState({
-		latitude: 60.5,
-		longitude: 26.5,
-		city: '',
-		country_name: ''
-	})
+	const [GPSlocation, setGPSLocation] = useState()
 	const [isLoading, setLoading] = useState(true)
 
 	const theme = createTheme({
@@ -41,15 +36,7 @@ const ProfileSetUpForm = () => {
 
 	useEffect(() => {
 		const getLocationData = async () => {
-			// var locationData = {
-			// 	data: {
-			// 		latitude: 60.5,
-			// 		longitude: 26.5,
-			// 		city: '',
-			// 		country_name: ''
-			// 	}
-			// }
-			var locationData = await axios.get('https://geolocation-db.com/json/')
+			var locationData = await axios.get('https://ipapi.co/json')
 			const result = await navigator.permissions.query({ name: "geolocation" });
 			if (result.state === 'granted') {
 				console.log(navigator.geolocation)
@@ -63,7 +50,7 @@ const ProfileSetUpForm = () => {
 				})
 				console.log(locationData.data)
 			} else {
-				setGPSLocation(locationData.data)
+				setGPSLocation({...locationData.data, location: `${locationData.data.city}, ${locationData.data.country_name}`})
 				setLoading(false)
 			}
 		}
@@ -118,6 +105,18 @@ const ProfileSetUpForm = () => {
 		setSexpref(event.target.value);
 	}
 
+	const handleLocation = (event) => {
+		setGPSLocation({ ...GPSlocation, location: event.target.value })
+	}
+
+	const handleGPSLat = (event) => {
+		setGPSLocation({ ...GPSlocation, latitude: event.target.value })
+	}
+
+	const handleGPSLon = (event) => {
+		setGPSLocation({ ...GPSlocation, longitude: event.target.value })
+	}
+
 	return (
 		<Container maxWidth='md' sx={{ pt: 5, pb: 5 }}>
 			<Paper elevation={10} sx={{ padding: 3 }}>
@@ -144,12 +143,12 @@ const ProfileSetUpForm = () => {
 							))}
 						</Select>
 					</FormControl>
-					<TextField fullWidth margin='normal' name="location" label='Location' value={`${GPSlocation.city}, ${GPSlocation.country_name}`}
-						placeholder="Location" sx={{ mb: 2 }} required></TextField>
+					<TextField fullWidth margin='normal' name="location" label='Location' value={GPSlocation.location}
+						onChange={handleLocation} placeholder="Location" sx={{ mb: 2 }} required></TextField>
 					<TextField fullWidth margin='normal' name="gps_lat" label='GPS latitude' value={GPSlocation.latitude}
-						placeholder="GPS latitude" sx={{ mb: 2, width: 300 }} required></TextField>
+						onChange={handleGPSLat} placeholder="GPS latitude" sx={{ mb: 2, width: 300 }} required></TextField>
 					<TextField fullWidth margin='normal' name="gps_lon" label='GPS longitude' value={GPSlocation.longitude}
-						placeholder="GPS longitude" sx={{ ml: 2, mb: 2, width: 300 }} required></TextField>
+						onChange={handleGPSLon} placeholder="GPS longitude" sx={{ ml: 2, mb: 2, width: 300 }} required></TextField>
 					<FormControl sx={{ mb: 2 }}>
 						<FormLabel id='sexual_pref'>Sexual Preference</FormLabel>
 						<RadioGroup row aria-labelledby='sexual_pref' name='sexual_pref' value={sexual_pref} onChange={handleSexpref} >
