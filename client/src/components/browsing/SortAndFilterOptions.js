@@ -83,14 +83,12 @@ const SortAndFilterOptions = ({ setLocationFilter, setNameFilter, setTagFilter,
 						<TextField fullWidth margin='normal' name="username" label='Username' onChange={handleNameFilter}
 							placeholder="Username" sx={{ m: 0 }} />
 					</Grid>
-					<Grid item xs={6} sx={{ m: 0, mr: 1 }}>
+					<Grid item xs={6} sx={{ m: 0 }}>
 						<TextField fullWidth margin='normal' name="location" label='Location' onChange={handleLocationFilter}
 							placeholder="Location" sx={{ m: 0 }} />
 					</Grid>
-					<Grid item xs={6} sx={{ m: 0, width: '50%' }}>
-						<TagFilter setTagFilter={setTagFilter} setDisplaySettings={setDisplaySettings} />
-					</Grid>
 				</Grid>
+				<TagFilter setTagFilter={setTagFilter} setDisplaySettings={setDisplaySettings} />
 			</Box>
 			<Box>
 				<InputLabel id='ageslider'>Filter by age:</InputLabel>
