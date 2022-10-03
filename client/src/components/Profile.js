@@ -156,7 +156,7 @@ const Profile = () => {
 						<Typography variant='h5'>Fame Rating: {profileData.total_pts}</Typography>
 						<StyledRating
 							name="read-only"
-							value={3.453}
+							value={profileData.total_pts/20}
 							precision={0.5}
 							icon={<FavoriteIcon fontSize="inherit" />}
 							emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
