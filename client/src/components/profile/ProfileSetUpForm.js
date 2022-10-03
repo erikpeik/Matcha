@@ -39,12 +39,12 @@ const ProfileSetUpForm = () => {
 		const getLocationData = async () => {
 			var locationData = await axios.get('https://geolocation-db.com/json/')
 			if (navigator.geolocation) {
-				var position = await navigator.geolocation.getCurrentPosition(position => {
+				await navigator.geolocation.getCurrentPosition(position => {
 					console.log(position.coords.latitude)
 					console.log(position.coords.longitude)
+					locationData.data.latitude = position.coords.latitude
+					locationData.data.longitude = position.coords.longitude
 				})
-				locationData.data.latitude = position.coords.latitude
-				locationData.data.longitude = position.coords.longitude
 				console.log(locationData.data)
 			}
 			setGPSLocation(locationData.data)

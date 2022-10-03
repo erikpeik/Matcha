@@ -59,13 +59,6 @@ const App = () => {
 			})
 	}, [dispatch])
 
-	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(position => {
-			console.log(position.coords.latitude)
-			console.log(position.coords.longitude)
-		});
-	}
-
 	useEffect(() => {
 		if (user && socketConnected) {
 			if (user.name && socket.id) {
