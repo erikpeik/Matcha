@@ -21,8 +21,8 @@ const ProfileSetUpForm = () => {
 	const [age, setAge] = useState('');
 	const [sexual_pref, setSexpref] = useState('bisexual');
 	const [GPSlocation, setGPSLocation] = useState({
-		latitude: 0,
-		longitude: 0,
+		latitude: 60.5,
+		longitude: 26.5,
 		city: '',
 		country_name: ''
 	})
@@ -41,6 +41,14 @@ const ProfileSetUpForm = () => {
 
 	useEffect(() => {
 		const getLocationData = async () => {
+			// var locationData = {
+			// 	data: {
+			// 		latitude: 60.5,
+			// 		longitude: 26.5,
+			// 		city: '',
+			// 		country_name: ''
+			// 	}
+			// }
 			var locationData = await axios.get('https://geolocation-db.com/json/')
 			const result = await navigator.permissions.query({ name: "geolocation" });
 			if (result.state === 'granted') {
@@ -75,8 +83,10 @@ const ProfileSetUpForm = () => {
 			city: event.target.location.value,
 			gps: [event.target.gps_lat.value, event.target.gps_lon.value],
 			sexual_pref: event.target.sexual_pref.value,
-			biography: event.target.biography.value,
+			biography: event.target.biography.value
 		}
+
+		console.log(ProfileSettings)
 
 		profileService.setUpProfile(ProfileSettings).then((result) => {
 			if (result === true) {

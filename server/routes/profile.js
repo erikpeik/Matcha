@@ -6,12 +6,13 @@ module.exports = (app, pool, session, upload, fs, path) => {
 		// MUST CREATE CHECKS FOR ALL THE VARIABLES FIRST
 
 		try {
-			var sql = `INSERT INTO user_settings (user_id, gender, age, user_location, sexual_pref, biography)
-					VALUES ($1,$2,$3,$4,$5, $6)`
-			await pool.query(sql, [sess.userid, gender, age, location, sexual_pref, biography])
+			var sql = `INSERT INTO user_settings (user_id, gender, age,
+						user_location, sexual_pref, biography, ip_location)
+						VALUES ($1,$2,$3,$4,$5,$6,point($7,$8))`
+			await pool.query(sql, [sess.userid, gender, age, city, sexual_pref, biography, gps[0], gps[1]])
 
-			var sql = "INSERT INTO user_settings (user_id, user_location, ip_location) VALUES ($1,$2,point($3,$4)) RETURNING *";
-			await pool.query(sql, [rows[0]['id'], city, gps[0], gps[1]])
+			// var sql = "UPDATE user_settings SET user_location = $2, ip_location = point($3,$4) WHERE id = $1 RETURNING *";
+			// await pool.query(sql, [sess.userid, city, gps[0], gps[1]])
 
 			response.send(true)
 		} catch (error) {

@@ -1,10 +1,12 @@
 module.exports = function (app, pool, session, bcrypt) {
 
 	app.post('/api/login', (request, response) => {
-		const { username, password, location, city } = request.body
+		const { username, password } = request.body
 
 		const verifyUser = async () => {
-			var sql = "SELECT * FROM users WHERE username = $1";
+			var sql = `SELECT * FROM users
+					LEFT JOIN user_settings ON users.id = user_settings.user_id
+					WHERE username = $1`;
 			const { rows } = await pool.query(sql, [username])
 			if (rows.length === 0) {
 				console.log("User not found!")
@@ -17,8 +19,10 @@ module.exports = function (app, pool, session, bcrypt) {
 					var sess = request.session
 					sess.userid = rows[0]['id']
 					sess.username = rows[0]['username']
-					sess.location = location
-					return sess
+					sess.location = rows[0]['ip_location']
+					console.log("Sess.location: ", sess.location)
+
+					return (sess)
 				} else
 					throw ("Wrong password!")
 			}
