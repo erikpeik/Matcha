@@ -38,7 +38,7 @@ const ProfileSetUpForm = () => {
 
 	const getLocationData = async () => {
 		var locationData = await axios.get('https://ipapi.co/json')
-		console.log(locationData.data)
+		console.log('LocationData from API', locationData.data)
 		var newGPSLocation = {
 			latitude: locationData.data.latitude,
 			longitude: locationData.data.longitude,
@@ -46,14 +46,32 @@ const ProfileSetUpForm = () => {
 		}
 
 		const result = await navigator.permissions.query({ name: "geolocation" });
+		console.log('Geolocation permission', result.state)
+
+		const successGeolocation = (position) => {
+			newGPSLocation.latitude = position.coords.latitude
+			newGPSLocation.longitude = position.coords.longitude
+			console.log('GPS granted', newGPSLocation)
+			setGPSLocation(newGPSLocation)
+			setLoading(false)
+		}
+
+		const errorGeolocation = (error) => {
+			console.warn(`ERROR(${error.code}): ${error.message}`);
+		}
+	
+		const geolocationOptions = {
+			enableHighAccuracy: true,
+			timeout: 5000,
+			maximumAge: 0
+		}
+
 		if (result.state === 'granted') {
-			await navigator.geolocation.getCurrentPosition(position => {
-				newGPSLocation.latitude = position.coords.latitude
-				newGPSLocation.longitude = position.coords.longitude
-				console.log(newGPSLocation)
-				setGPSLocation(newGPSLocation)
-				setLoading(false)
-			})
+			navigator.geolocation.getCurrentPosition(
+				successGeolocation,
+				errorGeolocation,
+				geolocationOptions
+			)
 		} else {
 			setGPSLocation(newGPSLocation)
 			setLoading(false)
