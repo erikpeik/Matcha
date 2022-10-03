@@ -1,8 +1,9 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import {
-	Button, createTheme, Paper, Avatar, Box, Typography, Grid
+	Button, createTheme, Paper, Box, Typography, Grid
 } from '@mui/material'
+import BrowsingUserIcon from './BrowsingUserIcon'
 import browsingService from '../../services/browsingService'
 import { setBrowsingCriteria } from '../../reducers/browsingReducer'
 import { getUserLists } from '../../reducers/userListsReducer'
@@ -112,16 +113,7 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 					<Paper key={`profile_container${user.id}`} sx={{ mb: 1 }}>
 						<Grid container display='flex' sx={{ alignItems: 'center' }}>
 							<Grid item>
-								<Box sx={{ padding: 1 }}>
-										<Avatar
-											variant="rounded"
-											key={user.id}
-											alt="profile_picture"
-											src={user.profile_pic}
-											onClick={() => navigate(`/userprofile/${user.id}`)}
-											sx={{ width: '200px', height: '200px', cursor: 'pointer' }}
-										/>
-								</Box>
+								<BrowsingUserIcon user={user} />
 							</Grid>
 							<Grid item>
 								<Box key={`profile_data${user.id}`}>
