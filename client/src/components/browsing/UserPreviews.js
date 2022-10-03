@@ -1,6 +1,10 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { Button, createTheme } from '@mui/material'
+import {
+	Button, createTheme, Paper, Avatar, Box, Typography,
+	Table, TableBody, TableRow, TableCell, Grid
+} from '@mui/material'
+import AspectRatio from '@mui/joy/AspectRatio';
 import browsingService from '../../services/browsingService'
 import { setBrowsingCriteria } from '../../reducers/browsingReducer'
 import { getUserLists } from '../../reducers/userListsReducer'
@@ -55,6 +59,10 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 		dispatch(setBrowsingCriteria({ ...browsingCriteria }))
 	}
 
+	const createData = (name, value) => {
+		return { name, value }
+	}
+
 	return (
 		pageUsers.map(user => {
 			var button
@@ -68,29 +76,62 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 			if (!user.id) {
 				return (<div key="emptyusers"></div>)
 			} else
-				return (<div key={`profile_container${user.id}`} id="profile_container">
-					<div key={`picture_container${user.id}`} id="picture_container">
-						<img key={user.id} alt="profile_picture" src={user.profile_pic} className="userprofilepic"
-							onClick={() => navigate(`/userprofile/${user.id}`)} height="200px"></img>
-					</div>
-					<div key={`profile_data${user.id}`} id="profile_data">
-						<h1>{user.username}</h1>
-						<h3>Fame rating: {user.fame_rating}</h3>
-						<br></br>
-						<p>First name: {user.firstname}</p>
-						<p>Last name: {user.lastname}</p>
-						<p>Gender: {user.gender}</p>
-						<p>Age: {user.age}</p>
-						<p>Sexual preference: {user.sexual_pref}</p>
-						<p>Location: {user.user_location}</p>
-						<p>Distance: {Math.floor(user.distance)} km</p>
-						<p>Biography: {user.biography}</p>
-						<p>Common tags: {user.common_tags}</p>
-						{button}
-						<Button theme={themeunlike} onClick={() => { blockUser(user.id) }}>Block user</Button>
-					</div>
-				</div>
-				)
+				var rows = [
+					createData('Name', `${user.firstname} ${user.lastname}`),
+					createData('Fame rating', user.fame_rating),
+					createData('Gender', user.gender),
+					createData('Age', user.age),
+					createData('Sexual preference', user.sexual_pref),
+					createData('Location', user.user_location),
+					createData('Distance', `${Math.floor(user.distance)} km`),
+					createData('Common tags', user.common_tags)
+				]
+			return (
+				<Paper key={`profile_container${user.id}`} sx={{ mb: 1 }} >
+					<Grid container display='flex' sx={{ alignItems: 'center' }}>
+						<Grid item xs={4} sx={{ paddingTop: 0 }}>
+							<Box sx={{ padding: 1 }}>
+								<AspectRatio
+									component={Paper}
+									elevation={3}
+									ratio='1'
+								>
+									<Avatar
+										variant="rounded"
+										key={user.id}
+										alt="profile_picture"
+										src={user.profile_pic}
+										onClick={() => navigate(`/userprofile/${user.id}`)}
+										sx={{ width: '100%', cursor: 'pointer' }}
+									/>
+								</AspectRatio>
+							</Box>
+						</Grid>
+						<Grid item xs={6}>
+							<Box key={`profile_data${user.id}`}>
+								<Typography variant='h2'>{user.username}</Typography>
+								<Table>
+									<TableBody>
+										{rows.map((row) => (
+											<TableRow
+												key={row.name}
+												sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+											>
+												<TableCell component="th" scope="row">
+													{row.name}
+												</TableCell>
+												<TableCell align="right">{row.value}</TableCell>
+											</TableRow>
+										))}
+									</TableBody>
+								</Table>
+								{button}
+								<Button theme={themeunlike} onClick={() => { blockUser(user.id) }}>Block user</Button>
+							</Box>
+						</Grid>
+					</Grid>
+				</Paper>
+			)
 		}
 		))
 }

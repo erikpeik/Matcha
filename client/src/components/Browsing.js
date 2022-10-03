@@ -137,12 +137,12 @@ const Browsing = () => {
 					</Paper>
 				</Grid>
 				<Grid item xs={8} md={8}>
-					<Paper>
+					{/* <Paper sx={{ backgroundColor: "gray" }}> */}
 						<UserPreviews
 							pageUsers={pageUsers}
 							browsingCriteria={browsingCriteria}
 						/>
-					</Paper>
+					{/* </Paper> */}
 				</Grid>
 			</Grid>
 		</Container>
