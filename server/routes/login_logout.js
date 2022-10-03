@@ -18,6 +18,7 @@ module.exports = function (app, pool, session, bcrypt) {
 					sess.userid = rows[0]['id']
 					sess.username = rows[0]['username']
 					sess.location = location
+					return sess
 				} else
 					throw ("Wrong password!")
 			}
