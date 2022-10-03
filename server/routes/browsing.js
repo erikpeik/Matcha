@@ -8,7 +8,7 @@ module.exports = (app, pool, transporter, session) => {
 			if (sess.userid) {
 				const variables = [sess.userid, body.min_age, body.max_age, body.min_fame, body.max_fame,
 				sess.location.x, sess.location.y, body.min_distance, body.max_distance]
-				console.log("Variables: ", body, sess.location[0], sess.location[1])
+				console.log("Variables: ", body, sess.location.x, sess.location.y)
 				var sql = `SELECT id, username, firstname, lastname, gender, age, sexual_pref,
 						biography, fame_rating, user_location, picture_data AS profile_pic, blocker_id, target_id,
 						calculate_distance($6, $7, ip_location[0], ip_location[1], 'K') AS distance,

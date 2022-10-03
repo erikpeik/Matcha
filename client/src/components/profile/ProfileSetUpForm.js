@@ -5,8 +5,10 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import {
 	Typography, Button, Paper, TextField, FormControl, FormLabel, createTheme,
-	RadioGroup, FormControlLabel, Radio, InputLabel, Select, MenuItem, TextareaAutosize
+	RadioGroup, FormControlLabel, Radio, InputLabel, Select, MenuItem, TextareaAutosize, Box
 } from '@mui/material'
+import { Tooltip, IconButton } from '@mui/material'
+import LocationSearchingIcon from '@mui/icons-material/LocationSearching'
 import { Container } from '@mui/system'
 import { IconUserCircle } from '@tabler/icons'
 import Notification from '../Notification'
@@ -34,28 +36,33 @@ const ProfileSetUpForm = () => {
 		}
 	})
 
-	useEffect(() => {
-		const getLocationData = async () => {
-			var locationData = await axios.get('https://ipapi.co/json')
-			const result = await navigator.permissions.query({ name: "geolocation" });
-			if (result.state === 'granted') {
-				console.log(navigator.geolocation)
-				await navigator.geolocation.getCurrentPosition(position => {
-					console.log(position.coords.latitude)
-					console.log(position.coords.longitude)
-					locationData.data.latitude = position.coords.latitude
-					locationData.data.longitude = position.coords.longitude
-					setGPSLocation(locationData.data)
-					setLoading(false)
-				})
-				console.log(locationData.data)
-			} else {
-				setGPSLocation({...locationData.data, location: `${locationData.data.city}, ${locationData.data.country_name}`})
-				setLoading(false)
-			}
+	const getLocationData = async () => {
+		var locationData = await axios.get('https://ipapi.co/json')
+		console.log(locationData.data)
+		var newGPSLocation = {
+			latitude: locationData.data.latitude,
+			longitude: locationData.data.longitude,
+			location: `${locationData.data.city}, ${locationData.data.country_name}`
 		}
+
+		const result = await navigator.permissions.query({ name: "geolocation" });
+		if (result.state === 'granted') {
+			await navigator.geolocation.getCurrentPosition(position => {
+				newGPSLocation.latitude = position.coords.latitude
+				newGPSLocation.longitude = position.coords.longitude
+				console.log(newGPSLocation)
+				setGPSLocation(newGPSLocation)
+				setLoading(false)
+			})
+		} else {
+			setGPSLocation(newGPSLocation)
+			setLoading(false)
+		}
+	}
+
+	useEffect(() => {
 		getLocationData()
-	}, [setLoading])
+	}, [])
 
 	if (isLoading) {
 		return <Loader />
@@ -67,7 +74,7 @@ const ProfileSetUpForm = () => {
 		const ProfileSettings = {
 			gender: event.target.gender.value,
 			age: event.target.age.value,
-			city: event.target.location.value,
+			location: event.target.location.value,
 			gps: [event.target.gps_lat.value, event.target.gps_lon.value],
 			sexual_pref: event.target.sexual_pref.value,
 			biography: event.target.biography.value
@@ -117,6 +124,10 @@ const ProfileSetUpForm = () => {
 		setGPSLocation({ ...GPSlocation, longitude: event.target.value })
 	}
 
+	const handleLocationSearch = async () => {
+		getLocationData()
+	}
+
 	return (
 		<Container maxWidth='md' sx={{ pt: 5, pb: 5 }}>
 			<Paper elevation={10} sx={{ padding: 3 }}>
@@ -145,10 +156,17 @@ const ProfileSetUpForm = () => {
 					</FormControl>
 					<TextField fullWidth margin='normal' name="location" label='Location' value={GPSlocation.location}
 						onChange={handleLocation} placeholder="Location" sx={{ mb: 2 }} required></TextField>
-					<TextField fullWidth margin='normal' name="gps_lat" label='GPS latitude' value={GPSlocation.latitude}
-						onChange={handleGPSLat} placeholder="GPS latitude" sx={{ mb: 2, width: 300 }} required></TextField>
-					<TextField fullWidth margin='normal' name="gps_lon" label='GPS longitude' value={GPSlocation.longitude}
-						onChange={handleGPSLon} placeholder="GPS longitude" sx={{ ml: 2, mb: 2, width: 300 }} required></TextField>
+					<Box sx={{ display: 'flex', alignItems: 'center' }}>
+						<TextField fullWidth margin='normal' name="gps_lat" label='GPS latitude' value={GPSlocation.latitude}
+							onChange={handleGPSLat} placeholder="GPS latitude" sx={{ mb: 2, width: 300 }} required></TextField>
+						<TextField fullWidth margin='normal' name="gps_lon" label='GPS longitude' value={GPSlocation.longitude}
+							onChange={handleGPSLon} placeholder="GPS longitude" sx={{ ml: 2, mb: 2, width: 300 }} required></TextField>
+						<Tooltip title="Locate with GPS">
+							<IconButton onClick={handleLocationSearch} sx={{ ml: 3 }}>
+								<LocationSearchingIcon />
+							</IconButton>
+						</Tooltip>
+					</Box>
 					<FormControl sx={{ mb: 2 }}>
 						<FormLabel id='sexual_pref'>Sexual Preference</FormLabel>
 						<RadioGroup row aria-labelledby='sexual_pref' name='sexual_pref' value={sexual_pref} onChange={handleSexpref} >
