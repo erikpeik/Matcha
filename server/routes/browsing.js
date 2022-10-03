@@ -65,7 +65,7 @@ module.exports = (app, pool, transporter, session) => {
 				pool.query(sql, [liked_person_id, notification, `/userprofile/${sess.userid}`])
 
 				var sql = `UPDATE fame_rates SET like_pts = like_pts + 10, total_pts = total_pts + 10
-							WHERE user_id = $1 AND like_pts < 50`
+							WHERE user_id = $1 AND like_pts < 50 AND total_pts <= 90`
 				pool.query(sql, [liked_person_id])
 
 				var sql = `SELECT * FROM likes WHERE liker_id = $2 AND target_id = $1`
@@ -80,7 +80,8 @@ module.exports = (app, pool, transporter, session) => {
 					var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path) VALUES ($1,$2, $3)`
 					pool.query(sql, [liked_person_id, notification, '/chat'])
 					var sql = `UPDATE fame_rates SET connection_pts = connection_pts + 5, total_pts = total_pts + 5
-								WHERE (user_id = $1 AND connection_pts < 30) OR (user_id = $2 AND connection_pts < 30)`
+								WHERE (user_id = $1 AND connection_pts < 30 AND total_pts <= 95)
+								OR (user_id = $2 AND connection_pts < 30 AND total_pts <= 95)`
 					pool.query(sql, [liked_person_id, sess.userid])
 				}
 				console.log("Liked user!")
