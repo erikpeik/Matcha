@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import {
 	Button, createTheme, Paper, Avatar, Box, Typography, Grid
 } from '@mui/material'
-import AspectRatio from '@mui/joy/AspectRatio';
 import browsingService from '../../services/browsingService'
 import { setBrowsingCriteria } from '../../reducers/browsingReducer'
 import { getUserLists } from '../../reducers/userListsReducer'
@@ -110,27 +109,21 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 				return (<div key="emptyusers"></div>)
 			} else
 				return (
-					<Paper key={`profile_container${user.id}`} sx={{ mb: 1}} >
+					<Paper key={`profile_container${user.id}`} sx={{ mb: 1 }}>
 						<Grid container display='flex' sx={{ alignItems: 'center' }}>
-							<Grid item xs={4} sx={{ paddingTop: 0 }}>
+							<Grid item>
 								<Box sx={{ padding: 1 }}>
-									<AspectRatio
-										component={Paper}
-										elevation={3}
-										ratio='1'
-									>
 										<Avatar
 											variant="rounded"
 											key={user.id}
 											alt="profile_picture"
 											src={user.profile_pic}
 											onClick={() => navigate(`/userprofile/${user.id}`)}
-											sx={{ width: '100%', cursor: 'pointer' }}
+											sx={{ width: '200px', height: '200px', cursor: 'pointer' }}
 										/>
-									</AspectRatio>
 								</Box>
 							</Grid>
-							<Grid item xs={6}>
+							<Grid item>
 								<Box key={`profile_data${user.id}`}>
 									<Grid display='flex' sx={{ alignItems: 'center' }}>
 										<Typography

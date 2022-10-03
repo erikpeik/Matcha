@@ -85,7 +85,7 @@ const sortUsers = (filteredUsers, displaySettings) => {
 const Browsing = () => {
 	const dispatch = useDispatch()
 
-	const matches = useMediaQuery("(max-width:800px)")
+	const matches = useMediaQuery("(max-width:1000px)")
 	const [isLoading, setLoading] = useState(true)
 	const [users, setUsers] = useState([])
 	const [nameFilter, setNameFilter] = useState()
@@ -137,12 +137,10 @@ const Browsing = () => {
 					</Paper>
 				</Grid>
 				<Grid item xs={8} md={8}>
-					{/* <Paper sx={{ backgroundColor: "gray" }}> */}
 						<UserPreviews
 							pageUsers={pageUsers}
 							browsingCriteria={browsingCriteria}
 						/>
-					{/* </Paper> */}
 				</Grid>
 			</Grid>
 		</Container>
