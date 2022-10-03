@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import axios from 'axios'
+import { useState, useEffect } from 'react'
 import { changeNotification } from '../../reducers/notificationReducer'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -16,6 +17,12 @@ import profileService from '../../services/profileService'
 const ProfileSetUpForm = () => {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
+	const [GPSlocation, setGPSLocation] = useState({
+		latitude: 0,
+		longitude: 0,
+		city: '',
+		country_name: ''
+	})
 
 	const theme = createTheme({
 		palette: {
@@ -28,13 +35,31 @@ const ProfileSetUpForm = () => {
 		}
 	})
 
+	useEffect(() => {
+		const getLocationData = async () => {
+			var locationData = await axios.get('https://geolocation-db.com/json/')
+			if (navigator.geolocation) {
+				var position = await navigator.geolocation.getCurrentPosition(position => {
+					console.log(position.coords.latitude)
+					console.log(position.coords.longitude)
+				})
+				locationData.data.latitude = position.coords.latitude
+				locationData.data.longitude = position.coords.longitude
+				console.log(locationData.data)
+			}
+			setGPSLocation(locationData.data)
+		}
+		getLocationData()
+	}, [])
+
 	const submitUserInfo = (event) => {
 		event.preventDefault()
 
 		const ProfileSettings = {
 			gender: event.target.gender.value,
 			age: event.target.age.value,
-			location: event.target.location.value,
+			city: event.target.location.value,
+			gps: [event.target.gps_lat.value, event.target.gps_lon.value],
 			sexual_pref: event.target.sexual_pref.value,
 			biography: event.target.biography.value,
 		}
@@ -98,8 +123,12 @@ const ProfileSetUpForm = () => {
 							))}
 						</Select>
 					</FormControl>
-					<TextField fullWidth margin='normal' name="location" label='Location'
+					<TextField fullWidth margin='normal' name="location" label='Location' value={`${GPSlocation.city}, ${GPSlocation.country_name}`}
 						placeholder="Location" sx={{ mb: 2 }} required></TextField>
+					<TextField fullWidth margin='normal' name="gps_lat" label='GPS latitude' value={GPSlocation.latitude}
+						placeholder="GPS latitude" sx={{ mb: 2, width: 300 }} required></TextField>
+					<TextField fullWidth margin='normal' name="gps_lon" label='GPS longitude' value={GPSlocation.longitude}
+						placeholder="GPS longitude" sx={{ ml:2, mb: 2, width: 300 }} required></TextField>
 					<FormControl sx={{ mb: 2 }}>
 						<FormLabel id='sexual_pref'>Sexual Preference</FormLabel>
 						<RadioGroup row aria-labelledby='sexual_pref' name='sexual_pref' value={sexual_pref} onChange={handleSexpref} >

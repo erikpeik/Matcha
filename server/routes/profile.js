@@ -1,7 +1,7 @@
 module.exports = (app, pool, session, upload, fs, path) => {
 	app.post('/api/profile/setup', async (request, response) => {
 		var sess = request.session
-		const { gender, age, location, sexual_pref, biography } = request.body
+		const { gender, age, city, gps, sexual_pref, biography } = request.body
 
 		// MUST CREATE CHECKS FOR ALL THE VARIABLES FIRST
 
@@ -9,6 +9,10 @@ module.exports = (app, pool, session, upload, fs, path) => {
 			var sql = `INSERT INTO user_settings (user_id, gender, age, user_location, sexual_pref, biography)
 					VALUES ($1,$2,$3,$4,$5, $6)`
 			await pool.query(sql, [sess.userid, gender, age, location, sexual_pref, biography])
+
+			var sql = "INSERT INTO user_settings (user_id, user_location, ip_location) VALUES ($1,$2,point($3,$4)) RETURNING *";
+			await pool.query(sql, [rows[0]['id'], city, gps[0], gps[1]])
+
 			response.send(true)
 		} catch (error) {
 			response.send(error)

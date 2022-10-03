@@ -41,8 +41,10 @@ const Signup = () => {
 		}
 	}, [user, navigate])
 
-	const submitUser = (event) => {
+	const submitUser = async (event) => {
 		event.preventDefault()
+
+
 
 		const signedUpUser = {
 			username: event.target.username.value,
@@ -50,7 +52,7 @@ const Signup = () => {
 			lastname: event.target.lastname.value,
 			email: event.target.email.value,
 			password: event.target.password.value,
-			confirmPassword: event.target.confirm_password.value,
+			confirmPassword: event.target.confirm_password.value
 		}
 
 		signUpService.checkUserForm(signedUpUser).then((result) => {
