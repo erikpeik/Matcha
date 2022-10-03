@@ -157,7 +157,7 @@ module.exports = (app, pool, transporter, session) => {
 
 						var mailOptions = {
 							from: process.env.EMAIL_ADDRESS,
-							to: 'matchamail4u@gmail.com',
+							to: process.env.EMAIL_ADDRESS,
 							subject: 'Matcha user reported as fake account',
 							html: `<h1>Hello!</h1>
 								<p>Bad news, admin. Someone on Matcha just reported a user as a fake account.</p>
