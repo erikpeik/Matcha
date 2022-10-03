@@ -12,6 +12,7 @@ module.exports = (app, pool, session, upload, fs, path) => {
 			await pool.query(sql, [sess.userid, gender, age, location, sexual_pref, biography, gps[0], gps[1]])
 			var sql = `UPDATE fame_rates SET setup_pts = setup_pts + 5, total_pts = total_pts + 5
 						WHERE user_id = $1 AND setup_pts < 5 AND total_pts <= 95`
+			pool.query(sql, [sess.userid])
 			response.send(true)
 		} catch (error) {
 			response.send(error)
