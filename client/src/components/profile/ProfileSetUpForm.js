@@ -48,10 +48,13 @@ const ProfileSetUpForm = () => {
 		const result = await navigator.permissions.query({ name: "geolocation" });
 		console.log('Geolocation permission', result.state)
 
-		const successGeolocation = (position) => {
+		const successGeolocation = async (position) => {
 			newGPSLocation.latitude = position.coords.latitude
 			newGPSLocation.longitude = position.coords.longitude
-			console.log('GPS granted', newGPSLocation)
+			console.log('GPS granted', position.coords)
+			var city_data = await axios.get(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&localityLanguage=en`)
+			console.log('City from location:', city_data.data)
+			newGPSLocation.location = `${city_data.data.city}, ${city_data.data.countryName}`
 			setGPSLocation(newGPSLocation)
 			setLoading(false)
 		}
