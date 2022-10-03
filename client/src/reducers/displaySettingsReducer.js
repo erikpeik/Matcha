@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
 	sexual_pref: 'bisexual',
-	sorting: 'age',
+	sorting: 'distance',
 	sort_order: 'asc',
 	amount: 10,
 	page: 1,

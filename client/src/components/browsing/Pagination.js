@@ -28,7 +28,7 @@ const PaginationRow = ({ filteredUsers }) => {
 	return <>
 		<Box>
 			<FormControl fullWidth sx={{ mb: 2 }}>
-				<Typography sx={{fontSize: "14px"}}>Ammount of results per page:</Typography>
+				<Typography sx={{fontSize: "14px"}}>Amount of results per page:</Typography>
 				<Select labelId='amount' id='amount' name='amount' value={displaySettings.amount} onChange={handleAmount} required>
 					<MenuItem value={10} key={10}>{10}</MenuItem>
 					<MenuItem value={50} key={50}>{50}</MenuItem>
@@ -38,7 +38,7 @@ const PaginationRow = ({ filteredUsers }) => {
 				</Select>
 			</FormControl>
 		</Box>
-		<Pagination 
+		<Pagination
 			count={final_page}
 			onChange={handlePageChange}
 			sx={{display: 'flex', justifyContent: 'center'}}

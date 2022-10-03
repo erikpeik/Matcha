@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-	FormControl, FormLabel, RadioGroup, FormControlLabel, 
+	FormControl, FormLabel, RadioGroup, FormControlLabel,
 	Radio, InputLabel, TextField, Box, Slider, Button, Grid
 } from '@mui/material'
 import { setDisplaySettings } from '../../reducers/displaySettingsReducer'
@@ -26,12 +26,10 @@ const SortAndFilterOptions = ({ setLocationFilter, setNameFilter, setTagFilter,
 		dispatch(setDisplaySettings({ ...displaySettings, page: 1, offset: 0 }))
 	}
 
-
-
 	const handleSorting = (event) => {
 		dispatch(setDisplaySettings({ ...displaySettings, sorting: event.target.value }))
 	}
-	
+
 	const handleSortOrder = async (event) => {
 		dispatch(setDisplaySettings({ ...displaySettings, sort_order: event.target.value }))
 	}
@@ -63,8 +61,8 @@ const SortAndFilterOptions = ({ setLocationFilter, setNameFilter, setTagFilter,
 			<FormControl>
 				<FormLabel id='sorted_by'>Results sorted by:</FormLabel>
 				<RadioGroup row aria-labelledby='sorted_by' name='sorted_by' value={displaySettings.sorting} onChange={handleSorting}>
-					<FormControlLabel value='age' control={<Radio />} label='Age' />
 					<FormControlLabel value='distance' control={<Radio />} label='Distance' />
+					<FormControlLabel value='age' control={<Radio />} label='Age' />
 					<FormControlLabel value='fame_rating' control={<Radio />} label='Fame Rating' />
 					<FormControlLabel value='common_tags' control={<Radio />} label='Common tags' />
 				</RadioGroup>
