@@ -11,7 +11,7 @@ module.exports = (app, pool, session, upload, fs, path) => {
 						VALUES ($1,$2,$3,$4,$5,$6,point($7,$8))`
 			await pool.query(sql, [sess.userid, gender, age, location, sexual_pref, biography, gps[0], gps[1]])
 			var sql = `UPDATE fame_rates SET setup_pts = setup_pts + 5, total_pts = total_pts + 5
-						WHERE user_id = $1 AND setup_pts < 5`
+						WHERE user_id = $1 AND setup_pts < 5 AND total_pts <= 95`
 			response.send(true)
 		} catch (error) {
 			response.send(error)
@@ -57,7 +57,7 @@ module.exports = (app, pool, session, upload, fs, path) => {
 				if (tagPoints > 5)
 					tagPoints = 5
 				var sql = `UPDATE fame_rates SET total_pts = total_pts - tag_pts + $2, tag_pts = $2
-							WHERE user_id = $1 RETURNING *`
+							WHERE user_id = $1 AND total_pts <= 95`
 				await pool.query(sql, [sess.userid, tagPoints])
 				// console.log(tagtext)
 				response.send(true)
@@ -135,7 +135,7 @@ module.exports = (app, pool, session, upload, fs, path) => {
 				}
 			} else {
 				var sql = `UPDATE fame_rates SET picture_pts = picture_pts + 2, total_pts = total_pts + 2
-				WHERE user_id = $1 AND picture_pts < 10`
+				WHERE user_id = $1 AND picture_pts < 10 AND total_pts <= 98`
 				await pool.query(sql, [sess.userid])
 			}
 			var sql = `UPDATE user_pictures SET picture_data = $1
@@ -158,7 +158,7 @@ module.exports = (app, pool, session, upload, fs, path) => {
 					var sql = `INSERT INTO user_pictures (user_id, picture_data, profile_pic) VALUES ($1, $2, 'NO')`
 					await pool.query(sql, [sess.userid, image])
 					var sql = `UPDATE fame_rates SET picture_pts = picture_pts + 2, total_pts = total_pts + 2
-								WHERE user_id = $1 AND picture_pts < 10`
+								WHERE user_id = $1 AND picture_pts < 10 AND total_pts <= 98`
 					await pool.query(sql, [sess.userid])
 					response.send(true)
 				} else {
