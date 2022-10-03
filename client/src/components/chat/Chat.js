@@ -56,7 +56,7 @@ const Chat = ({ socket }) => {
 	return (
 		<Container maxWidth='lg' sx={{ pt: 5, pb: 5 }}>
 			<Grid container spacing={2} direction={matches ? 'column' : 'row'}>
-				<Grid item xs={4} md={4} >
+				<Grid item xs={4} md={4}>
 					<ChatBar
 						connections={connections}
 						socket={socket} />

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Container, Paper, Typography } from '@mui/material'
+import { Container, Paper, Typography, useMediaQuery, Grid } from '@mui/material'
 import browsingService from '../services/browsingService'
 import Loader from './Loader'
 import { useDispatch, useSelector } from 'react-redux'
@@ -11,8 +11,8 @@ import SortAndFilterOptions from './browsing/SortAndFilterOptions'
 import UserPreviews from './browsing/UserPreviews'
 
 const filterUsers = (users, filters, profileData) => {
-
 	var filteredUsers = users
+
 	if (filters.nameFilter)
 		filteredUsers = users.filter(user => user.username.toLowerCase().includes(filters.nameFilter.toLowerCase()))
 
@@ -57,9 +57,9 @@ const filterUsers = (users, filters, profileData) => {
 }
 
 const sortUsers = (filteredUsers, displaySettings) => {
-
 	const sorting = displaySettings.sorting
 	const sort_order = displaySettings.sort_order
+
 	switch (true) {
 		case (sorting === 'age' && sort_order === 'asc'):
 			return filteredUsers.sort((a, b) => (a.age > b.age ? 1 : -1))
@@ -80,14 +80,13 @@ const sortUsers = (filteredUsers, displaySettings) => {
 		default:
 			return filteredUsers
 	}
-
 }
 
 const Browsing = () => {
-
 	const dispatch = useDispatch()
 
-	const [isLoading, setLoading] = useState(true);
+	const matches = useMediaQuery("(max-width:800px)")
+	const [isLoading, setLoading] = useState(true)
 	const [users, setUsers] = useState([])
 	const [nameFilter, setNameFilter] = useState()
 	const [locationFilter, setLocationFilter] = useState()
@@ -116,32 +115,36 @@ const Browsing = () => {
 
 	var filters = { nameFilter: nameFilter, locationFilter: locationFilter, tagFilter: tagFilter }
 	var filteredUsers = filterUsers(users, filters, profileData)
-
 	var sortedUsers = sortUsers(filteredUsers, displaySettings)
-
 	var pageUsers = sortedUsers.slice(displaySettings.offset, displaySettings.offset + displaySettings.amount)
 
 	return (
-		<Container maxWidth='md' sx={{ pt: 5, pb: 5 }}>
+		<Container maxWidth='xl' sx={{ pt: 5, pb: 5 }}>
 			<NotificationSnackbar />
-			<Paper sx={{ p: 3, mb: 2 }}>
-				<Typography variant='h5' component='h1' sx={{ mb: 2 }}>
-					Browsing
-				</Typography>
-				<PaginationRow filteredUsers={filteredUsers} />
-				<SortAndFilterOptions
-					setLocationFilter={setLocationFilter}
-					setNameFilter={setNameFilter}
-					setTagFilter={setTagFilter}
-					browsingCriteria={browsingCriteria}
-					setUsers={setUsers} />
-			</Paper>
-			<Paper>
-				<UserPreviews
-					pageUsers={pageUsers}
-					browsingCriteria={browsingCriteria}
-				/>
-			</Paper>
+			<Grid container spacing={2} direction={matches ? 'column' : 'row'}>
+				<Grid item xs={4} md={4}>
+					<Paper sx={{ p: 3, mb: 2 }}>
+						<Typography variant='h5' component='h1' sx={{ mb: 2 }}>
+							Browsing
+						</Typography>
+						<PaginationRow filteredUsers={filteredUsers} />
+						<SortAndFilterOptions
+							setLocationFilter={setLocationFilter}
+							setNameFilter={setNameFilter}
+							setTagFilter={setTagFilter}
+							browsingCriteria={browsingCriteria}
+							setUsers={setUsers} />
+					</Paper>
+				</Grid>
+				<Grid item xs={8} md={8}>
+					<Paper>
+						<UserPreviews
+							pageUsers={pageUsers}
+							browsingCriteria={browsingCriteria}
+						/>
+					</Paper>
+				</Grid>
+			</Grid>
 		</Container>
 	)
 

@@ -92,7 +92,7 @@ const SortAndFilterOptions = ({ setLocationFilter, setNameFilter, setTagFilter,
 					</Grid>
 				</Grid>
 			</Box>
-			<Box sx={{ width: 300 }}>
+			<Box>
 				<InputLabel id='ageslider'>Filter by age:</InputLabel>
 				<Slider
 					min={18}
@@ -103,17 +103,16 @@ const SortAndFilterOptions = ({ setLocationFilter, setNameFilter, setTagFilter,
 					valueLabelDisplay="auto"
 				/>
 			</Box>
-			<Box sx={{ width: 300 }}>
+			<Box>
 				<InputLabel id='fameslider'>Filter by fame rating:</InputLabel>
 				<Slider
 					aria-labelledby='fame range'
 					value={[sliderStatus.min_fame, sliderStatus.max_fame]}
 					onChange={handleFameSlider}
 					valueLabelDisplay="auto"
-				// getAriaValueText={valuetext}
 				/>
 			</Box>
-			<Box sx={{ width: 300 }}>
+			<Box>
 				<InputLabel id='distanceslider'>Filter by distance:</InputLabel>
 				<Slider
 					min={0}
