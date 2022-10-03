@@ -10,7 +10,8 @@ module.exports = (app, pool, session, upload, fs, path) => {
 						user_location, sexual_pref, biography, ip_location)
 						VALUES ($1,$2,$3,$4,$5,$6,point($7,$8))`
 			await pool.query(sql, [sess.userid, gender, age, location, sexual_pref, biography, gps[0], gps[1]])
-
+			var sql = `UPDATE fame_rates SET setup_pts = setup_pts + 5, total_pts = total_pts + 5
+						WHERE user_id = $1 AND setup_pts < 5`
 			response.send(true)
 		} catch (error) {
 			response.send(error)
@@ -35,7 +36,8 @@ module.exports = (app, pool, session, upload, fs, path) => {
 				await pool.query(sql, [gender, age, location, sexual_pref, biography, gps_lat, gps_lon, sess.userid])
 
 				var sql = `UPDATE tags SET tagged_users = array_remove(tagged_users, $1)
-							WHERE (array[LOWER($2)] @> array[LOWER(tag_content)]::TEXT[]) IS NOT TRUE`
+							WHERE (array[LOWER($2)] @> array[LOWER(tag_content)]::TEXT[]) IS NOT TRUE
+							RETURNING *`
 				await pool.query(sql, [sess.userid, tags])
 
 				tags.map(async (tagtext) => {
@@ -51,11 +53,17 @@ module.exports = (app, pool, session, upload, fs, path) => {
 						await pool.query(sql, [sess.userid, tagtext])
 					}
 				})
+				var tagPoints = tags.length
+				if (tagPoints > 5)
+					tagPoints = 5
+				var sql = `UPDATE fame_rates SET total_pts = total_pts - tag_pts + $2, tag_pts = $2
+							WHERE user_id = $1 RETURNING *`
+				await pool.query(sql, [sess.userid, tagPoints])
 				// console.log(tagtext)
 				response.send(true)
 			} catch (error) {
 				console.log(error)
-				response.send(error)
+				response.send(JSON.stringify(error))
 			}
 		}
 	})
@@ -66,6 +74,7 @@ module.exports = (app, pool, session, upload, fs, path) => {
 		try {
 			var sql = `SELECT * FROM users
 						INNER JOIN user_settings ON users.id = user_settings.user_id
+						INNER JOIN fame_rates ON users.id = fame_rates.user_id
 						WHERE users.id = $1`
 			var { rows } = await pool.query(sql, [sess.userid])
 			// console.log("Profile Data: ", rows[0])
@@ -124,6 +133,10 @@ module.exports = (app, pool, session, upload, fs, path) => {
 						}
 					})
 				}
+			} else {
+				var sql = `UPDATE fame_rates SET picture_pts = picture_pts + 2, total_pts = total_pts + 2
+				WHERE user_id = $1 AND picture_pts < 10`
+				await pool.query(sql, [sess.userid])
 			}
 			var sql = `UPDATE user_pictures SET picture_data = $1
 						WHERE user_id = $2 AND profile_pic = 'YES'`
@@ -144,6 +157,9 @@ module.exports = (app, pool, session, upload, fs, path) => {
 				if (rows.length < 5) {
 					var sql = `INSERT INTO user_pictures (user_id, picture_data, profile_pic) VALUES ($1, $2, 'NO')`
 					await pool.query(sql, [sess.userid, image])
+					var sql = `UPDATE fame_rates SET picture_pts = picture_pts + 2, total_pts = total_pts + 2
+								WHERE user_id = $1 AND picture_pts < 10`
+					await pool.query(sql, [sess.userid])
 					response.send(true)
 				} else {
 					response.send("You have uploaded too many pictures. Delete some to make room for new ones!")
@@ -201,6 +217,9 @@ module.exports = (app, pool, session, upload, fs, path) => {
 			}
 			var sql = "DELETE FROM user_pictures WHERE user_id = $1 AND picture_id = $2"
 			await pool.query(sql, [sess.userid, picture_id])
+			var sql = `UPDATE fame_rates SET picture_pts = picture_pts - 2, total_pts = total_pts - 2
+						WHERE user_id = $1 AND picture_pts > 0`
+			await pool.query(sql, [sess.userid])
 			response.status(200).send("Picture deleted")
 		}
 	})
@@ -210,7 +229,7 @@ module.exports = (app, pool, session, upload, fs, path) => {
 
 		if (sess.userid) {
 			var sql = `SELECT * FROM notifications WHERE user_id = $1 AND read = 'NO'`
-			const {rows} = await pool.query(sql, [sess.userid])
+			const { rows } = await pool.query(sql, [sess.userid])
 
 			response.send(rows)
 		}

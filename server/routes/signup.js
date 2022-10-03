@@ -12,7 +12,7 @@ module.exports = function (app, pool, bcrypt, transporter) {
 		if (!body.email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/))
 			return response.send("Please enter a valid e-mail address.")
 		if (!body.password.match(/(?=^.{8,30}$)(?=.*\d)(?=.*[!.@#$%^&*]+)(?=.*[A-Z])(?=.*[a-z]).*$/)) {
-			return response.send("PLEASE ENTER A PASSWORD WITH: </p><p> - a length between 8 and 30 characters </p><p> - at least one lowercase character (a-z) </p><p> - at least one uppercase character (A-Z) </p><p> - at least one numeric character (0-9) <br> at least one special character (!.@#$%^&*)")
+			return response.send("PLEASE ENTER A PASSWORD WITH: a length between 8 and 30 characters, at least one lowercase character (a-z), at least one uppercase character (A-Z), at least one numeric character (0-9) and at least one special character (!.@#$%^&*)")
 		}
 		if (body.password !== body.confirmPassword)
 			return response.send("The entered passwords are not the same!")
@@ -58,6 +58,8 @@ module.exports = function (app, pool, bcrypt, transporter) {
 				console.log(rows)
 				var sql = "INSERT INTO user_pictures (user_id, picture_data, profile_pic) VALUES ($1,$2,'YES') RETURNING *";
 				await pool.query(sql, [rows[0]['id'], 'http://localhost:3000/images/default_profilepic.jpeg'])
+				var sql = "INSERT INTO fame_rates (user_id) VALUES ($1)";
+				await pool.query(sql, [rows[0]['id']])
 				return
 			} catch (error) {
 				console.log("ERROR :", error)

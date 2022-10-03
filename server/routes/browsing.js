@@ -10,11 +10,13 @@ module.exports = (app, pool, transporter, session) => {
 				sess.location.x, sess.location.y, body.min_distance, body.max_distance]
 				console.log("Variables: ", body, sess.location.x, sess.location.y)
 				var sql = `SELECT id, username, firstname, lastname, gender, age, sexual_pref,
-						biography, fame_rating, user_location, picture_data AS profile_pic, blocker_id, target_id,
+						biography, total_pts AS fame_rating, user_location, picture_data AS profile_pic,
+						blocker_id, target_id,
 						calculate_distance($6, $7, ip_location[0], ip_location[1], 'K') AS distance,
 						(SELECT COUNT(*) FROM tags WHERE tagged_users @> array[$1,users.id]) AS common_tags
 						FROM users
 						INNER JOIN user_settings ON users.id = user_settings.user_id
+						INNER JOIN fame_rates ON users.id = fame_rates.user_id
 						INNER JOIN user_pictures ON users.id = user_pictures.user_id AND user_pictures.profile_pic = 'YES'
 						LEFT JOIN blocks ON (users.id = blocks.target_id AND blocks.blocker_id = $1) OR
 											(users.id = blocks.blocker_id AND blocks.target_id = $1)
@@ -62,6 +64,10 @@ module.exports = (app, pool, transporter, session) => {
 				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path) VALUES ($1,$2,$3)`
 				pool.query(sql, [liked_person_id, notification, `/userprofile/${sess.userid}`])
 
+				var sql = `UPDATE fame_rates SET like_pts = like_pts + 10, total_pts = total_pts + 10
+							WHERE user_id = $1 AND like_pts < 50`
+				pool.query(sql, [liked_person_id])
+
 				var sql = `SELECT * FROM likes WHERE liker_id = $2 AND target_id = $1`
 				const reverseliked = await pool.query(sql, [sess.userid, liked_person_id])
 
@@ -73,6 +79,9 @@ module.exports = (app, pool, transporter, session) => {
 										You are now connected and are able to chat with each other.`
 					var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path) VALUES ($1,$2, $3)`
 					pool.query(sql, [liked_person_id, notification, '/chat'])
+					var sql = `UPDATE fame_rates SET connection_pts = connection_pts + 5, total_pts = total_pts + 5
+								WHERE (user_id = $1 AND connection_pts < 30) OR (user_id = $2 AND connection_pts < 30)`
+					pool.query(sql, [liked_person_id, sess.userid])
 				}
 				console.log("Liked user!")
 				response.status(200).send("Liked user!")
@@ -218,6 +227,7 @@ module.exports = (app, pool, transporter, session) => {
 				const profile_id = request.params.id
 				var sql = `SELECT * FROM users
 						INNER JOIN user_settings ON users.id = user_settings.user_id
+						INNER JOIN fame_rates ON users.id = fame_rates.user_id
 						WHERE users.id = $1`
 				var { rows } = await pool.query(sql, [profile_id])
 				// console.log("Profile Data: ", rows[0])

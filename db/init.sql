@@ -147,5 +147,18 @@ CREATE TABLE IF NOT EXISTS notifications (
 	notification_text VARCHAR(255) NOT NULL,
 	redirect_path VARCHAR(255),
 	read enum_yesno DEFAULT 'NO',
-	time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS fame_rates (
+	famerate_id SERIAL NOT NULL PRIMARY KEY,
+	user_id INT NOT NULL,
+	setup_pts INT NOT NULL DEFAULT 0,
+	picture_pts INT NOT NULL DEFAULT 0,
+	tag_pts INT NOT NULL DEFAULT 0,
+	like_pts INT NOT NULL DEFAULT 0,
+	connection_pts INT NOT NULL DEFAULT 0,
+	total_pts INT NOT NULL DEFAULT 0,
+	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );

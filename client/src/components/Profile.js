@@ -153,7 +153,7 @@ const Profile = () => {
 						<Typography variant='h2' align='center'>
 							{profileData.username}
 						</Typography>
-						<Typography variant='h5'>Fame Rating: {profileData.fame_rating}</Typography>
+						<Typography variant='h5'>Fame Rating: {profileData.total_pts}</Typography>
 						<StyledRating
 							name="read-only"
 							value={3.453}
