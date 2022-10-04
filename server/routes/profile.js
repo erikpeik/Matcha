@@ -37,6 +37,8 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 						biography = $5, ip_location = point($6,$7) WHERE user_id = $8`
 				await pool.query(sql, [gender, age, location, sexual_pref, biography, gps_lat, gps_lon, sess.userid])
 
+				sess.location = { x: gps_lat, y: gps_lon }
+
 				var sql = `UPDATE tags SET tagged_users = array_remove(tagged_users, $1)
 							WHERE (array[LOWER($2)] @> array[LOWER(tag_content)]::TEXT[]) IS NOT TRUE
 							RETURNING *`
@@ -130,6 +132,21 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 			if (other_pictures.rows) {
 				profileData.other_pictures = other_pictures.rows
 			}
+
+			var sql = `SELECT watcher_id, username
+						FROM watches INNER JOIN users on watches.watcher_id = users.id
+						WHERE target_id = $1
+						GROUP BY watcher_id, username`
+			const watchers = await pool.query(sql, [sess.userid])
+			profileData.watchers = watchers.rows
+
+			var sql = `SELECT liker_id, username
+						FROM likes INNER JOIN users on likes.liker_id = users.id
+						WHERE target_id = $1
+						GROUP BY liker_id, username`
+			const likers = await pool.query(sql, [sess.userid])
+			profileData.likers = likers.rows
+
 			response.send(profileData)
 		} catch (error) {
 			response.send(false)

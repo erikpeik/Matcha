@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { changeNotification } from '../reducers/notificationReducer'
 import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import {
 	Typography, Button, Paper, createTheme, Box, Grid, Rating, styled, Avatar
 } from '@mui/material'
@@ -89,7 +89,21 @@ const Profile = () => {
 		'Sexual preference:': profileData.sexual_pref,
 		'Location:': profileData.user_location,
 		'GPS:': Object.values(profileData.ip_location).map((value, i) => ((i ? ', ' : '') + value)),
-		'Tags:': profileData.tags.map((tag, i) => ((i ? ', ' : '') + tag))
+		'Tags:': profileData.tags.map((tag, i) => ((i ? ', ' : '') + tag)),
+		'Users who liked you:': profileData.likers.map((liker, i) => {
+			return (
+				<Typography key={i} onClick={() => navigate(`/userprofile/${liker.liker_id}`)}
+					component={Link} to={`/userprofile/${liker.liker_id}`}>
+					{(i ? ', ' : '') + liker.username}
+				</Typography>)
+		}),
+		'Users who watched your profile:': profileData.watchers.map((watcher, i) => {
+			return (
+				<Typography key={i} onClick={() => navigate(`/userprofile/${watcher.watcher_id}`)}
+					component={Link} to={`/userprofile/${watcher.watcher_id}`}>
+					{(i ? ', ' : '') + watcher.username}
+				</Typography>)
+		})
 	}
 
 	const deleteImage = async (id) => {
