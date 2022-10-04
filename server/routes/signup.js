@@ -7,8 +7,8 @@ module.exports = function (app, pool, bcrypt, transporter) {
 			return response.send("Username has to be between 4 and 25 characters.")
 		if (!body.username.match(/^[a-z0-9]+$/i))
 			return response.send("Username should only include characters (a-z or A-Z) and numbers (0-9).")
-		if (!body.firstname.match(/^[a-zåäö]+$/i) || !body.lastname.match(/^[a-zåäö]+$/i))
-			return response.send("First name and last name can only include characters a-z and å, ä, ö.")
+		if (!body.firstname.match(/^[a-zåäö-]+$/i) || !body.lastname.match(/^[a-zåäö-]+$/i))
+			return response.send("First name and last name can only include characters a-z, å, ä, ö and dash (-).")
 		if (!body.email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/))
 			return response.send("Please enter a valid e-mail address.")
 		if (!body.password.match(/(?=^.{8,30}$)(?=.*\d)(?=.*[!.@#$%^&*]+)(?=.*[A-Z])(?=.*[a-z]).*$/)) {
