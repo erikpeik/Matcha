@@ -20,6 +20,7 @@ import ConfirmMail from './components/login/ConfirmMail'
 import Chat from './components/chat/Chat'
 import Loader from './components/Loader'
 import ResetPassword, { SetNewPassword } from './components/login/ResetPassword'
+import ChangePassword from './components/profile/ChangePassword'
 import Logout from './components/Logout'
 import UserProfile from './components/Userprofile'
 import { changeOnlineUsers } from './reducers/onlineUsersReducer'
@@ -81,6 +82,7 @@ const App = () => {
 				<Route path="/resetpassword/:user/:code" element={<SetNewPassword />} />
 				<Route path="/signup" element={<Signup />} />
 				<Route path="/settings" element={<ProfileSettings />} />
+				<Route path="/changepassword" element={<ChangePassword />} />
 				<Route path="/confirm/:user/:code" element={<ConfirmMail />} />
 				<Route path="/profile" element={<Profile />} />
 				<Route path="/userprofile/:id" element={<UserProfile />} />

@@ -11,6 +11,11 @@ const editUserSettings = ProfileSettings => {
 	return request.then(response => response.data)
 }
 
+const changePassword = passWords => {
+	const request = axios.post(`${baseUrl}/changepassword`, passWords)
+	return request.then(response => response.data)
+}
+
 const getProfileData = () => {
 	const request = axios.get(`${baseUrl}`)
 	return request.then(response => response.data)
@@ -36,6 +41,7 @@ const deletePicture = PictureId => {
 	return request.then(response => response.data)
 }
 
-const profileService = { setUpProfile, getProfileData, getNotifications, setProfilePic, uploadPicture, deletePicture, editUserSettings }
+const profileService = { setUpProfile, getProfileData, getNotifications, setProfilePic,
+						uploadPicture, deletePicture, editUserSettings, changePassword }
 
 export default profileService

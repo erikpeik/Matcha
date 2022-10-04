@@ -9,7 +9,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import { Container } from '@mui/system'
 import Notification from './Notification'
-import { resetNotification } from '../reducers/notificationReducer'
+// import { resetNotification } from '../reducers/notificationReducer'
 import { changeSeverity } from '../reducers/severityReducer'
 import { getProfileData } from '../reducers/profileReducer'
 import profileService from '../services/profileService'
@@ -56,7 +56,7 @@ const Profile = () => {
 	const profileData = useSelector(state => state.profile)
 
 	useEffect(() => {
-		dispatch(resetNotification())
+		// dispatch(resetNotification())
 		const getData = async () => {
 			await dispatch(getProfileData())
 			setLoading(false);
@@ -180,7 +180,7 @@ const Profile = () => {
 					</Grid>
 				</Grid>
 				<Button theme={theme} onClick={() => navigate('/settings')}>Edit profile</Button>
-				<Button theme={theme}>Change password</Button>
+				<Button theme={theme} onClick={() => navigate('/changepassword')}>Change password</Button>
 				<Button theme={theme}>
 					<label htmlFor="set_profilepic" className="styled-image-upload">
 						Change profile picture

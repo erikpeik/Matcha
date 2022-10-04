@@ -1,4 +1,4 @@
-module.exports = (app, pool, session, upload, fs, path) => {
+module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 	app.post('/api/profile/setup', async (request, response) => {
 		var sess = request.session
 		const { gender, age, location, gps, sexual_pref, biography } = request.body
@@ -65,6 +65,36 @@ module.exports = (app, pool, session, upload, fs, path) => {
 			} catch (error) {
 				console.log(error)
 				response.send(JSON.stringify(error))
+			}
+		}
+	})
+
+	app.post('/api/profile/changepassword', async (request, response) => {
+		const sess = request.session
+		const {oldPassword, newPassword, confirmPassword} = request.body
+
+		if (newPassword !== confirmPassword) {
+			return response.send("The entered new passwords are not the same!")
+		}
+		else if (!newPassword.match(/(?=^.{8,30}$)(?=.*\d)(?=.*[!.@#$%^&*]+)(?=.*[A-Z])(?=.*[a-z]).*$/)) {
+			return response.send("PLEASE ENTER A NEW PASSWORD WITH: a length between 8 and 30 characters, at least one lowercase character (a-z), at least one uppercase character (A-Z), at least one numeric character (0-9) and at least one special character (!.@#$%^&*)")
+		}
+
+		var sql = `SELECT * FROM users WHERE id = $1`;
+		const { rows } = await pool.query(sql, [sess.userid])
+
+		if (!(await bcrypt.compare(oldPassword, rows[0]['password']))) {
+			return response.send("The old password is not correct!")
+		} else {
+			const hash = await bcrypt.hash(newPassword, 10);
+			console.log("Hashed password: " + hash)
+			try {
+				var sql = "UPDATE users SET password = $1 WHERE id = $2";
+				await pool.query(sql, [hash, sess.userid])
+				return response.send(true)
+			} catch (error) {
+				console.log("ERROR :", error)
+				return response.send("Password creation failed")
 			}
 		}
 	})
