@@ -19,7 +19,7 @@ import FemaleIcon from '@mui/icons-material/Female'
 import WcIcon from '@mui/icons-material/Wc'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import TodayIcon from '@mui/icons-material/Today';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGenderless } from '@fortawesome/free-solid-svg-icons'
 
@@ -117,7 +117,6 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 					filter: 'drop-shadow(0 2px 1px rgb(125, 52, 148))'
 				}} />
 			}
-			console.log('user', user)
 			if (!user.id) {
 				return (<div key="emptyusers"></div>)
 			} else
@@ -165,28 +164,27 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 											<Typography sx={{ fontWeight: 550 }}>{`${user.age} years old`}</Typography>
 										</Grid>
 									</Box>
-									<Grid item>
-											<IconButton
-												arial-label='more'
-												id='long-button'
-												aria-controls={open ? 'long-menu' : undefined}
-												aria-expanded={open ? 'true' : undefined}
-												aria-haspopup='true'
-												onClick={handleClick}
-											>
-												<MoreVertIcon />
-											</IconButton>
-											<Menu
-												anchorEl={anchorEl}
-												open={open}
-												onClose={handleClose}
-											>
-												<Button theme={themeunlike} onClick={() => { blockUser(user.id) }} sx={{ mt: 1 }}>
-													<BlockIcon sx={{ mr: 1 }} />
-													Block user
-												</Button>
-											</Menu>
-										</Grid>
+									<IconButton
+										arial-label='more'
+										id='long-button'
+										aria-controls={open ? 'long-menu' : undefined}
+										aria-expanded={open ? 'true' : undefined}
+										aria-haspopup='true'
+										onClick={handleClick}
+									>
+										<MoreHorizIcon />
+									</IconButton>
+									<Menu
+										elevation={1}
+										anchorEl={anchorEl}
+										open={open}
+										onClose={handleClose}
+									>
+										<Button theme={themeunlike} onClick={() => { blockUser(user.id) }}>
+											<BlockIcon sx={{ mr: 1 }} />
+											Block user
+										</Button>
+									</Menu>
 								</Box>
 							</Grid>
 						</Grid>

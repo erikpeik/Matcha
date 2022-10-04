@@ -126,12 +126,17 @@ const Browsing = () => {
 	var sortedUsers = sortUsers(filteredUsers, displaySettings)
 	var pageUsers = sortedUsers.slice(displaySettings.offset, displaySettings.offset + displaySettings.amount)
 
+	const paperStyles = {
+		padding: '15px',
+		marginBottom: '10px',
+	}
+
 	return (
-		<Container maxWidth='xl' sx={{ pt: 5, pb: 5 }}>
+		<Container maxWidth='xl' sx={{ pt: 5, pb: 5}}>
 			<NotificationSnackbar />
-			<Grid container spacing={2} direction={matches ? 'column' : 'row'}>
-				<Grid item xs={4} md={4}>
-					<Paper sx={{ p: 3, mb: 2 }}>
+			<Grid container columnSpacing={2} direction={matches ? 'column' : 'row'}>
+				<Grid item xs={4}>
+					<Paper style={paperStyles}>
 						<Typography variant='h5' component='h1' sx={{ mb: 2 }}>
 							Browsing
 						</Typography>
@@ -144,11 +149,11 @@ const Browsing = () => {
 							setUsers={setUsers} />
 					</Paper>
 				</Grid>
-				<Grid item xs={8} md={8}>
-						<UserPreviews
-							pageUsers={pageUsers}
-							browsingCriteria={browsingCriteria}
-						/>
+				<Grid item xs={8}>
+					<UserPreviews
+						pageUsers={pageUsers}
+						browsingCriteria={browsingCriteria}
+					/>
 				</Grid>
 			</Grid>
 		</Container>
