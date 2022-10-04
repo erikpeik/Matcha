@@ -17,7 +17,7 @@ module.exports = (app, pool, transporter, session) => {
 						FROM users
 						INNER JOIN user_settings ON users.id = user_settings.user_id
 						INNER JOIN fame_rates ON users.id = fame_rates.user_id
-						INNER JOIN user_pictures ON users.id = user_pictures.user_id AND user_pictures.profile_pic = 'YES'
+						LEFT JOIN user_pictures ON users.id = user_pictures.user_id AND user_pictures.profile_pic = 'YES'
 						LEFT JOIN blocks ON (users.id = blocks.target_id AND blocks.blocker_id = $1) OR
 											(users.id = blocks.blocker_id AND blocks.target_id = $1)
 						WHERE users.id != $1 AND users.verified = 'YES' AND blocker_id IS NULL AND target_id IS NULL
@@ -28,7 +28,7 @@ module.exports = (app, pool, transporter, session) => {
 
 				var returnedRows = rows.map(user => {
 					if (!user.profile_pic)
-						return ({ ...user, profile_pic: "http://localhost:3000/images/default_profilepic.jpeg" })
+						return ({ ...user, profile_pic: null })
 					else
 						return (user)
 				})
@@ -51,8 +51,7 @@ module.exports = (app, pool, transporter, session) => {
 						INNER JOIN users ON user_pictures.user_id = users.id
 						WHERE user_pictures.user_id = $1 AND user_pictures.profile_pic = 'YES'`
 			const { rows } = await pool.query(sql, [sess.userid])
-
-			if (rows[0]['picture_data'] === 'http://localhost:3000/images/default_profilepic.jpeg') {
+			if (rows[0] == undefined || rows[0]['picture_data'] === null || rows[0]['picture_data'] === 'http://localhost:3000/images/default_profilepic.jpeg') {
 				return response.send('No profile picture')
 			} else {
 				const liked_person_id = request.params.id
@@ -231,9 +230,7 @@ module.exports = (app, pool, transporter, session) => {
 						INNER JOIN fame_rates ON users.id = fame_rates.user_id
 						WHERE users.id = $1`
 				var { rows } = await pool.query(sql, [profile_id])
-				// console.log("Profile Data: ", rows[0])
 				const { password: removed_password, ...profileData } = rows[0]
-				// console.log("Profile Data: ", profileData)
 
 				var sql = `SELECT * FROM tags WHERE tagged_users @> array[$1]::INT[]
 						ORDER BY tag_id`
@@ -247,13 +244,10 @@ module.exports = (app, pool, transporter, session) => {
 				if (profile_pic.rows[0]) {
 					profileData.profile_pic = profile_pic.rows[0]
 				} else {
-					profileData.profile_pic = { user_id: sess.userid, picture_data: 'http://localhost:3000/images/default_profilepic.jpeg' }
+					profileData.profile_pic = { user_id: sess.userid, picture_data: null }
 				}
-				// console.log(profile_pic.rows[0]['picture_data'])
-
 				var sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND profile_pic = 'NO' ORDER BY picture_id`
 				var other_pictures = await pool.query(sql, [profile_id])
-				// console.log(other_pictures.rows)
 				if (other_pictures.rows) {
 					profileData.other_pictures = other_pictures.rows
 				}

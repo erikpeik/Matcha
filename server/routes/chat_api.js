@@ -7,7 +7,6 @@ module.exports = (app, pool, session) => {
 				var variables = [sess.userid]
 				var sql = `SELECT * from connections WHERE user1_id = $1 OR user2_id = $1`
 				var { rows } = await pool.query(sql, variables)
-				// console.log(rows)
 				var connected_user = []
 				for (var i = 0; i < rows.length; i++) {
 					var row = rows[i]
@@ -23,16 +22,17 @@ module.exports = (app, pool, session) => {
 						})
 					}
 				}
-				// console.log('connected_users:', connected_user)
 				for (var i = 0; i < connected_user.length; i++) {
 					variables = [connected_user[i].user_id]
-					sql = `SELECT id, username, picture_data from users
-					LEFT JOIN user_pictures ON user_pictures.user_id = users.id
-					WHERE users.id = $1 AND profile_pic = 'YES'`
+					sql = `SELECT id, username from users WHERE users.id = $1`
 					var { rows } = await pool.query(sql, variables)
 					rows[0].connection_id = connected_user[i].connection_id
+
+					sql = `SELECT picture_data from user_pictures
+					WHERE user_id = $1 AND profile_pic = 'YES'`
+					var { rows: picture_data } = await pool.query(sql, variables)
+					rows[0].picture_data = picture_data[0].picture_data
 					connected_user[i] = rows[0]
-					// console.log(connected_user[i])
 				}
 				response.send(connected_user)
 			} else {
@@ -99,7 +99,6 @@ module.exports = (app, pool, session) => {
 					else
 						return (user)
 				})
-				// console.log("Browsing Data To Show: ", returnedRows)
 				response.send(returnedRows)
 			} else {
 				response.send(false)

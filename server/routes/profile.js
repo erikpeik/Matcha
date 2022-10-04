@@ -60,7 +60,6 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 				var sql = `UPDATE fame_rates SET total_pts = total_pts - tag_pts + $2, tag_pts = $2
 							WHERE user_id = $1 AND total_pts <= 95`
 				await pool.query(sql, [sess.userid, tagPoints])
-				// console.log(tagtext)
 				response.send(true)
 			} catch (error) {
 				console.log(error)
@@ -108,9 +107,7 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 						INNER JOIN fame_rates ON users.id = fame_rates.user_id
 						WHERE users.id = $1`
 			var { rows } = await pool.query(sql, [sess.userid])
-			// console.log("Profile Data: ", rows[0])
 			const { password: removed_password, ...profileData } = rows[0]
-			// console.log("Profile Data: ", profileData)
 
 			var sql = `SELECT * FROM tags WHERE tagged_users @> array[$1]::INT[]
 						ORDER BY tag_id`
@@ -124,13 +121,11 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 			if (profile_pic.rows[0]) {
 				profileData.profile_pic = profile_pic.rows[0]
 			} else {
-				profileData.profile_pic = { user_id: sess.userid, picture_data: 'http://localhost:3000/images/default_profilepic.jpeg' }
+				profileData.profile_pic = { user_id: sess.userid, picture_data: null }
 			}
-			// console.log(profile_pic.rows[0]['picture_data'])
 
 			var sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND profile_pic = 'NO' ORDER BY picture_id`
 			var other_pictures = await pool.query(sql, [sess.userid])
-			// console.log(other_pictures.rows)
 			if (other_pictures.rows) {
 				profileData.other_pictures = other_pictures.rows
 			}

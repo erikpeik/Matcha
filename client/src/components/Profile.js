@@ -3,13 +3,13 @@ import { changeNotification } from '../reducers/notificationReducer'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import {
-	Typography, Button, Paper, createTheme, Box, Grid, Rating, styled
+	Typography, Button, Paper, createTheme, Box, Grid, Rating, styled, Avatar
 } from '@mui/material'
+import AspectRatio from '@mui/joy/AspectRatio'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import { Container } from '@mui/system'
 import Notification from './Notification'
-// import { resetNotification } from '../reducers/notificationReducer'
 import { changeSeverity } from '../reducers/severityReducer'
 import { getProfileData } from '../reducers/profileReducer'
 import profileService from '../services/profileService'
@@ -56,7 +56,6 @@ const Profile = () => {
 	const profileData = useSelector(state => state.profile)
 
 	useEffect(() => {
-		// dispatch(resetNotification())
 		const getData = async () => {
 			await dispatch(getProfileData())
 			setLoading(false);
@@ -78,10 +77,8 @@ const Profile = () => {
 		return <ProfileSetUpForm />
 	}
 
-	// console.log(profileData.profile_pic['picture_data'])
 	const profile_pic = profileData.profile_pic['picture_data']
 	const other_pictures = profileData.other_pictures
-	// console.log(other_pictures)
 
 	const ProfileData = {
 		'First name:': profileData.firstname,
@@ -91,8 +88,8 @@ const Profile = () => {
 		'Age:': profileData.age,
 		'Sexual preference:': profileData.sexual_pref,
 		'Location:': profileData.user_location,
-		'GPS:': Object.values(profileData.ip_location).map((value, i) => ((i ? ', ': '') + value )),
-		'Tags:': profileData.tags.map((tag, i) => ((i ? ', ': '') + tag ))
+		'GPS:': Object.values(profileData.ip_location).map((value, i) => ((i ? ', ' : '') + value)),
+		'Tags:': profileData.tags.map((tag, i) => ((i ? ', ' : '') + tag))
 	}
 
 	const deleteImage = async (id) => {
@@ -143,11 +140,13 @@ const Profile = () => {
 					mb: 2,
 				}}>
 					<Box sx={{ width: '200px', display: 'inline-block' }}>
-						<img
-							src={profile_pic}
-							alt='profile'
-							style={profilePicture}
-						/>
+						<AspectRatio ratio={1}>
+							<Avatar
+								src={profile_pic}
+								alt='profile'
+								style={profilePicture}
+							/>
+						</AspectRatio>
 					</Box>
 					<Box sx={{ width: 'fit-content', ml: 5 }}>
 						<Typography variant='h2' align='center'>
@@ -156,7 +155,7 @@ const Profile = () => {
 						<Typography variant='h5'>Fame Rating: {profileData.total_pts}</Typography>
 						<StyledRating
 							name="read-only"
-							value={profileData.total_pts/20}
+							value={profileData.total_pts / 20}
 							precision={0.5}
 							icon={<FavoriteIcon fontSize="inherit" />}
 							emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}

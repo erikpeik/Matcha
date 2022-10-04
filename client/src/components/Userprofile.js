@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import {
-	Typography, Paper, Box, Grid, Rating, styled, Button, createTheme
+	Typography, Paper, Box, Grid, Rating, styled, Button, createTheme, Avatar
 } from '@mui/material'
+import AspectRatio from '@mui/joy/AspectRatio'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import { Container } from '@mui/system'
@@ -154,11 +155,13 @@ const UserProfile = () => {
 					mb: 2,
 				}}>
 					<Box sx={{ width: '200px', display: 'inline-block' }}>
-						<img
-							src={profile_pic}
-							alt='profile'
-							style={profilePicture}
-						/>
+						<AspectRatio ratio={1}>
+							<Avatar
+								src={profile_pic}
+								alt='profile'
+								style={profilePicture}
+							/>
+						</AspectRatio>
 					</Box>
 					<Box sx={{ width: 'fit-content', ml: 5 }}>
 						<Typography variant='h2' align='center'>
@@ -167,7 +170,7 @@ const UserProfile = () => {
 						<Typography variant='h5'>Fame Rating: {userData.total_pts}</Typography>
 						<StyledRating
 							name="read-only"
-							value={userData.total_pts/20}
+							value={userData.total_pts / 20}
 							precision={0.5}
 							icon={<FavoriteIcon fontSize="inherit" />}
 							emptyIcon={<FavoriteBorderIcon fontSize="inherit" />}
