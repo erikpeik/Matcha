@@ -70,7 +70,11 @@ module.exports = (app, pool, transporter, session) => {
 				var sql = `SELECT * FROM likes WHERE liker_id = $2 AND target_id = $1`
 				const reverseliked = await pool.query(sql, [sess.userid, liked_person_id])
 
-				if (reverseliked.rows.length !== 0) {
+				var sql = `SELECT * FROM connections
+							WHERE (user1_id = $1 AND user2_id = $2) OR (user1_id = $2 AND user2_id = $1)`
+				const oldConnections = await pool.query(sql, [sess.userid, liked_person_id])
+
+				if (reverseliked.rows.length !== 0 && oldConnections.rows.length === 0) {
 					var sql = `INSERT INTO connections (user1_id, user2_id) VALUES ($1, $2)`
 					await pool.query(sql, [sess.userid, liked_person_id])
 
