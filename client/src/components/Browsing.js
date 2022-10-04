@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Container, Paper, Typography, useMediaQuery, Grid } from '@mui/material'
 import browsingService from '../services/browsingService'
 import Loader from './Loader'
@@ -9,6 +10,8 @@ import NotificationSnackbar from './NotificationSnackbar'
 import PaginationRow from './browsing/Pagination'
 import SortAndFilterOptions from './browsing/SortAndFilterOptions'
 import UserPreviews from './browsing/UserPreviews'
+import { changeNotification } from '../reducers/notificationReducer'
+import { changeSeverity } from '../reducers/severityReducer'
 
 const filterUsers = (users, filters, profileData) => {
 	var filteredUsers = users
@@ -84,6 +87,7 @@ const sortUsers = (filteredUsers, displaySettings) => {
 
 const Browsing = () => {
 	const dispatch = useDispatch()
+	const navigate = useNavigate()
 
 	const matches = useMediaQuery("(max-width:1000px)")
 	const [isLoading, setLoading] = useState(true)
@@ -100,14 +104,18 @@ const Browsing = () => {
 		dispatch(resetNotification())
 		const getUsers = async () => {
 			const allUsers = await browsingService.getUsers(browsingCriteria)
-			if (allUsers) {
+			if (allUsers !== "Fetching users failed") {
 				setUsers(allUsers)
 				setLoading(false);
+			} else {
+				dispatch(changeSeverity('error'))
+				dispatch(changeNotification('Fetching users failed'))
+				navigate('/profile')
 			}
 			await dispatch(getUserLists())
 		}
 		getUsers()
-	}, [dispatch, browsingCriteria])
+	}, [dispatch, navigate, browsingCriteria])
 
 	if (isLoading) {
 		return <Loader />

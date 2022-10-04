@@ -13,6 +13,7 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 			var sql = `UPDATE fame_rates SET setup_pts = setup_pts + 5, total_pts = total_pts + 5
 						WHERE user_id = $1 AND setup_pts < 5 AND total_pts <= 95`
 			pool.query(sql, [sess.userid])
+			sess.location = { x: gps[0], y: gps[1] }
 			response.send(true)
 		} catch (error) {
 			response.send(error)
@@ -70,7 +71,7 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 
 	app.post('/api/profile/changepassword', async (request, response) => {
 		const sess = request.session
-		const {oldPassword, newPassword, confirmPassword} = request.body
+		const { oldPassword, newPassword, confirmPassword } = request.body
 
 		if (newPassword !== confirmPassword) {
 			return response.send("The entered new passwords are not the same!")

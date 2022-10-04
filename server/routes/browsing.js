@@ -4,8 +4,8 @@ module.exports = (app, pool, transporter, session) => {
 		const body = request.body
 		const sess = request.session
 
-		try {
-			if (sess.userid) {
+		if (sess.userid && sess.location) {
+			try {
 				const variables = [sess.userid, body.min_age, body.max_age, body.min_fame, body.max_fame,
 				sess.location.x, sess.location.y, body.min_distance, body.max_distance]
 				console.log("Variables: ", body, sess.location.x, sess.location.y)
@@ -26,19 +26,19 @@ module.exports = (app, pool, transporter, session) => {
 						ORDER BY username`;
 				var { rows } = await pool.query(sql, variables)
 
-				var returnedRows = rows.map(user => {
-					if (!user.profile_pic)
-						return ({ ...user, profile_pic: null })
-					else
-						return (user)
-				})
-				console.log("Browsing Data To Show: ", returnedRows)
-				response.send(returnedRows)
-			} else {
-				response.send(false)
+				// var returnedRows = rows.map(user => {
+				// 	if (!user.profile_pic)
+				// 		return ({ ...user, profile_pic: null })
+				// 	else
+				// 		return (user)
+				// })
+				console.log("Browsing Data To Show: ", rows)
+				response.send(rows)
+			} catch (error) {
+				response.send("Fetching users failed")
 			}
-		} catch (error) {
-			response.send(error)
+		} else {
+			response.send(false)
 		}
 	})
 
@@ -70,7 +70,11 @@ module.exports = (app, pool, transporter, session) => {
 				var sql = `SELECT * FROM likes WHERE liker_id = $2 AND target_id = $1`
 				const reverseliked = await pool.query(sql, [sess.userid, liked_person_id])
 
-				if (reverseliked.rows.length !== 0) {
+				var sql = `SELECT * FROM connections
+							WHERE (user1_id = $1 AND user2_id = $2) OR (user1_id = $2 AND user2_id = $1)`
+				const oldConnections = await pool.query(sql, [sess.userid, liked_person_id])
+
+				if (reverseliked.rows.length !== 0 && oldConnections.rows.length === 0) {
 					var sql = `INSERT INTO connections (user1_id, user2_id) VALUES ($1, $2)`
 					await pool.query(sql, [sess.userid, liked_person_id])
 
