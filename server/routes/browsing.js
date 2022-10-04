@@ -4,8 +4,8 @@ module.exports = (app, pool, transporter, session) => {
 		const body = request.body
 		const sess = request.session
 
-		try {
-			if (sess.userid) {
+		if (sess.userid && sess.location) {
+			try {
 				const variables = [sess.userid, body.min_age, body.max_age, body.min_fame, body.max_fame,
 				sess.location.x, sess.location.y, body.min_distance, body.max_distance]
 				console.log("Variables: ", body, sess.location.x, sess.location.y)
@@ -26,19 +26,19 @@ module.exports = (app, pool, transporter, session) => {
 						ORDER BY username`;
 				var { rows } = await pool.query(sql, variables)
 
-				var returnedRows = rows.map(user => {
-					if (!user.profile_pic)
-						return ({ ...user, profile_pic: null })
-					else
-						return (user)
-				})
-				console.log("Browsing Data To Show: ", returnedRows)
-				response.send(returnedRows)
-			} else {
-				response.send(false)
+				// var returnedRows = rows.map(user => {
+				// 	if (!user.profile_pic)
+				// 		return ({ ...user, profile_pic: null })
+				// 	else
+				// 		return (user)
+				// })
+				console.log("Browsing Data To Show: ", rows)
+				response.send(rows)
+			} catch (error) {
+				response.send("Fetching users failed")
 			}
-		} catch (error) {
-			response.send(error)
+		} else {
+			response.send(false)
 		}
 	})
 
