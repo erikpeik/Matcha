@@ -272,10 +272,46 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 		const sess = request.session
 
 		if (sess.userid) {
-			var sql = `SELECT * FROM notifications WHERE user_id = $1 AND read = 'NO'`
-			const { rows } = await pool.query(sql, [sess.userid])
-
-			response.send(rows)
+			try {
+				var sql = `SELECT * FROM notifications WHERE user_id = $1 AND read = 'NO'`
+				const { rows } = await pool.query(sql, [sess.userid])
+				response.send(rows)
+			} catch (error) {
+				console.log(error)
+				response.send(false)
+			}
 		}
 	})
+
+	app.delete('api/profile/notifications', (request, response) => {
+		const sess = request.session
+
+		if (sess.userid) {
+			try {
+				var sql = `DELETE FROM notifications WHERE user_id = $1`
+				pool.query(sql, [sess.userid])
+				response.send(true)
+			} catch (error) {
+				console.log(error)
+				response.send("Failed to clear notifications")
+			}
+		}
+	})
+
+	app.delete('api/profile/notification/:id', (request, response) => {
+		const sess = request.session
+
+		if (sess.userid) {
+			try {
+				const notification_id = request.params.id
+				var sql = `DELETE FROM notifications WHERE user_id = $1 AND notification_id = $2`
+				pool.query(sql, [sess.userid, notification_id])
+				response.send(true)
+			} catch (error) {
+				console.log(error)
+				response.send("Failed to delete notification")
+			}
+		}
+	})
+
 }

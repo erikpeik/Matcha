@@ -26,6 +26,16 @@ const getNotifications = () => {
 	return request.then(response => response.data)
 }
 
+const clearNotifications = () => {
+	const request = axios.delete(`${baseUrl}/notifications`)
+	return request.then(response => response.data)
+}
+
+const deleteNotification = id => {
+	const request = axios.delete(`${baseUrl}/notification/${id}`)
+	return request.then(response => response.data)
+}
+
 const setProfilePic = Picture => {
 	const request = axios.post(`${baseUrl}/setprofilepic`, Picture)
 	return request.then(response => response.data)
@@ -41,7 +51,7 @@ const deletePicture = PictureId => {
 	return request.then(response => response.data)
 }
 
-const profileService = { setUpProfile, getProfileData, getNotifications, setProfilePic,
-						uploadPicture, deletePicture, editUserSettings, changePassword }
+const profileService = { setUpProfile, getProfileData, getNotifications, clearNotifications, deleteNotification,
+						setProfilePic, uploadPicture, deletePicture, editUserSettings, changePassword }
 
 export default profileService
