@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import {
-	Button, createTheme, Paper, Box, Typography, Grid
+	Button, createTheme, Paper, Box, Typography, Grid, Menu, IconButton
 } from '@mui/material'
 import BrowsingUserIcon from './BrowsingUserIcon'
 import browsingService from '../../services/browsingService'
@@ -18,6 +19,7 @@ import FemaleIcon from '@mui/icons-material/Female'
 import WcIcon from '@mui/icons-material/Wc'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import TodayIcon from '@mui/icons-material/Today';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGenderless } from '@fortawesome/free-solid-svg-icons'
 
@@ -45,6 +47,8 @@ const themeunlike = createTheme({
 
 const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 	const userLists = useSelector(state => state.userLists)
+	const [anchorEl, setAnchorEl] = useState(null);
+	const open = Boolean(anchorEl);
 	const navigate = useNavigate()
 	const dispatch = useDispatch()
 
@@ -68,6 +72,14 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 		dispatch(getUserLists())
 		dispatch(setBrowsingCriteria({ ...browsingCriteria }))
 	}
+
+	const handleClick = (event) => {
+		setAnchorEl(event.currentTarget);
+	};
+
+	const handleClose = () => {
+		setAnchorEl(null);
+	};
 
 	return (
 		pageUsers.map(user => {
@@ -105,7 +117,7 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 					filter: 'drop-shadow(0 2px 1px rgb(125, 52, 148))'
 				}} />
 			}
-
+			console.log('user', user)
 			if (!user.id) {
 				return (<div key="emptyusers"></div>)
 			} else
@@ -119,7 +131,7 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 								<Box key={`profile_data${user.id}`}>
 									<Grid display='flex' sx={{ alignItems: 'center' }}>
 										<Typography
-											variant='h2'
+											variant='h3'
 											onClick={() => navigate(`/userprofile/${user.id}`)}
 											sx={{ cursor: 'pointer' }}
 										>{user.username}</Typography>
@@ -146,17 +158,35 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 										</Grid>
 										<Grid display='flex' sx={{ alignItems: 'center' }}>
 											<LocationOnIcon sx={{ color: 'gray', mr: 1 }} />
-											<Typography sx={{ fontWeight: 550 }}>{user.user_location}</Typography>
+											<Typography sx={{ fontWeight: 550 }}>{user.user_location} ({Math.floor(user.distance)} km)</Typography>
 										</Grid>
 										<Grid display='flex' sx={{ alignItems: 'center' }}>
 											<TodayIcon sx={{ color: 'gray', mr: 1 }} />
 											<Typography sx={{ fontWeight: 550 }}>{`${user.age} years old`}</Typography>
 										</Grid>
 									</Box>
-									<Button theme={themeunlike} onClick={() => { blockUser(user.id) }} sx={{ mt: 1 }}>
-										<BlockIcon sx={{ mr: 1 }} />
-										Block user
-									</Button>
+									<Grid item>
+											<IconButton
+												arial-label='more'
+												id='long-button'
+												aria-controls={open ? 'long-menu' : undefined}
+												aria-expanded={open ? 'true' : undefined}
+												aria-haspopup='true'
+												onClick={handleClick}
+											>
+												<MoreVertIcon />
+											</IconButton>
+											<Menu
+												anchorEl={anchorEl}
+												open={open}
+												onClose={handleClose}
+											>
+												<Button theme={themeunlike} onClick={() => { blockUser(user.id) }} sx={{ mt: 1 }}>
+													<BlockIcon sx={{ mr: 1 }} />
+													Block user
+												</Button>
+											</Menu>
+										</Grid>
 								</Box>
 							</Grid>
 						</Grid>
