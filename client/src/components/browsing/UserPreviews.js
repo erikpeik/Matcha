@@ -169,6 +169,7 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 											<Grid display='flex' sx={{ alignItems: 'center' }}>
 												<TurnedInIcon sx={{ color: 'gray', mr: 1 }} />
 												<Typography sx={{ fontWeight: 550 }}>{user.tags.join(', ')}</Typography>
+												<Typography sx={{ fontWeight: 550, ml: 1, color: 'gray' }}>({user.common_tags} common)</Typography>
 											</Grid>
 										}
 									</Box>
