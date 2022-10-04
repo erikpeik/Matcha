@@ -26,13 +26,15 @@ module.exports = (app, pool, transporter, session) => {
 						ORDER BY username`;
 				var { rows } = await pool.query(sql, variables)
 
-				// var returnedRows = rows.map(user => {
-				// 	if (!user.profile_pic)
-				// 		return ({ ...user, profile_pic: null })
-				// 	else
-				// 		return (user)
-				// })
-				console.log("Browsing Data To Show: ", rows)
+				for (let i = 0; i < rows.length; i++) {
+					var sql = `SELECT tag_content FROM tags WHERE tagged_users @> array[$1]::INT[]`
+					var { rows: tags } = await pool.query(sql, [rows[i].id])
+					for (let j = 0; j < tags.length; j++) {
+						tags[j] = tags[j].tag_content
+					}
+					rows[i].tags = tags
+				}
+				// console.log("Browsing Data To Show: ", rows)
 				response.send(rows)
 			} catch (error) {
 				response.send("Fetching users failed")
@@ -273,6 +275,14 @@ module.exports = (app, pool, transporter, session) => {
 	app.get('/api/browsing/tags', async (request, response) => {
 		var sql = "SELECT * FROM tags ORDER BY tag_content"
 		const { rows } = await pool.query(sql)
+
+		response.send(rows)
+	})
+
+	app.get('/api/browsing/user_tags/:id', async (request, response) => {
+		const user_id = request.params.id
+		var sql = `SELECT * FROM tags WHERE tagged_users @> array[$1]::INT[]`
+		const { rows } = await pool.query(sql, [user_id])
 
 		response.send(rows)
 	})

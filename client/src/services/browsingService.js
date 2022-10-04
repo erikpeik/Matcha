@@ -1,11 +1,6 @@
 import axios from 'axios'
 const baseUrl = '/api/browsing'
 
-// const getAll = () => {
-// 	const request = axios.get(`${baseUrl}`)
-// 	return request.then(response => response.data)
-// }
-
 const getUsers = searchCriteria => {
 	const request = axios.post(`${baseUrl}/sorted`, searchCriteria)
 	return request.then(response => response.data)
@@ -47,7 +42,8 @@ const getUserProfile = (id) => {
 }
 
 const browsingService = {
-	getUsers, likeUser, unlikeUser, blockUser, reportUser, getUserLists, getAllTags, getUserProfile
+	getUsers, likeUser, unlikeUser, blockUser, reportUser,
+	getUserLists, getAllTags, getUserProfile
 }
 
 export default browsingService
