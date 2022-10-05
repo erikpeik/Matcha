@@ -46,6 +46,16 @@ const themeunlike = createTheme({
 	}
 })
 
+const NoResults = () => {
+	return (
+		<Paper sx={{ p: 2, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+			<Typography variant='h1'>😔</Typography>
+			<Typography variant='h5' color='#1c1c1c'>No Results</Typography>
+			<Typography variant='body2'>PLEASE ADJUST YOUR FILTERS</Typography>
+		</Paper>
+	)
+}
+
 const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 	const userLists = useSelector(state => state.userLists)
 	const [anchorEl, setAnchorEl] = useState(null);
@@ -81,7 +91,9 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 	const handleClose = () => {
 		setAnchorEl(null);
 	};
-
+	if (pageUsers.length === 0) {
+		return <NoResults />
+	}
 	return (
 		pageUsers.map(user => {
 			var button, gender
