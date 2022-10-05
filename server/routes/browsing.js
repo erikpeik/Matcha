@@ -62,8 +62,8 @@ module.exports = (app, pool, transporter, session) => {
 				await pool.query(sql, [sess.userid, liked_person_id])
 
 				var notification = `You have been liked by user ${sess.username}`
-				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path) VALUES ($1,$2,$3)`
-				pool.query(sql, [liked_person_id, notification, `/userprofile/${sess.userid}`])
+				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id) VALUES ($1,$2,$3,$4)`
+				pool.query(sql, [liked_person_id, notification, `/userprofile/${sess.userid}`, sess.userid])
 
 				var sql = `UPDATE fame_rates SET like_pts = like_pts + 10, total_pts = total_pts + 10
 							WHERE user_id = $1 AND like_pts < 50 AND total_pts <= 90`
@@ -82,8 +82,8 @@ module.exports = (app, pool, transporter, session) => {
 
 					var notification = `You have been liked back by user ${sess.username}!
 										You are now connected and are able to chat with each other.`
-					var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path) VALUES ($1,$2, $3)`
-					pool.query(sql, [liked_person_id, notification, '/chat'])
+					var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id) VALUES ($1,$2, $3, $4)`
+					pool.query(sql, [liked_person_id, notification, '/chat', sess.userid])
 					var sql = `UPDATE fame_rates SET connection_pts = connection_pts + 5, total_pts = total_pts + 5
 								WHERE (user_id = $1 AND connection_pts < 30 AND total_pts <= 95)
 								OR (user_id = $2 AND connection_pts < 30 AND total_pts <= 95)`
@@ -112,8 +112,8 @@ module.exports = (app, pool, transporter, session) => {
 			if (rows.length !== 0) {
 				var notification = `The user ${sess.username} just unliked you.
 					This means your connection has been lost and you can no longer chat with each other. :(`
-				var sql = `INSERT INTO notifications (user_id, notification_text) VALUES ($1,$2)`
-				pool.query(sql, [unliked_person_id, notification])
+				var sql = `INSERT INTO notifications (user_id, notification_text, sender_id) VALUES ($1,$2,$3)`
+				pool.query(sql, [unliked_person_id, notification, sess.userid])
 			}
 
 			response.status(200).send("Unliked user!")
@@ -262,8 +262,8 @@ module.exports = (app, pool, transporter, session) => {
 				pool.query(sql, [sess.userid, profile_id])
 
 				var notification = `The user ${sess.username} just checked your profile`
-				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path) VALUES ($1,$2, $3)`
-				pool.query(sql, [profile_id, notification, `/userprofile/${sess.userid}`])
+				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id) VALUES ($1,$2, $3, $4)`
+				pool.query(sql, [profile_id, notification, `/userprofile/${sess.userid}`, sess.userid])
 
 				response.send(profileData)
 			} catch (error) {

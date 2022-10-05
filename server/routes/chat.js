@@ -27,8 +27,8 @@ module.exports = (http, pool) => {
 				pool.query(sql, variables)
 
 				var notification = `You received a new message from ${data.name}`
-				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path) VALUES ($1,$2,$3)`
-				pool.query(sql, [data.receiver_id, notification, '/chat'])
+				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id) VALUES ($1,$2,$3)`
+				pool.query(sql, [data.receiver_id, notification, '/chat', sess.userid])
 			}
 			socketIO.in(`room-${data.room}`).emit('receive_message', data)
 			sendToDatabase(data)

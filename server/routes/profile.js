@@ -331,7 +331,10 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 
 		if (sess.userid) {
 			try {
-				var sql = `SELECT * FROM notifications WHERE user_id = $1 AND read = 'NO'`
+				var sql = `SELECT notification_id, notifications.user_id AS user_id, sender_id, notification_text, redirect_path, read, picture_data AS profile_pic
+							FROM notifications
+							INNER JOIN user_pictures ON notifications.sender_id = user_pictures.user_id AND user_pictures.profile_pic = 'YES'
+							WHERE notifications.user_id = $1 AND read = 'NO'`
 				const { rows } = await pool.query(sql, [sess.userid])
 				response.send(rows)
 			} catch (error) {
