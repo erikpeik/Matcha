@@ -1,14 +1,37 @@
 import CloseIcon from '@mui/icons-material/Close'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import { clearUserNotifications, deleteUserNotification } from '../../reducers/userNotificationsReducer'
-import { Button, Typography, Box, IconButton, Menu, Card } from '@mui/material'
+import { Button, Typography, Box, IconButton, Menu, Card, Avatar, Badge } from '@mui/material'
 import { useDispatch, useSelector } from 'react-redux'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
+const NotificationBadge = ({ is_read }) => {
+	const BaseAvatar = () => {
+		return (<Avatar />)
+	}
+	if (!is_read) {
+		return (
+			<Badge
+				sx={{ mr: 1 }}
+				color="error"
+				variant="dot"
+				overlap="circular"
+			>
+				<BaseAvatar />
+			</Badge>
+		)
+	} else {
+		return (
+			<BaseAvatar />
+		)
+	}
+}
+
 const NotificationMenu = () => {
 	const [anchorElNotifications, setAnchorElNotifications] = useState(null);
 	const unreadNotifications = useSelector(state => state.userNotifications)
+//	console.log('unreadNotifications', unreadNotifications)
 	const dispatch = useDispatch()
 
 	return (
@@ -25,8 +48,20 @@ const NotificationMenu = () => {
 			>
 				<Box sx={{ p: '0 5px', maxHeight: 500, overflow: 'auto' }}>
 					{unreadNotifications.map((notification, i) => {
+						var is_read = notification.read === 'YES'
 						return (
-							<Card sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#fcfcfc', margin: '10px 0' }} key={`box${i}`}>
+							<Card
+								key={`box${i}`}
+								sx={{
+									display: 'flex',
+									alignItems: 'center',
+									margin: '10px 0',
+									padding: '5px 10px',
+									backgroundColor: is_read ? '#FAFAFA' : '#e8e8e8',
+									minHeight: 50,
+								}}
+							>
+								<NotificationBadge is_read={is_read} />
 								<Typography
 									key={i}
 									onClick={notification.redirect_path ? () => setAnchorElNotifications(null) : undefined}
