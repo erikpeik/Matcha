@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import {
-	Typography, Paper, Box, Grid, Rating, styled, Button, createTheme, Avatar
+	Typography, Paper, Box, Grid, Rating, styled, Button, createTheme
 } from '@mui/material'
-import AspectRatio from '@mui/joy/AspectRatio'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import { Container } from '@mui/system'
@@ -14,6 +13,7 @@ import Notification from './Notification'
 import Loader from './Loader'
 import { changeSeverity } from '../reducers/severityReducer'
 import { changeNotification } from '../reducers/notificationReducer'
+import UserAvatar from './profile/UserAvatar'
 
 const themelike = createTheme({
 	palette: {
@@ -65,6 +65,8 @@ const UserProfile = () => {
 	const userLists = useSelector(state => state.userLists)
 	const [userData, setUserData] = useState([])
 	const params = useParams()
+	const onlineUsers = useSelector(state => state.onlineUsers)
+	const usernames = onlineUsers.map(user => user.name)
 
 	useEffect(() => {
 		const getData = async () => {
@@ -76,18 +78,10 @@ const UserProfile = () => {
 		getData()
 	}, [params, dispatch])
 
-	const profilePicture = {
-		width: '100%',
-		aspectRatio: '1/1',
-		borderRadius: '50%',
-		objectFit: 'cover',
-	}
-
 	if (isLoading) {
 		return <Loader />
 	}
 
-	const profile_pic = userData.profile_pic['picture_data']
 	const other_pictures = userData.other_pictures
 
 	const ProfileData = {
@@ -137,7 +131,10 @@ const UserProfile = () => {
 
 	var likeButton
 	if (userLists.connected.includes(Number(params.id))) {
-		likeButton = <div><Button theme={themeunlike} onClick={() => { unlikeUser(params.id) }}>Unlike user</Button><Button>Connected</Button></div>
+		likeButton = <>
+			<Button theme={themeunlike} onClick={() => { unlikeUser(params.id) }}>Unlike user</Button>
+			<Button>Connected</Button>
+		</>
 	} else if (userLists.liked.includes(Number(params.id))) {
 		likeButton = <Button theme={themeunlike} onClick={() => { unlikeUser(params.id) }}>Unlike user</Button>
 	} else {
@@ -154,19 +151,27 @@ const UserProfile = () => {
 					justifyContent: 'center',
 					mb: 2,
 				}}>
-					<Box sx={{ width: '200px', display: 'inline-block' }}>
-						<AspectRatio ratio={1}>
-							<Avatar
-								src={profile_pic}
-								alt='profile'
-								style={profilePicture}
-							/>
-						</AspectRatio>
-					</Box>
+					<UserAvatar userData={userData} />
 					<Box sx={{ width: 'fit-content', ml: 5 }}>
-						<Typography variant='h2' align='center'>
-							{userData.username}
-						</Typography>
+						<Grid container display='flex' spacing={2} sx={{ alignItems: 'center' }}>
+							<Typography variant='h2' align='center'>
+								{userData.username}
+							</Typography>
+							{usernames.includes(userData.username) ?
+								<Box
+									sx={{
+										ml: 2,
+										fontSize: 25,
+										width: 'fit-content',
+										height: 'fit-content',
+										padding: '2px 5px',
+										borderRadius: '10px',
+										backgroundColor: 'rgb(68, 183, 0)',
+										color: 'white',
+										filter: 'drop-shadow(0px 0px 2px rgb(40, 163, 0))',
+									}}>online</Box>
+								: null}
+						</Grid>
 						<Typography variant='h5'>Fame Rating: {userData.total_pts}</Typography>
 						<StyledRating
 							name="read-only"
