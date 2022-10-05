@@ -72,10 +72,10 @@ const Login = ({ socket }) => {
 					sx={{ fontWeight: 550 }}>Login</Typography>
 				<Typography align='center' xs={{ mb: 4 }}>Login and start dating now!</Typography>
 				<form onSubmit={submitUser}>
-					<TextField fullWidth margin='normal' name="username" label='Username'
-						placeholder="Username" autoComplete="username" required></TextField>
+					<TextField fullWidth margin='normal' name="username" label='Username or e-mail address'
+						placeholder="Username or email address" required></TextField>
 					<TextField fullWidth margin='dense' type="password" name="password"
-						label='Password' placeholder="Password" autoComplete="password" required></TextField>
+						label='Password' placeholder="Password" required></TextField>
 					<Button type='submit' variant='contained' theme={theme} size='large' sx={{ mt: 1 }}>Submit</Button>
 				</form>
 				<Button onClick={navigateToReset} sx={{ mt: 1 }}>Forgot password?</Button>

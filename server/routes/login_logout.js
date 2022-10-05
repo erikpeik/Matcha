@@ -6,7 +6,7 @@ module.exports = function (app, pool, session, bcrypt) {
 		const verifyUser = async () => {
 			var sql = `SELECT * FROM users
 					LEFT JOIN user_settings ON users.id = user_settings.user_id
-					WHERE username = $1`;
+					WHERE username = $1 OR email = $1`;
 			const { rows } = await pool.query(sql, [username])
 			if (rows.length === 0) {
 				console.log("User not found!")
