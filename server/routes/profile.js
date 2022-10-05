@@ -1,9 +1,24 @@
 module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
+
+
 	app.post('/api/profile/setup', async (request, response) => {
 		var sess = request.session
 		const { gender, age, location, gps, sexual_pref, biography } = request.body
 
-		// MUST CREATE CHECKS FOR ALL THE VARIABLES FIRST
+		if (!sess.userid)
+			return response.send("User not signed in!")
+		if (gender !== 'male' && gender !== 'female' && gender !== 'other')
+			return response.send("Forbidden gender!")
+		if (isNaN(age) || age < 18 || age > 120)
+			return response.send("Forbidden age!")
+		if (!location.match(/^[a-z, åäö-]+$/i))
+			return response.send("Forbidden characters in location! Allowed characters are a-z, å, ä, ö, comma (,) and dash (-).")
+		if (isNaN(gps[0]) || isNaN(gps[1]) || gps[0] < -90 || gps[0] > 90 || gps[1] < -180 || gps[1] > 180)
+			return response.send("Forbidden coordinates! The range for latitude is -90 to 90, and for longitude -180 to 180.")
+		if (sexual_pref !== 'male' && sexual_pref !== 'female' && sexual_pref !== 'bisexual')
+			return response.send("Forbidden sexual preference!")
+		if (biography.length > 500)
+			return response.send("The maximum length for biography is 500 characters!")
 
 		try {
 			var sql = `INSERT INTO user_settings (user_id, gender, age,
@@ -25,49 +40,80 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 		const { username, firstname, lastname, email, gender, age,
 			location, gps_lat, gps_lon, sexual_pref, biography, tags } = request.body
 
-		// MUST CREATE CHECKS FOR ALL THE VARIABLES FIRST
-		if (sess.userid) {
-			try {
-				var sql = `UPDATE users SET username = $1, firstname = $2, lastname = $3, email = $4
-						WHERE id = $5`
-				await pool.query(sql, [username, firstname, lastname, email, sess.userid])
+		if (!sess.userid)
+			return response.send("User not signed in!")
+		var sql = "SELECT * FROM users WHERE (username = $1 OR email = $2) AND id != $3";
+		const { rows } = await pool.query(sql, [username, email, sess.userid])
+		if (rows.length !== 0)
+			return response.send("Username or email is already in use!")
+		if (username.length < 4 || username.length > 25)
+			return response.send("Username has to be between 4 and 25 characters.")
+		if (!username.match(/^[a-z0-9]+$/i))
+			return response.send("Username should only include characters (a-z or A-Z) and numbers (0-9).")
+		if (firstname.length > 50 || lastname.length > 50)
+			return response.send("Maximum length for firstname and lastname is 50 characters.")
+		if (!firstname.match(/^[a-zåäö-]+$/i) || !lastname.match(/^[a-zåäö-]+$/i))
+			return response.send("First name and last name can only include characters a-z, å, ä, ö and dash (-).")
+		if (!email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/))
+			return response.send("Please enter a valid e-mail address.")
+		if (gender !== 'male' && gender !== 'female' && gender !== 'other')
+			return response.send("Forbidden gender!")
+		if (isNaN(age) || age < 18 || age > 120)
+			return response.send("Forbidden age!")
+		if (location.length > 50)
+			return response.send("Maximum length for location is 50 characters.")
+		if (!location.match(/^[a-z, åäö-]+$/i))
+			return response.send("Forbidden characters in location! Allowed characters are a-z, å, ä, ö, comma (,) and dash (-).")
+		if (isNaN(gps_lat) || isNaN(gps_lon) || gps_lat < -90 || gps_lat > 90 || gps_lon < -180 || gps_lon > 180)
+			return response.send("Forbidden coordinates! The range for latitude is -90 to 90, and for longitude -180 to 180.")
+		if (sexual_pref !== 'male' && sexual_pref !== 'female' && sexual_pref !== 'bisexual')
+			return response.send("Forbidden sexual preference!")
+		if (biography.length > 500)
+			return response.send("The maximum length for biography is 500 characters!")
+		const forbiddenTags = tags.filter(tag => !tag.match(/(?=^.{1,20}$)[a-z åäö-]+$/i))
+		if (forbiddenTags.length !== 0)
+			return response.send("The allowed characters in tags are a-z, å, ä, ö and dash (-), and maximum length is 20 characters.")
 
-				var sql = `UPDATE user_settings
+		try {
+			var sql = `UPDATE users SET username = $1, firstname = $2, lastname = $3, email = $4
+						WHERE id = $5`
+			await pool.query(sql, [username, firstname, lastname, email, sess.userid])
+
+			var sql = `UPDATE user_settings
 						SET gender = $1, age = $2, user_location = $3, sexual_pref = $4,
 						biography = $5, ip_location = point($6,$7) WHERE user_id = $8`
-				await pool.query(sql, [gender, age, location, sexual_pref, biography, gps_lat, gps_lon, sess.userid])
+			await pool.query(sql, [gender, age, location, sexual_pref, biography, gps_lat, gps_lon, sess.userid])
 
-				sess.location = { x: gps_lat, y: gps_lon }
+			sess.location = { x: gps_lat, y: gps_lon }
 
-				var sql = `UPDATE tags SET tagged_users = array_remove(tagged_users, $1)
+			var sql = `UPDATE tags SET tagged_users = array_remove(tagged_users, $1)
 							WHERE (array[LOWER($2)] @> array[LOWER(tag_content)]::TEXT[]) IS NOT TRUE
 							RETURNING *`
-				await pool.query(sql, [sess.userid, tags])
+			await pool.query(sql, [sess.userid, tags])
 
-				tags.map(async (tagtext) => {
-					var sql = "SELECT * FROM tags WHERE LOWER(tag_content) = LOWER($1)"
-					var { rows } = await pool.query(sql, [tagtext])
+			tags.map(async (tagtext) => {
+				var sql = "SELECT * FROM tags WHERE LOWER(tag_content) = LOWER($1)"
+				var { rows } = await pool.query(sql, [tagtext])
 
-					if (rows.length === 0) {
-						var sql = `INSERT INTO tags (tag_content, tagged_users) VALUES (LOWER($2), array[$1]::INT[])`
-						await pool.query(sql, [sess.userid, tagtext])
-					} else {
-						var sql = `UPDATE tags SET tagged_users = array_append(tagged_users, $1)
+				if (rows.length === 0) {
+					var sql = `INSERT INTO tags (tag_content, tagged_users) VALUES (LOWER($2), array[$1]::INT[])`
+					await pool.query(sql, [sess.userid, tagtext])
+				} else {
+					var sql = `UPDATE tags SET tagged_users = array_append(tagged_users, $1)
 								WHERE LOWER(tag_content) = LOWER($2) AND (tagged_users @> array[$1]::INT[]) IS NOT TRUE`
-						await pool.query(sql, [sess.userid, tagtext])
-					}
-				})
-				var tagPoints = tags.length
-				if (tagPoints > 5)
-					tagPoints = 5
-				var sql = `UPDATE fame_rates SET total_pts = total_pts - tag_pts + $2, tag_pts = $2
+					await pool.query(sql, [sess.userid, tagtext])
+				}
+			})
+			var tagPoints = tags.length
+			if (tagPoints > 5)
+				tagPoints = 5
+			var sql = `UPDATE fame_rates SET total_pts = total_pts - tag_pts + $2, tag_pts = $2
 							WHERE user_id = $1 AND total_pts <= 95`
-				await pool.query(sql, [sess.userid, tagPoints])
-				response.send(true)
-			} catch (error) {
-				console.log(error)
-				response.send(JSON.stringify(error))
-			}
+			await pool.query(sql, [sess.userid, tagPoints])
+			response.send(true)
+		} catch (error) {
+			console.log(error)
+			response.send("User settings update failed for some reason")
 		}
 	})
 
@@ -157,36 +203,45 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 		const sess = request.session
 		const image = 'http://localhost:3000/images/' + request.file.filename
 
-		var sql = `SELECT * FROM user_pictures
+		if (sess.userid) {
+			if (request.file.size > 5242880)
+				return response.send("The maximum size for uploaded images is 5 megabytes.")
+			try {
+				var sql = `SELECT * FROM user_pictures
 					WHERE user_id = $1 AND profile_pic = 'YES'`
-		var { rows } = await pool.query(sql, [sess.userid])
+				var { rows } = await pool.query(sql, [sess.userid])
 
-		if (rows.length === 0) {
-			var sql = `INSERT INTO user_pictures (user_id, picture_data, profile_pic) VALUES ($1, $2, 'YES')`
-			await pool.query(sql, [sess.userid, image])
-		} else {
-			var oldImageData = rows[0]['picture_data']
-			if (oldImageData !== 'http://localhost:3000/images/default_profilepic.jpeg') {
-				const oldImage = path.resolve(__dirname, '../images') + oldImageData.replace('http://localhost:3000/images', '');
-				console.log(oldImage)
-				if (fs.existsSync(oldImage)) {
-					fs.unlink(oldImage, (err) => {
-						if (err) {
-							console.error(err);
-							return;
+				if (rows.length === 0) {
+					var sql = `INSERT INTO user_pictures (user_id, picture_data, profile_pic) VALUES ($1, $2, 'YES')`
+					await pool.query(sql, [sess.userid, image])
+				} else {
+					var oldImageData = rows[0]['picture_data']
+					if (oldImageData !== 'http://localhost:3000/images/default_profilepic.jpeg') {
+						const oldImage = path.resolve(__dirname, '../images') + oldImageData.replace('http://localhost:3000/images', '');
+						console.log(oldImage)
+						if (fs.existsSync(oldImage)) {
+							fs.unlink(oldImage, (err) => {
+								if (err) {
+									console.error(err);
+									return;
+								}
+							})
 						}
-					})
-				}
-			} else {
-				var sql = `UPDATE fame_rates SET picture_pts = picture_pts + 2, total_pts = total_pts + 2
-				WHERE user_id = $1 AND picture_pts < 10 AND total_pts <= 98`
-				await pool.query(sql, [sess.userid])
-			}
-			var sql = `UPDATE user_pictures SET picture_data = $1
+					} else {
+						var sql = `UPDATE fame_rates SET picture_pts = picture_pts + 2, total_pts = total_pts + 2
+								WHERE user_id = $1 AND picture_pts < 10 AND total_pts <= 98`
+						await pool.query(sql, [sess.userid])
+					}
+					var sql = `UPDATE user_pictures SET picture_data = $1
 						WHERE user_id = $2 AND profile_pic = 'YES'`
-			await pool.query(sql, [image, sess.userid])
+					await pool.query(sql, [image, sess.userid])
+				}
+				response.send(true)
+			} catch (error) {
+				console.log(error)
+				response.send("Image uploading failed for some reason.")
+			}
 		}
-		response.send("Success uploading!")
 	})
 
 	app.post('/api/profile/imageupload', upload.single('file'), async (request, response) => {
@@ -194,6 +249,8 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 		const image = 'http://localhost:3000/images/' + request.file.filename
 
 		if (sess.userid) {
+			if (request.file.size > 5242880)
+				return response.send("The maximum size for uploaded images is 5 megabytes.")
 			try {
 				var sql = `SELECT * FROM user_pictures WHERE user_id = $1`
 				var { rows } = await pool.query(sql, [sess.userid])
@@ -210,6 +267,7 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 				}
 			} catch (error) {
 				console.log(error)
+				response.send("Image uploading failed for some reason.")
 			}
 		}
 	})

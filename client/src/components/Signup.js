@@ -55,26 +55,18 @@ const Signup = () => {
 			confirmPassword: event.target.confirm_password.value
 		}
 
-		signUpService.checkUserForm(signedUpUser).then((result) => {
-			if (result === true) {
-				signUpService
-					.createUser(signedUpUser)
-					.then(result => {
-						if (result === true) {
-							console.log(result)
-							dispatch(changeSeverity('success'))
-							dispatch(changeNotification("User created successfully! Please check your inbox for confirmation e-mail."))
-							navigate('/login')
-						} else {
-							dispatch(changeSeverity('error'))
-							dispatch(changeNotification(result))
-						}
-					})
-			} else {
-				dispatch(changeSeverity('error'))
-				dispatch(changeNotification(result))
-			}
-		})
+		signUpService.createUser(signedUpUser)
+			.then(result => {
+				if (result === true) {
+					console.log(result)
+					dispatch(changeSeverity('success'))
+					dispatch(changeNotification("User created successfully! Please check your inbox for confirmation e-mail."))
+					navigate('/login')
+				} else {
+					dispatch(changeSeverity('error'))
+					dispatch(changeNotification(result))
+				}
+			})
 	}
 
 	return (
@@ -86,17 +78,17 @@ const Signup = () => {
 				<Typography align='center'>Make the first move and create your account</Typography>
 				<form onSubmit={submitUser}>
 					<TextField fullWidth margin='normal' name="username" label='Username'
-						placeholder="Username" autoComplete="username" required></TextField>
+						placeholder="Username" autoComplete="username" required />
 					<TextField sx={{ width: '49%', mr: '1%' }} margin='dense' name="firstname"
-						label='First name' placeholder="First name" autoComplete="given-name" required></TextField>
+						label='First name' placeholder="First name" autoComplete="given-name" required />
 					<TextField sx={{ width: '49%', ml: '1%' }} margin='dense' name="lastname"
-						label='Last name' placeholder="Last name" autoComplete="family-name" required></TextField>
-					<TextField fullWidth margin='dense' name="email" label='E-mail'
-						placeholder="E-mail" autoComplete="email" required></TextField>
+						label='Last name' placeholder="Last name" autoComplete="family-name" required />
+					<TextField type="email" fullWidth margin='dense' name="email" label='E-mail'
+						placeholder="E-mail" autoComplete="email" required />
 					<TextField type='password' fullWidth margin='dense' name="password"
-						label='Password' placeholder="Password" autoComplete="new-password" required></TextField>
+						label='Password' placeholder="Password" autoComplete="new-password" required />
 					<TextField type='password' fullWidth margin='dense' name="confirm_password"
-						label='Confirm password' placeholder="Confirm password" autoComplete="new-password" required></TextField>
+						label='Confirm password' placeholder="Confirm password" autoComplete="new-password" required />
 					<Button type="submit" variant='contained' theme={theme} size='large' sx={{ mt: 1 }}>Submit</Button>
 				</form>
 				<Notification />

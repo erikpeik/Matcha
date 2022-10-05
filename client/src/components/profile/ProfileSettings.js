@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { useState, useEffect } from 'react'
-import { changeNotification } from '../../reducers/notificationReducer'
+import { changeNotification, resetNotification } from '../../reducers/notificationReducer'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -53,6 +53,7 @@ const ProfileSettings = () => {
 	const [tags, setTagState] = useState([])
 
 	useEffect(() => {
+		dispatch(resetNotification())
 		if (profileData) {
 			changeSettings({
 				username: profileData.username,
@@ -71,7 +72,7 @@ const ProfileSettings = () => {
 			setTagState(profileData.tags)
 		}
 		setLoading(false)
-	}, [profileData])
+	}, [dispatch, profileData])
 
 	if (isLoading) {
 		return <Loader />
@@ -211,8 +212,8 @@ const ProfileSettings = () => {
 						label='First name' placeholder="First name" value={settings.firstname} onChange={handleFirstname} required></TextField>
 					<TextField sx={{ width: '49%', ml: '1%' }} margin='dense' name="lastname"
 						label='Last name' placeholder="Last name" value={settings.lastname} onChange={handleLastname} required></TextField>
-					<TextField fullWidth margin='dense' name="email" label='E-mail'
-						placeholder="E-mail" value={settings.email} onChange={handleEmail} required></TextField>
+					<TextField type="email" fullWidth margin='dense' name="email" label='E-mail' autoComplete="email"
+						placeholder="E-mail" value={settings.email} onChange={handleEmail} required />
 					<FormControl sx={{ mb: 2 }}>
 						<FormLabel id='gender'>Gender</FormLabel>
 						<RadioGroup row aria-labelledby='gender' name='gender' value={settings.gender} onChange={handleGender}>

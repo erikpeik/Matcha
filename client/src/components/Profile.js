@@ -116,30 +116,45 @@ const Profile = () => {
 
 	const uploadImage = async (event) => {
 		const image = event.target.files[0]
-
-		let formData = new FormData()
-		formData.append('file', image)
-		const result = await profileService.uploadPicture(formData)
-		if (result === true) {
-			dispatch(getProfileData())
-			dispatch(changeSeverity('success'))
-			dispatch(changeNotification("Image uploaded successfully!"))
-		} else {
+		if (image.size > 5242880) {
 			dispatch(changeSeverity('error'))
-			dispatch(changeNotification(result))
+			dispatch(changeNotification("The maximum size for uploaded images is 5 megabytes."))
+
+		} else {
+			let formData = new FormData()
+			formData.append('file', image)
+			const result = await profileService.uploadPicture(formData)
+			if (result === true) {
+				dispatch(getProfileData())
+				dispatch(changeSeverity('success'))
+				dispatch(changeNotification("Image uploaded successfully!"))
+			} else {
+				dispatch(changeSeverity('error'))
+				dispatch(changeNotification(result))
+			}
 		}
 		event.target.value = ''
 	}
 
 	const setProfilePicture = async (event) => {
 		const image = event.target.files[0]
+		if (image.size > 5242880) {
+			dispatch(changeSeverity('error'))
+			dispatch(changeNotification("The maximum size for uploaded images is 5 megabytes."))
 
-		let formData = new FormData()
-		formData.append('file', image)
-		await profileService.setProfilePic(formData)
-		dispatch(getProfileData())
-		dispatch(changeSeverity('success'))
-		dispatch(changeNotification("Profile picture set!"))
+		} else {
+			let formData = new FormData()
+			formData.append('file', image)
+			const result = await profileService.setProfilePic(formData)
+			if (result === true) {
+				dispatch(getProfileData())
+				dispatch(changeSeverity('success'))
+				dispatch(changeNotification("Profile picture set!"))
+			} else {
+				dispatch(changeSeverity('error'))
+				dispatch(changeNotification(result))
+			}
+		}
 		event.target.value = ''
 	}
 

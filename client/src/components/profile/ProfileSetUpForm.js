@@ -20,6 +20,7 @@ import Loader from '../Loader'
 const ProfileSetUpForm = () => {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
+	const [gender, setGender] = useState('female');
 	const [age, setAge] = useState('');
 	const [sexual_pref, setSexpref] = useState('bisexual');
 	const [GPSlocation, setGPSLocation] = useState()
@@ -62,7 +63,7 @@ const ProfileSetUpForm = () => {
 		const errorGeolocation = (error) => {
 			console.warn(`ERROR(${error.code}): ${error.message}`);
 		}
-	
+
 		const geolocationOptions = {
 			enableHighAccuracy: true,
 			timeout: 5000,
@@ -125,6 +126,10 @@ const ProfileSetUpForm = () => {
 		filter: 'drop-shadow(0px 0px 3px rgb(241 25 38 / 0.8))',
 	}
 
+	const handleGender = (event) => {
+		setGender(event.target.value);
+	}
+
 	const handleAge = (event) => {
 		setAge(event.target.value);
 	}
@@ -161,14 +166,14 @@ const ProfileSetUpForm = () => {
 				<form onSubmit={submitUserInfo}>
 					<FormControl sx={{ mb: 2 }}>
 						<FormLabel id='gender'>Gender</FormLabel>
-						<RadioGroup row aria-labelledby='gender' name='gender'>
+						<RadioGroup row aria-labelledby='gender' name='gender' value={gender} onChange={handleGender}>
 							<FormControlLabel value='female' control={<Radio />} label='Female' />
 							<FormControlLabel value='male' control={<Radio />} label='Male' />
 							<FormControlLabel value='other' control={<Radio />} label='Other' />
 						</RadioGroup>
 					</FormControl>
 					<FormControl fullWidth sx={{ mb: 2 }}>
-						<InputLabel id='age'>Age</InputLabel>
+						<InputLabel id='age' required>Age</InputLabel>
 						<Select labelId='age' id='age' name='age' value={age} onChange={handleAge} required>
 							{[...Array(103).keys()].map((i) => (
 								<MenuItem value={i + 18} key={i + 18}>{i + 18}</MenuItem>
@@ -197,13 +202,14 @@ const ProfileSetUpForm = () => {
 						</RadioGroup>
 					</FormControl>
 					<br />
-					<FormLabel id='biography' >Biography</FormLabel>
+					<FormLabel id='biography' required>Biography</FormLabel>
 					<TextareaAutosize
 						name='biography'
 						style={{ width: '100%', marginTop: '10px' }}
 						maxLength={500}
 						minRows={5}
 						placeholder='Short description of you here...'
+						required
 					/>
 					<Button type="submit" variant='contained' theme={theme}
 						size='large' sx={{ mt: 1 }}>

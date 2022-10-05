@@ -1,10 +1,10 @@
 import axios from 'axios'
 const baseUrl = '/api'
 
-const checkUserForm = signedUpUser => {
-	const request = axios.post(`${baseUrl}/signup/checkuser`, signedUpUser)
-	return request.then(response => response.data)
-}
+// const checkUserForm = signedUpUser => {
+// 	const request = axios.post(`${baseUrl}/signup/checkuser`, signedUpUser)
+// 	return request.then(response => response.data)
+// }
 
 const createUser = signedUpUser => {
 	const request = axios.post(`${baseUrl}/signup`, signedUpUser)
@@ -41,6 +41,6 @@ const setNewPassword = passwords => {
 	return request.then(response => response.data)
 }
 
-const signUpService = { checkUserForm, createUser, verifyUser, logInUser, logOutUser, getSessionUser, resetPassword, setNewPassword }
+const signUpService = { createUser, verifyUser, logInUser, logOutUser, getSessionUser, resetPassword, setNewPassword }
 
 export default signUpService
