@@ -170,7 +170,7 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 										</Grid>
 										<Grid display='flex' sx={{ alignItems: 'center' }}>
 											<LocationOnIcon sx={{ color: 'gray', mr: 1 }} />
-											<Typography sx={{ fontWeight: 550 }}>{user.user_location} ({Math.floor(user.distance)} km)</Typography>
+											<Typography sx={{ fontWeight: 550 }}>{user.user_location} ({Math.round(user.distance)} km)</Typography>
 										</Grid>
 										<Grid display='flex' sx={{ alignItems: 'center' }}>
 											<TodayIcon sx={{ color: 'gray', mr: 1 }} />
