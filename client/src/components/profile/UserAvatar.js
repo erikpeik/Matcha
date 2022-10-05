@@ -24,14 +24,16 @@ const UserAvatar = ({ userData }) => {
 			</Box>
 		)
 	} else {
-		<Box sx={{ width: '200px', display: 'inline-block' }}>
-			<AspectRatio ratio={1}>
-				<Avatar
-					src={profile_pic}
-					alt='profile'
-				/>
-			</AspectRatio>
-		</Box>
+		return (
+			<Box sx={{ width: '200px', display: 'inline-block' }}>
+				<AspectRatio ratio={1}>
+					<Avatar
+						src={profile_pic}
+						alt='profile'
+					/>
+				</AspectRatio>
+			</Box>
+		)
 	}
 }
 

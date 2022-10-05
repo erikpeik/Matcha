@@ -1,7 +1,7 @@
 import CloseIcon from '@mui/icons-material/Close'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import { clearUserNotifications, deleteUserNotification } from '../../reducers/userNotificationsReducer'
-import { Button, Typography, Box, IconButton, Menu } from '@mui/material'
+import { Button, Typography, Box, IconButton, Menu, Card } from '@mui/material'
 import { useDispatch, useSelector } from 'react-redux'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -25,39 +25,25 @@ const NotificationMenu = () => {
 			>
 				<Box sx={{ p: '0 5px', maxHeight: 500, overflow: 'auto' }}>
 					{unreadNotifications.map((notification, i) => {
-						if (notification.redirect_path) {
-							return (
-								<Box sx={{ display: 'flex', alignItems: 'center' }} key={`box${i}`}>
-									<Typography
-										key={i} onClick={() => setAnchorElNotifications(null)}
-										component={Link} to={notification.redirect_path}
-										sx={{ width: 300 }}
-									>
-										{notification.notification_text}
-									</Typography>
-									<IconButton
-										size='small'
-										onClick={() => dispatch(deleteUserNotification(notification.notification_id))}
-									>
-										<CloseIcon sx={{ fontSize: 20 }} />
-									</IconButton>
-								</Box>
-							)
-						} else {
-							return (
-								<Box container sx={{ display: 'flex', alignItems: 'center' }} key={`box${i}`}>
-									<Typography key={i} sx={{ maxWidth: 300 }}>
-										{notification.notification_text}
-									</Typography>
-									<IconButton
-										size='small'
-										onClick={() => dispatch(deleteUserNotification(notification.notification_id))}
-									>
-										<CloseIcon sx={{ fontSize: 20 }} />
-									</IconButton>
-								</Box>
-							)
-						}
+						return (
+							<Card sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#fcfcfc', margin: '10px 0' }} key={`box${i}`}>
+								<Typography
+									key={i}
+									onClick={notification.redirect_path ? () => setAnchorElNotifications(null) : undefined}
+									component={notification.redirect_path ? Link : undefined}
+									to={notification.redirect_path}
+									sx={{ width: 300, color: 'black', textDecoration: 'none' }}
+								>
+									{notification.notification_text}
+								</Typography>
+								<IconButton
+									size='small'
+									onClick={() => dispatch(deleteUserNotification(notification.notification_id))}
+								>
+									<CloseIcon sx={{ fontSize: 20 }} />
+								</IconButton>
+							</Card>
+						)
 					})}
 				</Box>
 				<Button onClick={() => dispatch(clearUserNotifications())}>Clear notifications</Button>
