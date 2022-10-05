@@ -283,7 +283,7 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 		}
 	})
 
-	app.delete('api/profile/notifications', (request, response) => {
+	app.delete('/api/profile/notifications', (request, response) => {
 		const sess = request.session
 
 		if (sess.userid) {
@@ -298,7 +298,7 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 		}
 	})
 
-	app.delete('api/profile/notification/:id', (request, response) => {
+	app.delete('/api/profile/notification/:id', (request, response) => {
 		const sess = request.session
 
 		if (sess.userid) {

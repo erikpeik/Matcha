@@ -3,10 +3,13 @@ import { Link } from 'react-router-dom'
 import {
 	Box, IconButton, Menu, MenuItem, Tooltip, Avatar, Button, Typography,
 } from '@mui/material'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import CloseIcon from '@mui/icons-material/Close'
 import NotificationsIcon from '@mui/icons-material/Notifications'
+import { clearUserNotifications, deleteUserNotification } from '../../reducers/userNotificationsReducer'
 
 const UserMenu = ({ user }) => {
+	const dispatch = useDispatch()
 	const [anchorElUser, setAnchorElUser] = useState(null);
 	const [anchorElNotifications, setAnchorElNotifications] = useState(null);
 	const unreadNotifications = useSelector(state => state.userNotifications)
@@ -46,11 +49,15 @@ const UserMenu = ({ user }) => {
 				{unreadNotifications.map((notification, i) => {
 					if (notification.redirect_path) {
 						return (
-							<Box key={`box${i}`}>
+							<Box sx={{ display: 'flex', alignItems: 'center' }} key={`box${i}`}>
 								<Typography key={i} onClick={() => setAnchorElNotifications(null)}
 									component={Link} to={notification.redirect_path}>
 									{notification.notification_text}
 								</Typography>
+								<IconButton size='small'
+									onClick={() => dispatch(deleteUserNotification(notification.notification_id))}>
+									<CloseIcon sx={{ fontSize: 20 }} />
+								</IconButton>
 							</Box>
 						)
 					} else {
@@ -59,11 +66,15 @@ const UserMenu = ({ user }) => {
 								<Typography key={i}>
 									{notification.notification_text}
 								</Typography>
+								<IconButton size='small'
+									onClick={() => dispatch(deleteUserNotification(notification.notification_id))}>
+									<CloseIcon sx={{ fontSize: 20 }} />
+								</IconButton>
 							</Box>
 						)
 					}
 				})}
-				<Button>Clear notifications</Button>
+				<Button onClick={() => dispatch(clearUserNotifications())}>Clear notifications</Button>
 			</Menu>
 			<Button onClick={(event) => setAnchorElNotifications(event.currentTarget)}
 				sx={{
