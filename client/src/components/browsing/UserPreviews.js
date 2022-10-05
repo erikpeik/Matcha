@@ -10,6 +10,7 @@ import { setBrowsingCriteria } from '../../reducers/browsingReducer'
 import { getUserLists } from '../../reducers/userListsReducer'
 import { changeNotification } from '../../reducers/notificationReducer'
 import { changeSeverity } from '../../reducers/severityReducer'
+import PrintTags from './PrintTags'
 import WhatshotIcon from '@mui/icons-material/Whatshot'
 import ThumbUpIcon from '@mui/icons-material/ThumbUp'
 import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt'
@@ -20,7 +21,6 @@ import WcIcon from '@mui/icons-material/Wc'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import TodayIcon from '@mui/icons-material/Today';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
-import TurnedInIcon from '@mui/icons-material/TurnedIn'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGenderless } from '@fortawesome/free-solid-svg-icons'
 
@@ -164,14 +164,7 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 											<TodayIcon sx={{ color: 'gray', mr: 1 }} />
 											<Typography sx={{ fontWeight: 550 }}>{`${user.age} years old`}</Typography>
 										</Grid>
-										{
-											user.tags.length > 0 &&
-											<Grid display='flex' sx={{ alignItems: 'center' }}>
-												<TurnedInIcon sx={{ color: 'gray', mr: 1 }} />
-												<Typography sx={{ fontWeight: 550 }}>{user.tags.join(', ')}</Typography>
-												<Typography sx={{ fontWeight: 550, ml: 1, color: 'gray' }}>({user.common_tags} common)</Typography>
-											</Grid>
-										}
+										<PrintTags tags={user.tags} common_tags={user.common_tags} />
 									</Box>
 									<IconButton
 										arial-label='more'
