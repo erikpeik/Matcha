@@ -1,9 +1,5 @@
-module.exports = (http, pool) => {
-	const socketIO = require('socket.io')(http, {
-		cors: {
-			origin: "http://localhost:3000"
-		}
-	});
+module.exports = (pool, socketIO) => {
+
 
 	let users = []
 
@@ -13,6 +9,16 @@ module.exports = (http, pool) => {
 		socket.on('join_room', (data) => {
 			console.log('join_room', `room-${data.room}`);
 			socket.join(`room-${data.room}`);
+		})
+
+		socket.on('join_notification', (data) => {
+			console.log('join_notification', `notification-${data.id}`);
+			socket.join(`notification-${data.id}`);
+		})
+
+		socket.on('send_notification', (data) => {
+			console.log('send_notification', `notification-${data.id}`);
+			socketIO.to(`notification-${data.id}`).emit('new_notification', data)
 		})
 
 		socket.on('leave_room', (data) => {

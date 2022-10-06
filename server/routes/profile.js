@@ -1,4 +1,4 @@
-module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
+module.exports = (app, pool, upload, fs, path, bcrypt) => {
 
 
 	app.post('/api/profile/setup', async (request, response) => {

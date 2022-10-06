@@ -34,6 +34,7 @@ const Login = ({ socket }) => {
 				dispatch(getProfileData())
 				dispatch(changeNotification(""))
 				socket.emit("newUser", { name: result.username, id: result.userid, socketID: socket.id })
+				socket.emit("join_notification", { id: result.userid })
 			} else {
 				dispatch(changeSeverity('error'))
 				dispatch(changeNotification(result))

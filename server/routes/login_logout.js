@@ -1,4 +1,4 @@
-module.exports = function (app, pool, session, bcrypt) {
+module.exports = function (app, pool, bcrypt) {
 
 	app.post('/api/login', (request, response) => {
 		const { username, password } = request.body

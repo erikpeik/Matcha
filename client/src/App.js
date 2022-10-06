@@ -47,6 +47,9 @@ const App = () => {
 		socket.on('newUserResponse', (data) => {
 			dispatch(changeOnlineUsers(data))
 		})
+		socket.on('new_notification', (data) => {
+			console.log('new notification:', data)
+		})
 	}, [socket, dispatch, user])
 
 	useEffect(() => {
@@ -65,6 +68,7 @@ const App = () => {
 			if (user.name && socket.id) {
 				console.log("Added new user!", user.name, socket.id)
 				socket.emit("newUser", { name: user.name, id: user.id, socketID: socket.id })
+				socket.emit("join_notification", { id: user.id })
 			}
 		}
 	}, [user, socket, socketConnected])

@@ -22,6 +22,12 @@ morgan.token('body', request => {
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
+const socketIO = require('socket.io')(http, {
+	cors: {
+		origin: "http://localhost:3000"
+	}
+});
+
 const { Pool } = require('pg')
 const pool = new Pool({
 	user: 'matcha',
@@ -64,12 +70,12 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 
 require('./routes/signup.js')(app, pool, bcrypt, transporter);
-require('./routes/login_logout.js')(app, pool, session, bcrypt)
+require('./routes/login_logout.js')(app, pool, bcrypt)
 require('./routes/resetpassword.js')(app, pool, bcrypt, transporter)
-require('./routes/profile.js')(app, pool, session, upload, fs, path, bcrypt)
-require('./routes/browsing.js')(app, pool, transporter, session)
-require('./routes/chat.js')(http, pool)
-require('./routes/chat_api.js')(app, pool, session)
+require('./routes/profile.js')(app, pool, upload, fs, path, bcrypt)
+require('./routes/browsing.js')(app, pool, transporter, socketIO)
+require('./routes/chat.js')(pool, socketIO)
+require('./routes/chat_api.js')(app, pool)
 
 const PORT = process.env.PORT || 3001
 

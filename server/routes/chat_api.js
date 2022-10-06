@@ -1,4 +1,4 @@
-module.exports = (app, pool, session) => {
+module.exports = (app, pool) => {
 	app.get('/api/chat/chat_connections', async (request, response) => {
 		const sess = request.session
 
