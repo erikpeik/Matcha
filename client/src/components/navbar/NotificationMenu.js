@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import profileService from '../../services/profileService'
-import { setNotificationRead } from '../../reducers/userNotificationsReducer'
+import { setNotificationRead, setAllNotificationsRead } from '../../reducers/userNotificationsReducer'
 
 const MenuButton = ({ unread, setAnchorElNotifications }) => {
 	const BaseButton = () => {
@@ -147,6 +147,7 @@ const NotificationMenu = () => {
 					})}
 				</Box>
 				<Button onClick={() => dispatch(clearUserNotifications())}>Clear notifications</Button>
+				<Button onClick={() => dispatch(setAllNotificationsRead())}>Set all as read</Button>
 			</Menu>
 			<MenuButton unread={unreadNotifications.length} setAnchorElNotifications={setAnchorElNotifications} />
 		</>
