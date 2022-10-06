@@ -29,10 +29,15 @@ const theme = createTheme({
 	palette: {
 		primary: {
 			main: '#FF1E56',
-		},
-		secondary: {
-			main: '#F5F5F5',
-		},
+		}
+	}
+})
+
+const deleteTheme = createTheme({
+	palette: {
+		primary: {
+			main: '#FF0000',
+		}
 	}
 })
 
@@ -158,6 +163,11 @@ const Profile = () => {
 		event.target.value = ''
 	}
 
+	const deleteUser = () => {
+		console.log("Trying to delete")
+		navigate('/deleteuser')
+	}
+
 	return (
 		<Container maxWidth='md' sx={{ pt: 5, pb: 5 }}>
 			<Paper elevation={10} sx={{ padding: 3 }}>
@@ -230,6 +240,7 @@ const Profile = () => {
 					<input type="file" name="file" id="image-upload" accept="image/jpeg, image/png, image/jpg"
 						onChange={uploadImage}></input>
 				</Button>
+				<Button theme={deleteTheme} variant="contained" onClick={() => deleteUser()}>Delete user</Button>
 			</Paper>
 			<Notification />
 		</Container>

@@ -22,6 +22,7 @@ import Loader from './components/Loader'
 import ResetPassword, { SetNewPassword } from './components/login/ResetPassword'
 import ChangePassword from './components/profile/ChangePassword'
 import Logout from './components/Logout'
+import DeleteUser from './components/profile/DeleteUser'
 import UserProfile from './components/Userprofile'
 import { changeOnlineUsers } from './reducers/onlineUsersReducer'
 import socketIO from 'socket.io-client';
@@ -90,6 +91,7 @@ const App = () => {
 				<Route path="/browsing" element={<Browsing />} />
 				<Route path="/chat" element={<Chat socket={socket} />} />
 				<Route path="/logout" element={<Logout socket={socket} />} />
+				<Route path="/deleteuser" element={<DeleteUser />} />
 			</Routes>
 		</Router>
 		<Footer />

@@ -223,6 +223,7 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 
 			response.send(profileData)
 		} catch (error) {
+			console.log(error)
 			response.send(false)
 		}
 	})
@@ -431,6 +432,21 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 			} catch (error) {
 				console.log(error)
 				response.send("Failed to read all notifications")
+			}
+		}
+	})
+
+	app.delete('/api/profile/deleteuser', (request, response) => {
+		const sess = request.session
+
+		if (sess.userid) {
+			try {
+				var sql = `DELETE FROM users WHERE id = $1`
+				pool.query(sql, [sess.userid])
+				response.send(true)
+			} catch (error) {
+				console.log(error)
+				response.send("Failed to delete user!")
 			}
 		}
 	})

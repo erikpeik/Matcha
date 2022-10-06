@@ -61,9 +61,14 @@ const deletePicture = PictureId => {
 	return request.then(response => response.data)
 }
 
+const deleteUser = () => {
+	const request = axios.delete(`${baseUrl}/deleteuser`)
+	return request.then(response => response.data)
+}
+
 const profileService = {
 	setUpProfile, getProfileData, getNotifications, clearNotifications, deleteNotification, readNotification,
-	readAllNotifications, setProfilePic, uploadPicture, deletePicture, editUserSettings, changePassword
+	readAllNotifications, setProfilePic, uploadPicture, deletePicture, editUserSettings, changePassword, deleteUser
 }
 
 export default profileService
