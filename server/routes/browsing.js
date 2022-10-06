@@ -58,46 +58,54 @@ module.exports = (app, pool, transporter, socketIO) => {
 			} else {
 				const liked_person_id = request.params.id
 
-				var sql = `INSERT INTO likes (liker_id, target_id) VALUES ($1, $2);`
-				await pool.query(sql, [sess.userid, liked_person_id])
+				// preventing multiple press of the like button
+				var sql = `SELECT * FROM likes WHERE liker_id = $1 AND target_id = $2`
+				const oldLikes = await pool.query(sql, [sess.userid, liked_person_id])
 
-				var notification = `You have been liked by user ${sess.username}`
-				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id) VALUES ($1,$2,$3,$4) RETURNING notification_id`
-				var inserted_id = pool.query(sql, [liked_person_id, notification, `/userprofile/${sess.userid}`, sess.userid])
-				console.log('inserted_id: ', inserted_id)
-				var data = {
-					user_id: liked_person_id,
-					sender_id: sess.userid,
-					text: notification,
-					redirect_path: `/userprofile/${sess.userid}`,
-					read: 'NO',
-					time_stamp: new Date()
-				}
-				socketIO.to(`notification-${liked_person_id}`).emit('new_notification', data)
-
-				var sql = `UPDATE fame_rates SET like_pts = like_pts + 10, total_pts = total_pts + 10
-							WHERE user_id = $1 AND like_pts < 50 AND total_pts <= 90`
-				pool.query(sql, [liked_person_id])
-
-				var sql = `SELECT * FROM likes WHERE liker_id = $2 AND target_id = $1`
-				const reverseliked = await pool.query(sql, [sess.userid, liked_person_id])
-
-				var sql = `SELECT * FROM connections
-							WHERE (user1_id = $1 AND user2_id = $2) OR (user1_id = $2 AND user2_id = $1)`
-				const oldConnections = await pool.query(sql, [sess.userid, liked_person_id])
-
-				if (reverseliked.rows.length !== 0 && oldConnections.rows.length === 0) {
-					var sql = `INSERT INTO connections (user1_id, user2_id) VALUES ($1, $2)`
+				if (oldLikes.rows.length === 0) {
+					var sql = `INSERT INTO likes (liker_id, target_id) VALUES ($1, $2)`
 					await pool.query(sql, [sess.userid, liked_person_id])
 
-					var notification = `You have been liked back by user ${sess.username}!
+					var notification = `You have been liked by user ${sess.username}`
+					var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id) VALUES ($1,$2,$3,$4) RETURNING notification_id`
+					var inserted_id = await pool.query(sql, [liked_person_id, notification, `/userprofile/${sess.userid}`, sess.userid])
+					// console.log('inserted_id: ', inserted_id)
+					var data = {
+						id: inserted_id.rows[0]['notification_id'],
+						user_id: Number(liked_person_id),
+						sender_id: sess.userid,
+						text: notification,
+						redirect_path: `/userprofile/${sess.userid}`,
+						read: 'NO',
+						picture: rows[0]['picture_data'],
+						time_stamp: new Date()
+					}
+					socketIO.to(`notification-${liked_person_id}`).emit('new_notification', data)
+
+					var sql = `UPDATE fame_rates SET like_pts = like_pts + 10, total_pts = total_pts + 10
+							WHERE user_id = $1 AND like_pts < 50 AND total_pts <= 90`
+					pool.query(sql, [liked_person_id])
+
+					var sql = `SELECT * FROM likes WHERE liker_id = $2 AND target_id = $1`
+					const reverseliked = await pool.query(sql, [sess.userid, liked_person_id])
+
+					var sql = `SELECT * FROM connections
+							WHERE (user1_id = $1 AND user2_id = $2) OR (user1_id = $2 AND user2_id = $1)`
+					const oldConnections = await pool.query(sql, [sess.userid, liked_person_id])
+
+					if (reverseliked.rows.length !== 0 && oldConnections.rows.length === 0) {
+						var sql = `INSERT INTO connections (user1_id, user2_id) VALUES ($1, $2)`
+						await pool.query(sql, [sess.userid, liked_person_id])
+
+						var notification = `You have been liked back by user ${sess.username}!
 										You are now connected and are able to chat with each other.`
-					var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id) VALUES ($1,$2, $3, $4)`
-					pool.query(sql, [liked_person_id, notification, '/chat', sess.userid])
-					var sql = `UPDATE fame_rates SET connection_pts = connection_pts + 5, total_pts = total_pts + 5
+						var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id) VALUES ($1,$2, $3, $4)`
+						pool.query(sql, [liked_person_id, notification, '/chat', sess.userid])
+						var sql = `UPDATE fame_rates SET connection_pts = connection_pts + 5, total_pts = total_pts + 5
 								WHERE (user_id = $1 AND connection_pts < 30 AND total_pts <= 95)
 								OR (user_id = $2 AND connection_pts < 30 AND total_pts <= 95)`
-					pool.query(sql, [liked_person_id, sess.userid])
+						pool.query(sql, [liked_person_id, sess.userid])
+					}
 				}
 				console.log("Liked user!")
 				response.status(200).send("Liked user!")

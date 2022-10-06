@@ -164,8 +164,11 @@ const Profile = () => {
 	}
 
 	const deleteUser = () => {
-		console.log("Trying to delete")
-		navigate('/deleteuser')
+		if (window.confirm("Are you sure you want to completely delete your account?")) {
+			if (window.confirm("Are you really really sure?")) {
+				navigate('/deleteuser')
+			}
+		}
 	}
 
 	return (

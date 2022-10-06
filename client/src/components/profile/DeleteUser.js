@@ -12,6 +12,8 @@ const DeleteUser = () => {
 	useEffect(() => {
 		profileService.deleteUser().then(result => {
 			if (result === true) {
+				dispatch(changeSeverity('success'))
+				dispatch(changeNotification("User has been successfully deleted. Bye bye!"))
 				navigate('/logout')
 			} else {
 				dispatch(changeSeverity('error'))
@@ -19,10 +21,6 @@ const DeleteUser = () => {
 			}
 		})
 	}, [dispatch, navigate])
-
-	// dispatch(changeSeverity('success'))
-	// dispatch(changeNotification("User has been successfully deleted. Bye bye!"))
-
 }
 
 export default DeleteUser

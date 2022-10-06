@@ -178,53 +178,54 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 	app.get('/api/profile', async (request, response) => {
 		const sess = request.session
 
-		try {
-			var sql = `SELECT * FROM users
+		if (sess.userid) {
+			try {
+				var sql = `SELECT * FROM users
 						INNER JOIN user_settings ON users.id = user_settings.user_id
 						INNER JOIN fame_rates ON users.id = fame_rates.user_id
 						WHERE users.id = $1`
-			var { rows } = await pool.query(sql, [sess.userid])
-			const { password: removed_password, ...profileData } = rows[0]
+				var { rows } = await pool.query(sql, [sess.userid])
+				const { password: removed_password, ...profileData } = rows[0]
 
-			var sql = `SELECT * FROM tags WHERE tagged_users @> array[$1]::INT[]
+				var sql = `SELECT * FROM tags WHERE tagged_users @> array[$1]::INT[]
 						ORDER BY tag_id`
-			var tags = await pool.query(sql, [sess.userid])
+				var tags = await pool.query(sql, [sess.userid])
 
-			profileData.tags = tags.rows.map(tag => tag.tag_content)
+				profileData.tags = tags.rows.map(tag => tag.tag_content)
 
-			var sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND profile_pic = 'YES'`
-			var profile_pic = await pool.query(sql, [sess.userid])
+				var sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND profile_pic = 'YES'`
+				var profile_pic = await pool.query(sql, [sess.userid])
 
-			if (profile_pic.rows[0]) {
-				profileData.profile_pic = profile_pic.rows[0]
-			} else {
-				profileData.profile_pic = { user_id: sess.userid, picture_data: null }
-			}
+				if (profile_pic.rows[0]) {
+					profileData.profile_pic = profile_pic.rows[0]
+				} else {
+					profileData.profile_pic = { user_id: sess.userid, picture_data: null }
+				}
 
-			var sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND profile_pic = 'NO' ORDER BY picture_id`
-			var other_pictures = await pool.query(sql, [sess.userid])
-			if (other_pictures.rows) {
-				profileData.other_pictures = other_pictures.rows
-			}
+				var sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND profile_pic = 'NO' ORDER BY picture_id`
+				var other_pictures = await pool.query(sql, [sess.userid])
+				if (other_pictures.rows) {
+					profileData.other_pictures = other_pictures.rows
+				}
 
-			var sql = `SELECT watcher_id, username
+				var sql = `SELECT watcher_id, username
 						FROM watches INNER JOIN users on watches.watcher_id = users.id
 						WHERE target_id = $1
 						GROUP BY watcher_id, username`
-			const watchers = await pool.query(sql, [sess.userid])
-			profileData.watchers = watchers.rows
+				const watchers = await pool.query(sql, [sess.userid])
+				profileData.watchers = watchers.rows
 
-			var sql = `SELECT liker_id, username
+				var sql = `SELECT liker_id, username
 						FROM likes INNER JOIN users on likes.liker_id = users.id
 						WHERE target_id = $1
 						GROUP BY liker_id, username`
-			const likers = await pool.query(sql, [sess.userid])
-			profileData.likers = likers.rows
+				const likers = await pool.query(sql, [sess.userid])
+				profileData.likers = likers.rows
 
-			response.send(profileData)
-		} catch (error) {
-			console.log(error)
-			response.send(false)
+				response.send(profileData)
+			} catch (error) {
+				response.send(false)
+			}
 		}
 	})
 
@@ -364,7 +365,8 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 							notification_text AS text, redirect_path, read, picture_data AS picture
 							FROM notifications
 							INNER JOIN user_pictures ON notifications.sender_id = user_pictures.user_id AND user_pictures.profile_pic = 'YES'
-							WHERE notifications.user_id = $1`
+							WHERE notifications.user_id = $1
+							ORDER BY notification_id DESC`
 				const { rows } = await pool.query(sql, [sess.userid])
 				response.send(rows)
 			} catch (error) {
@@ -442,6 +444,18 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 		if (sess.userid) {
 			try {
 				var sql = `DELETE FROM users WHERE id = $1`
+				pool.query(sql, [sess.userid])
+				var sql = `DELETE FROM likes WHERE target_id = $1`
+				pool.query(sql, [sess.userid])
+				var sql = `DELETE FROM blocks WHERE target_id = $1`
+				pool.query(sql, [sess.userid])
+				var sql = `DELETE FROM watches WHERE target_id = $1`
+				pool.query(sql, [sess.userid])
+				var sql = `DELETE FROM reports WHERE target_id = $1`
+				pool.query(sql, [sess.userid])
+				var sql = `DELETE FROM connections WHERE user2_id = $1`
+				pool.query(sql, [sess.userid])
+				var sql = `DELETE FROM notifications WHERE sender_id = $1`
 				pool.query(sql, [sess.userid])
 				response.send(true)
 			} catch (error) {

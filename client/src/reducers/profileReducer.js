@@ -8,11 +8,14 @@ const profileSlice = createSlice({
 		setProfileData(state, action) {
 			const content = action.payload
 			return content
+		},
+		resetProfileData(state, action) {
+			return {}
 		}
 	},
 })
 
-export const { setProfileData } = profileSlice.actions
+export const { setProfileData, resetProfileData } = profileSlice.actions
 
 export const getProfileData = () => {
 	return async dispatch => {
