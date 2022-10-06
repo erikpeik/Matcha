@@ -19,11 +19,20 @@ const userNotificationSlice = createSlice({
 			return state.filter(notification =>
 				notification.notification_id !== id
 			)
+		},
+		readUserNotification(state, action) {
+			const id = action.payload
+			return state.map(notification =>
+				notification.notification_id !== id
+				? notification
+				: {...notification, read: 'YES'}
+			)
 		}
 	},
 })
 
-export const { setUserNotifications, resetUserNotifications, removeUserNotification } = userNotificationSlice.actions
+export const { setUserNotifications, resetUserNotifications,
+				removeUserNotification, readUserNotification } = userNotificationSlice.actions
 
 export const getUserNotifications = () => {
 	return async dispatch => {
@@ -47,6 +56,15 @@ export const deleteUserNotification = id => {
 		profileService.deleteNotification(id).then(result => {
 			if (result === true)
 				dispatch(removeUserNotification(id))
+		})
+	}
+}
+
+export const setNotificationRead = id => {
+	return dispatch => {
+		profileService.readNotification(id).then(result => {
+			if (result === true)
+				dispatch(readUserNotification(id))
 		})
 	}
 }

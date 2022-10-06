@@ -5,85 +5,12 @@ import { Button, Typography, Box, IconButton, Menu, Card, Avatar, Badge } from '
 import { useDispatch, useSelector } from 'react-redux'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import profileService from '../../services/profileService'
 
-const NotificationBadge = ({ is_read }) => {
-	const BaseAvatar = () => {
-		return (<Avatar />)
-	}
-	if (!is_read) {
+const MenuButton = ({ unread, setAnchorElNotifications }) => {
+	const BaseButton = () => {
 		return (
-			<Badge
-				sx={{ mr: 1 }}
-				color="error"
-				variant="dot"
-				overlap="circular"
-			>
-				<BaseAvatar />
-			</Badge>
-		)
-	} else {
-		return (
-			<BaseAvatar />
-		)
-	}
-}
-
-const NotificationMenu = () => {
-	const [anchorElNotifications, setAnchorElNotifications] = useState(null);
-	const unreadNotifications = useSelector(state => state.userNotifications)
-//	console.log('unreadNotifications', unreadNotifications)
-	const dispatch = useDispatch()
-
-	return (
-		<>
-			<Menu
-				sx={{ mt: '45px' }}
-				id="user-notifications"
-				anchorEl={anchorElNotifications}
-				anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-				keepMounted
-				transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-				open={Boolean(anchorElNotifications)}
-				onClose={() => setAnchorElNotifications(null)}
-			>
-				<Box sx={{ p: '0 5px', maxHeight: 500, overflow: 'auto' }}>
-					{unreadNotifications.map((notification, i) => {
-						var is_read = notification.read === 'YES'
-						return (
-							<Card
-								key={`box${i}`}
-								sx={{
-									display: 'flex',
-									alignItems: 'center',
-									margin: '10px 0',
-									padding: '5px 10px',
-									backgroundColor: is_read ? '#FAFAFA' : '#e8e8e8',
-									minHeight: 50,
-								}}
-							>
-								<NotificationBadge is_read={is_read} />
-								<Typography
-									key={i}
-									onClick={notification.redirect_path ? () => setAnchorElNotifications(null) : undefined}
-									component={notification.redirect_path ? Link : undefined}
-									to={notification.redirect_path}
-									sx={{ width: 300, color: 'black', textDecoration: 'none' }}
-								>
-									{notification.notification_text}
-								</Typography>
-								<IconButton
-									size='small'
-									onClick={() => dispatch(deleteUserNotification(notification.notification_id))}
-								>
-									<CloseIcon sx={{ fontSize: 20 }} />
-								</IconButton>
-							</Card>
-						)
-					})}
-				</Box>
-				<Button onClick={() => dispatch(clearUserNotifications())}>Clear notifications</Button>
-			</Menu>
-			<Button onClick={(event) => setAnchorElNotifications(event.currentTarget)}
+			<Button
 				sx={{
 					minWidth: 0,
 					borderRadius: '50%',
@@ -99,6 +26,127 @@ const NotificationMenu = () => {
 				}}>
 				<NotificationsIcon sx={{ fontSize: '28px' }} />
 			</Button>
+		)
+	}
+
+	if (unread === 0) {
+		return (
+			<Badge onClick={(event) => setAnchorElNotifications(event.currentTarget)}
+				sx={{ mr: 1 }}>
+				<BaseButton />
+			</Badge>
+		)
+	} else {
+		return (
+			<Badge onClick={(event) => setAnchorElNotifications(event.currentTarget)}
+				sx={{ mr: 1 }}
+				color="error"
+				variant="dot"
+				overlap="circular"
+			>
+				< BaseButton />
+			</Badge>
+		)
+	}
+}
+
+const NotificationBadge = ({ is_read, picture }) => {
+	const UserPicture = () => {
+		return (
+			<Avatar
+				src={picture}
+				alt='user_picture'
+			/>
+		)
+	}
+	// const BaseAvatar = () => {
+	// 	return (<Avatar />)
+	// }
+	if (is_read === "NO") {
+		return (
+			<Badge
+				sx={{ mr: 1 }}
+				color="error"
+				variant="dot"
+				overlap="circular"
+			>
+				<UserPicture />
+			</Badge>
+		)
+	} else {
+		return (
+			<Badge
+				sx={{ mr: 1 }}>
+				<UserPicture />
+			</Badge>
+		)
+	}
+}
+
+const NotificationMenu = () => {
+	const [anchorElNotifications, setAnchorElNotifications] = useState(null);
+	const allNotifications = useSelector(state => state.userNotifications)
+	const unreadNotifications = allNotifications.filter(notification => notification.read === 'NO')
+	//	console.log('unreadNotifications', unreadNotifications)
+	const dispatch = useDispatch()
+
+	const handleNotificationClick = (id, redirect_path) => {
+		if (redirect_path)
+			setAnchorElNotifications(null)
+		profileService.readNotification(id)
+	}
+
+	return (
+		<>
+			<Menu
+				sx={{ mt: '45px' }}
+				id="user-notifications"
+				anchorEl={anchorElNotifications}
+				anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+				keepMounted
+				transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+				open={Boolean(anchorElNotifications)}
+				onClose={() => setAnchorElNotifications(null)}
+			>
+				<Box sx={{ p: '0 5px', maxHeight: 500, overflow: 'auto' }}>
+					{unreadNotifications.length} unread notifications
+					{allNotifications.map((notification, i) => {
+						var is_read = notification.read
+						return (
+							<Card
+								key={`box${i}`}
+								sx={{
+									display: 'flex',
+									alignItems: 'center',
+									margin: '10px 0',
+									padding: '5px 10px',
+									backgroundColor: is_read ? '#FAFAFA' : '#e8e8e8',
+									minHeight: 50,
+								}}
+							>
+								<NotificationBadge is_read={is_read} picture={notification.picture} />
+								<Typography
+									key={i}
+									onClick={() => handleNotificationClick(notification.id, notification.redirect_path)}
+									component={notification.redirect_path ? Link : undefined}
+									to={notification.redirect_path}
+									sx={{ width: 300, color: 'black', textDecoration: 'none' }}
+								>
+									{notification.text}
+								</Typography>
+								<IconButton
+									size='small'
+									onClick={() => dispatch(deleteUserNotification(notification.id))}
+								>
+									<CloseIcon sx={{ fontSize: 20 }} />
+								</IconButton>
+							</Card>
+						)
+					})}
+				</Box>
+				<Button onClick={() => dispatch(clearUserNotifications())}>Clear notifications</Button>
+			</Menu>
+			<MenuButton unread={unreadNotifications.length} setAnchorElNotifications={setAnchorElNotifications} />
 		</>
 	)
 }
