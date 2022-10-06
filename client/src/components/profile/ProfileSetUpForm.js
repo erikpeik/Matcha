@@ -16,6 +16,7 @@ import { changeSeverity } from '../../reducers/severityReducer'
 import { getProfileData } from '../../reducers/profileReducer'
 import profileService from '../../services/profileService'
 import Loader from '../Loader'
+import { TagsInput } from './ProfileSettings'
 
 const ProfileSetUpForm = () => {
 	const dispatch = useDispatch()
@@ -24,6 +25,7 @@ const ProfileSetUpForm = () => {
 	const [age, setAge] = useState('');
 	const [sexual_pref, setSexpref] = useState('bisexual');
 	const [GPSlocation, setGPSLocation] = useState()
+	const [tags, setTagState] = useState([])
 	const [isLoading, setLoading] = useState(true)
 
 	const theme = createTheme({
@@ -99,7 +101,8 @@ const ProfileSetUpForm = () => {
 			location: event.target.location.value,
 			gps: [event.target.gps_lat.value, event.target.gps_lon.value],
 			sexual_pref: event.target.sexual_pref.value,
-			biography: event.target.biography.value
+			biography: event.target.biography.value,
+			tags: tags
 		}
 
 		console.log(ProfileSettings)
@@ -211,6 +214,7 @@ const ProfileSetUpForm = () => {
 						placeholder='Short description of you here...'
 						required
 					/>
+					<TagsInput tags={tags} setTags={setTagState} />
 					<Button type="submit" variant='contained' theme={theme}
 						size='large' sx={{ mt: 1 }}>
 						Save settings

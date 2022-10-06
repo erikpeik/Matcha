@@ -64,7 +64,7 @@ const App = () => {
 		if (user && socketConnected) {
 			if (user.name && socket.id) {
 				console.log("Added new user!", user.name, socket.id)
-				socket.emit("newUser", { name: user.name, socketID: socket.id })
+				socket.emit("newUser", { name: user.name, id: user.id, socketID: socket.id })
 			}
 		}
 	}, [user, socket, socketConnected])

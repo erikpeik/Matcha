@@ -192,6 +192,16 @@ const UserProfile = () => {
 					{Object.keys(ProfileData).map((key, index) => {
 						return <ProfileInput key={index} text={key} input={ProfileData[key]} />
 					})}
+					{!usernames.includes(userData.username) ?
+						<Grid item xs={12} sm={6} sx={{ display: 'inline' }}>
+							<Typography sx={{ width: 170, display: 'inline-block', fontWeight: '700' }}>
+								Last connected:
+							</Typography>
+							<Typography sx={{ width: 'fit-content', display: 'inline' }}>
+								{userData.connection_time}
+							</Typography>
+						</Grid>
+						: null}
 				</Grid>
 				<Grid container sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
 					<Typography sx={{ width: 'fit-content', fontWeight: '700' }}>

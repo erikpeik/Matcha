@@ -3,7 +3,7 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 
 	app.post('/api/profile/setup', async (request, response) => {
 		var sess = request.session
-		const { gender, age, location, gps, sexual_pref, biography } = request.body
+		const { gender, age, location, gps, sexual_pref, biography, tags } = request.body
 
 		if (!sess.userid)
 			return response.send("User not signed in!")
@@ -19,6 +19,9 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 			return response.send("Forbidden sexual preference!")
 		if (biography.length > 500)
 			return response.send("The maximum length for biography is 500 characters!")
+		const forbiddenTags = tags.filter(tag => !tag.match(/(?=^.{1,20}$)[a-z åäö-]+$/i))
+		if (forbiddenTags.length !== 0)
+			return response.send("The allowed characters in tags are a-z, å, ä, ö and dash (-), and maximum length is 20 characters.")
 
 		try {
 			var sql = `INSERT INTO user_settings (user_id, gender, age,
@@ -29,6 +32,31 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 						WHERE user_id = $1 AND setup_pts < 5 AND total_pts <= 95`
 			pool.query(sql, [sess.userid])
 			sess.location = { x: gps[0], y: gps[1] }
+			var sql = `UPDATE tags SET tagged_users = array_remove(tagged_users, $1)
+							WHERE (array[LOWER($2)] @> array[LOWER(tag_content)]::TEXT[]) IS NOT TRUE
+							RETURNING *`
+			await pool.query(sql, [sess.userid, tags])
+
+			tags.map(async (tagtext) => {
+				var sql = "SELECT * FROM tags WHERE LOWER(tag_content) = LOWER($1)"
+				var { rows } = await pool.query(sql, [tagtext])
+
+				if (rows.length === 0) {
+					var sql = `INSERT INTO tags (tag_content, tagged_users) VALUES (LOWER($2), array[$1]::INT[])`
+					await pool.query(sql, [sess.userid, tagtext])
+				} else {
+					var sql = `UPDATE tags SET tagged_users = array_append(tagged_users, $1)
+								WHERE LOWER(tag_content) = LOWER($2) AND (tagged_users @> array[$1]::INT[]) IS NOT TRUE`
+					await pool.query(sql, [sess.userid, tagtext])
+				}
+			})
+			var tagPoints = tags.length
+			if (tagPoints > 5)
+				tagPoints = 5
+			var sql = `UPDATE fame_rates SET total_pts = total_pts - tag_pts + $2, tag_pts = $2
+							WHERE user_id = $1 AND total_pts <= 95`
+			await pool.query(sql, [sess.userid, tagPoints])
+
 			response.send(true)
 		} catch (error) {
 			response.send(error)

@@ -49,6 +49,11 @@ module.exports = (http, pool) => {
 
 		socket.on('disconnect', () => {
 			console.log('socket disconnected: ', socket.id);
+			disconnected_user = users.filter(user => user.socketID === socket.id)
+
+			var sql = `UPDATE users SET last_connection = NOW()::timestamp WHERE id = $1`
+			pool.query(sql, [disconnected_user[0].id])
+
 			users = users.filter(user => user.socketID !== socket.id)
 			console.log('users:', users)
 			socketIO.emit('newUserResponse', users)
@@ -56,6 +61,11 @@ module.exports = (http, pool) => {
 		})
 
 		socket.on('logOut', (data) => {
+			logged_out_user = users.filter(user => user.socketID === data.socketID)
+
+			var sql = `UPDATE users SET last_connection = NOW()::timestamp WHERE id = $1`
+			pool.query(sql, [logged_out_user[0].id])
+
 			users = users.filter(user => user.socketID !== data.socketID)
 			console.log("Logged out:", users)
 			socketIO.emit('newUserResponse', users)

@@ -17,7 +17,7 @@ import profileService from '../../services/profileService'
 import Loader from '../Loader'
 import ProfileSetUpForm from './ProfileSetUpForm'
 
-const TagsInput = ({ tags, setTags }) => {
+export const TagsInput = ({ tags, setTags }) => {
 
 	const handleTagChange = (event) => {
 		if (event.key !== 'Enter' || event.target.value === '')
