@@ -125,7 +125,7 @@ const NavBar = ({ socket }) => {
 							})
 						}
 					</Box>
-					<UserMenu user={user} />
+					<UserMenu user={user} socket={socket} />
 				</Toolbar>
 			</Container>
 		</AppBar >

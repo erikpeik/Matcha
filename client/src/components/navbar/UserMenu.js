@@ -6,7 +6,7 @@ import {
 import { useSelector } from 'react-redux'
 import NotificationMenu from './NotificationMenu'
 
-const UserMenu = ({ user }) => {
+const UserMenu = ({ user, socket }) => {
 	const [anchorElUser, setAnchorElUser] = useState(null);
 	const profileData = useSelector(state => state.profile)
 	if (profileData != null && Object.keys(profileData).length > 0)
@@ -29,7 +29,7 @@ const UserMenu = ({ user }) => {
 	// console.log('profile_pic:', profile_pic)
 	if (user !== undefined && user !== '' && profile_pic !== undefined) {
 		return <>
-			<NotificationMenu />
+			<NotificationMenu socket={socket} />
 			<Box sx={{ flexGrow: 0 }}>
 				<Menu
 					sx={{ mt: '45px' }}

@@ -14,10 +14,10 @@ module.exports = (pool, socketIO) => {
 			socket.join(`notification-${data.id}`);
 		})
 
-		socket.on('send_notification', (data) => {
-			console.log('send_notification', `notification-${data.id}`);
-			socketIO.to(`notification-${data.id}`).emit('new_notification', data)
-		})
+		// socket.on('send_notification', (data) => {
+		// 	console.log('send_notification', `notification-${data.id}`);
+		// 	socketIO.to(`notification-${data.id}`).emit('new_notification', data)
+		// })
 
 		socket.on('leave_room', (data) => {
 			socket.leave(`room-${data.room}`);

@@ -32,12 +32,16 @@ const userNotificationSlice = createSlice({
 			return state.map(notification => {
 				return { ...notification, read: 'YES' }
 			})
+		},
+		addUserNotification(state, action) {
+			const content = action.payload
+			return [content, ...state]
 		}
 	},
 })
 
 export const { setUserNotifications, resetUserNotifications, removeUserNotification,
-	readUserNotification, readAllUserNotifications } = userNotificationSlice.actions
+	readUserNotification, readAllUserNotifications, addUserNotification } = userNotificationSlice.actions
 
 export const getUserNotifications = () => {
 	return async dispatch => {

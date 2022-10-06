@@ -3,10 +3,10 @@ import NotificationsIcon from '@mui/icons-material/Notifications'
 import { clearUserNotifications, deleteUserNotification } from '../../reducers/userNotificationsReducer'
 import { Button, Typography, Box, IconButton, Menu, Card, Avatar, Badge } from '@mui/material'
 import { useDispatch, useSelector } from 'react-redux'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import profileService from '../../services/profileService'
-import { setNotificationRead, setAllNotificationsRead } from '../../reducers/userNotificationsReducer'
+import { setNotificationRead, setAllNotificationsRead, addUserNotification } from '../../reducers/userNotificationsReducer'
 
 const MenuButton = ({ unread, setAnchorElNotifications }) => {
 	const BaseButton = () => {
@@ -84,12 +84,21 @@ const NotificationBadge = ({ is_read, picture }) => {
 	}
 }
 
-const NotificationMenu = () => {
+const NotificationMenu = ({ socket }) => {
 	const [anchorElNotifications, setAnchorElNotifications] = useState(null);
 	const allNotifications = useSelector(state => state.userNotifications)
 	const unreadNotifications = allNotifications.filter(notification => notification.read === 'NO')
-	//	console.log('unreadNotifications', unreadNotifications)
 	const dispatch = useDispatch()
+
+	useEffect(() => {
+		socket.on('new_notification', (data) => {
+			console.log('new notification:', data)
+			dispatch(addUserNotification(data))
+		})
+		return () => socket.off('new_notification')
+	}, [socket, dispatch])
+	//	console.log('unreadNotifications', unreadNotifications)
+
 
 	const handleNotificationClick = (id, redirect_path) => {
 		if (redirect_path)

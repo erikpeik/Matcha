@@ -62,11 +62,18 @@ module.exports = (app, pool, transporter, socketIO) => {
 				await pool.query(sql, [sess.userid, liked_person_id])
 
 				var notification = `You have been liked by user ${sess.username}`
-				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id) VALUES ($1,$2,$3,$4)`
-				pool.query(sql, [liked_person_id, notification, `/userprofile/${sess.userid}`, sess.userid])
-
-				var data = { user_id: liked_person_id, sender_id: sess.userid, text: notification, redirect_path: `/userprofile/${sess.userid}` }
-				socketIO.to(`notification-${liked_person_id}`).emit('new_notification', `liked user id is ${liked_person_id} `)
+				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id) VALUES ($1,$2,$3,$4) RETURNING notification_id`
+				var inserted_id = pool.query(sql, [liked_person_id, notification, `/userprofile/${sess.userid}`, sess.userid])
+				console.log('inserted_id: ', inserted_id)
+				var data = {
+					user_id: liked_person_id,
+					sender_id: sess.userid,
+					text: notification,
+					redirect_path: `/userprofile/${sess.userid}`,
+					read: 'NO',
+					time_stamp: new Date()
+				}
+				socketIO.to(`notification-${liked_person_id}`).emit('new_notification', data)
 
 				var sql = `UPDATE fame_rates SET like_pts = like_pts + 10, total_pts = total_pts + 10
 							WHERE user_id = $1 AND like_pts < 50 AND total_pts <= 90`

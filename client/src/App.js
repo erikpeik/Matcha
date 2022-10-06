@@ -47,9 +47,6 @@ const App = () => {
 		socket.on('newUserResponse', (data) => {
 			dispatch(changeOnlineUsers(data))
 		})
-		socket.on('new_notification', (data) => {
-			console.log('new notification:', data)
-		})
 	}, [socket, dispatch, user])
 
 	useEffect(() => {
