@@ -17,22 +17,22 @@ const userNotificationSlice = createSlice({
 		removeUserNotification(state, action) {
 			const id = action.payload
 			return state.filter(notification =>
-				notification.notification_id !== id
+				notification.id !== id
 			)
 		},
 		readUserNotification(state, action) {
 			const id = action.payload
 			return state.map(notification =>
-				notification.notification_id !== id
-				? notification
-				: {...notification, read: 'YES'}
+				notification.id !== id
+					? notification
+					: { ...notification, read: 'YES' }
 			)
 		}
 	},
 })
 
 export const { setUserNotifications, resetUserNotifications,
-				removeUserNotification, readUserNotification } = userNotificationSlice.actions
+	removeUserNotification, readUserNotification } = userNotificationSlice.actions
 
 export const getUserNotifications = () => {
 	return async dispatch => {

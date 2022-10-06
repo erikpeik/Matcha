@@ -376,4 +376,20 @@ module.exports = (app, pool, session, upload, fs, path, bcrypt) => {
 		}
 	})
 
+	app.patch('/api/profile/readnotification/:id', (request, response) => {
+		const sess = request.session
+
+		if (sess.userid) {
+			try {
+				const notification_id = request.params.id
+				var sql = `UPDATE notifications SET read = 'YES' WHERE user_id = $1 AND notification_id = $2`
+				pool.query(sql, [sess.userid, notification_id])
+				response.send(true)
+			} catch (error) {
+				console.log(error)
+				response.send("Failed to read notification")
+			}
+		}
+	})
+
 }

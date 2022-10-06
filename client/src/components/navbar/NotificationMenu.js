@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import profileService from '../../services/profileService'
+import { setNotificationRead } from '../../reducers/userNotificationsReducer'
 
 const MenuButton = ({ unread, setAnchorElNotifications }) => {
 	const BaseButton = () => {
@@ -41,8 +42,8 @@ const MenuButton = ({ unread, setAnchorElNotifications }) => {
 			<Badge onClick={(event) => setAnchorElNotifications(event.currentTarget)}
 				sx={{ mr: 1 }}
 				color="error"
-				variant="dot"
 				overlap="circular"
+				badgeContent={unread}
 			>
 				< BaseButton />
 			</Badge>
@@ -94,6 +95,7 @@ const NotificationMenu = () => {
 		if (redirect_path)
 			setAnchorElNotifications(null)
 		profileService.readNotification(id)
+		dispatch(setNotificationRead(id))
 	}
 
 	return (

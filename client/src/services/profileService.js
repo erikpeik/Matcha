@@ -37,7 +37,7 @@ const deleteNotification = id => {
 }
 
 const readNotification = id => {
-	const request = axios.put(`${baseUrl}/notification/${id}`)
+	const request = axios.patch(`${baseUrl}/readnotification/${id}`)
 	return request.then(response => response.data)
 }
 
