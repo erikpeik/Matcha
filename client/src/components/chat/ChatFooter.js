@@ -8,7 +8,6 @@ const ChatFooter = ({ socket, connections }) => {
 	const user = useSelector(state => state.user)
 
 	if (room === '') return null
-
 	const receiver_id = connections.find(user => user.connection_id === room).id
 
 	const handleSendMessage = (e) => {

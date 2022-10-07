@@ -13,13 +13,10 @@ const ChatBody = ({ connections }) => {
 	const dispatch = useDispatch()
 
 	useEffect(() => {
-		console.log('room:', room)
-		chatService.getRoomMessages(room)
-			.then(data => {
-				// console.log('data:', data)
-				dispatch(setMessages(data))
-			}
-			)
+		if (room !== '') {
+			chatService.getRoomMessages(room)
+				.then(data => dispatch(setMessages(data)))
+		}
 	}, [room, dispatch])
 
 	if (room === '') return (

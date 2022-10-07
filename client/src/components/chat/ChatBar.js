@@ -1,6 +1,5 @@
 import { Paper, Typography, Box, Button, createTheme } from '@mui/material'
-import { changeRoom } from '../../reducers/roomReducer'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import ChatIcon from './ChatIcon'
 
 const theme = createTheme({
@@ -14,29 +13,8 @@ const theme = createTheme({
 	}
 })
 
-const ChatBar = ({ connections, socket }) => {
-	const dispatch = useDispatch()
-
+const ChatBar = ({ connections, joinRoom }) => {
 	const room = useSelector(state => state.room)
-	const user = useSelector(state => state.user)
-
-	if (connections.length > 0 && room === '' && user !== null) {
-		dispatch(changeRoom(connections[0].connection_id))
-		socket.emit('join_room', {
-			room: connections[0].connection_id,
-			user_id: user.id, username: user.name
-		})
-	}
-
-	const joinRoom = (connection_id) => {
-		socket.emit('leave_room', { room })
-		if (connection_id !== '') {
-			dispatch(changeRoom(connection_id))
-			socket.emit('join_room', {
-				room: connection_id, user_id: user.id, username: user.name
-			})
-		}
-	}
 
 	const textColor = {
 		true: 'white',

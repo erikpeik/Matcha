@@ -90,6 +90,7 @@ const App = () => {
 				<Route path="/userprofile/:id" element={<UserProfile />} />
 				<Route path="/browsing" element={<Browsing />} />
 				<Route path="/chat" element={<Chat socket={socket} />} />
+				<Route path="/chat/:id" element={<Chat socket={socket} />} />
 				<Route path="/logout" element={<Logout socket={socket} />} />
 				<Route path="/deleteuser" element={<DeleteUser />} />
 			</Routes>
