@@ -11,6 +11,7 @@ import browsingService from '../services/browsingService'
 import { getUserLists } from '../reducers/userListsReducer'
 import Notification from './Notification'
 import Loader from './Loader'
+import PathNotExists from './PathNotExists'
 import { changeSeverity } from '../reducers/severityReducer'
 import { changeNotification } from '../reducers/notificationReducer'
 import UserAvatar from './profile/UserAvatar'
@@ -80,6 +81,10 @@ const UserProfile = () => {
 
 	if (isLoading) {
 		return <Loader />
+	}
+
+	if (userData === false) {
+		return <PathNotExists />
 	}
 
 	const other_pictures = userData.other_pictures
