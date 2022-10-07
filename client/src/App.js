@@ -15,7 +15,7 @@ import ProfileSettings from './components/profile/ProfileSettings'
 import Browsing from './components/Browsing'
 import NavBar from './components/navbar/Navbar'
 import Footer from './components/Footer'
-import Redirect from './components/Redirect'
+import RedirectPage from './components/RedirectPage'
 import ConfirmMail from './components/login/ConfirmMail'
 import Chat from './components/chat/Chat'
 import Loader from './components/Loader'
@@ -24,6 +24,7 @@ import ChangePassword from './components/profile/ChangePassword'
 import Logout from './components/Logout'
 import DeleteUser from './components/profile/DeleteUser'
 import UserProfile from './components/Userprofile'
+import PathNotExists from './components/PathNotExists'
 import { changeOnlineUsers } from './reducers/onlineUsersReducer'
 import socketIO from 'socket.io-client';
 import "./css/App.css"
@@ -75,7 +76,7 @@ const App = () => {
 
 	return <div className='content-wrap'>
 		<Router>
-			<Redirect />
+			<RedirectPage />
 			<NavBar socket={socket} />
 			<Routes>
 				<Route path="/" element={<Profile />} />
@@ -93,6 +94,7 @@ const App = () => {
 				<Route path="/chat/:id" element={<Chat socket={socket} />} />
 				<Route path="/logout" element={<Logout socket={socket} />} />
 				<Route path="/deleteuser" element={<DeleteUser />} />
+				<Route path='*' element={<PathNotExists />} />
 			</Routes>
 		</Router>
 		<Footer />
