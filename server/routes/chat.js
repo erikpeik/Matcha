@@ -1,4 +1,24 @@
 module.exports = (pool, socketIO) => {
+	sendNotification = async (notification_id, notification, sender_id, target_id, redirect_address) => {
+
+		if (sender_id) {
+			var sql = `SELECT picture_data
+						FROM user_pictures WHERE user_id = $1 AND profile_pic = 'YES'`
+			const { rows } = await pool.query(sql, [sender_id])
+			var data = {
+				id: notification_id,
+				user_id: Number(target_id),
+				sender_id: sender_id,
+				text: notification,
+				redirect_path: redirect_address,
+				read: 'NO',
+				picture: rows[0]['picture_data'],
+				time_stamp: new Date()
+			}
+			socketIO.to(`notification-${target_id}`).emit('new_notification', data)
+		}
+	}
+
 	let users = []
 
 	socketIO.on('connection', (socket) => {
@@ -24,15 +44,19 @@ module.exports = (pool, socketIO) => {
 		})
 
 		socket.on('send_message', (data) => {
-			const sendToDatabase = (data) => {
+			const sendToDatabase = async (data) => {
 				var variables = [data.room, data.sender_id, data.text]
 				var sql = `INSERT INTO chat (connection_id, sender_id, message)
-				VALUES ($1, $2, $3)`
+							VALUES ($1, $2, $3)`
 				pool.query(sql, variables)
 
 				var notification = `You received a new message from ${data.name}`
-				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id) VALUES ($1,$2,$3,$4)`
-				pool.query(sql, [data.receiver_id, notification, '/chat', data.sender_id])
+				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id)
+							VALUES ($1,$2,$3,$4) RETURNING notification_id`
+				const {rows} = await pool.query(sql, [data.receiver_id, notification, '/chat', data.sender_id])
+
+				sendNotification(rows[0]['notification_id'], notification, data.sender_id,
+					data.receiver_id, `/chat/${data.room}`)
 			}
 			socketIO.in(`room-${data.room}`).emit('receive_message', data)
 			sendToDatabase(data)

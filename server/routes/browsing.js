@@ -1,5 +1,26 @@
 module.exports = (app, pool, transporter, socketIO) => {
 
+	sendNotification = async (request, notification_id, notification, target_id, redirect_address) => {
+		const sess = request.session
+
+		if (sess.userid) {
+			var sql = `SELECT picture_data
+						FROM user_pictures WHERE user_id = $1 AND profile_pic = 'YES'`
+			const { rows } = await pool.query(sql, [sess.userid])
+			var data = {
+				id: notification_id,
+				user_id: Number(target_id),
+				sender_id: sess.userid,
+				text: notification,
+				redirect_path: redirect_address,
+				read: 'NO',
+				picture: rows[0]['picture_data'],
+				time_stamp: new Date()
+			}
+			socketIO.to(`notification-${target_id}`).emit('new_notification', data)
+		}
+	}
+
 	app.post('/api/browsing/sorted', async (request, response) => {
 		const body = request.body
 		const sess = request.session
@@ -50,8 +71,7 @@ module.exports = (app, pool, transporter, socketIO) => {
 		if (sess.userid) {
 			console.log("Liking user...")
 			var sql = `SELECT picture_data FROM user_pictures
-						INNER JOIN users ON user_pictures.user_id = users.id
-						WHERE user_pictures.user_id = $1 AND user_pictures.profile_pic = 'YES'`
+						WHERE user_id = $1 AND profile_pic = 'YES'`
 			const { rows } = await pool.query(sql, [sess.userid])
 			if (rows[0] == undefined || rows[0]['picture_data'] === null || rows[0]['picture_data'] === 'http://localhost:3000/images/default_profilepic.jpeg') {
 				return response.send('No profile picture')
@@ -66,22 +86,6 @@ module.exports = (app, pool, transporter, socketIO) => {
 					var sql = `INSERT INTO likes (liker_id, target_id) VALUES ($1, $2)`
 					await pool.query(sql, [sess.userid, liked_person_id])
 
-					var notification = `You have been liked by user ${sess.username}`
-					var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id) VALUES ($1,$2,$3,$4) RETURNING notification_id`
-					var inserted_id = await pool.query(sql, [liked_person_id, notification, `/userprofile/${sess.userid}`, sess.userid])
-					// console.log('inserted_id: ', inserted_id)
-					var data = {
-						id: inserted_id.rows[0]['notification_id'],
-						user_id: Number(liked_person_id),
-						sender_id: sess.userid,
-						text: notification,
-						redirect_path: `/userprofile/${sess.userid}`,
-						read: 'NO',
-						picture: rows[0]['picture_data'],
-						time_stamp: new Date()
-					}
-					socketIO.to(`notification-${liked_person_id}`).emit('new_notification', data)
-
 					var sql = `UPDATE fame_rates SET like_pts = like_pts + 10, total_pts = total_pts + 10
 							WHERE user_id = $1 AND like_pts < 50 AND total_pts <= 90`
 					pool.query(sql, [liked_person_id])
@@ -94,17 +98,31 @@ module.exports = (app, pool, transporter, socketIO) => {
 					const oldConnections = await pool.query(sql, [sess.userid, liked_person_id])
 
 					if (reverseliked.rows.length !== 0 && oldConnections.rows.length === 0) {
-						var sql = `INSERT INTO connections (user1_id, user2_id) VALUES ($1, $2)`
-						await pool.query(sql, [sess.userid, liked_person_id])
+						var sql = `INSERT INTO connections (user1_id, user2_id) VALUES ($1, $2) RETURNING connection_id`
+						const room_id = await pool.query(sql, [sess.userid, liked_person_id])
+						console.log("ROOM ID:" , room_id)
 
 						var notification = `You have been liked back by user ${sess.username}!
 										You are now connected and are able to chat with each other.`
-						var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id) VALUES ($1,$2, $3, $4)`
-						pool.query(sql, [liked_person_id, notification, '/chat', sess.userid])
+						var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id)
+									VALUES ($1,$2, $3, $4) RETURNING notification_id`
+						const inserted_id = await pool.query(sql, [liked_person_id, notification, '/chat', sess.userid])
+
+						sendNotification(request, inserted_id.rows[0]['notification_id'], notification,
+							liked_person_id, `/chat/${room_id.rows[0]['connection_id']}`)
+
 						var sql = `UPDATE fame_rates SET connection_pts = connection_pts + 5, total_pts = total_pts + 5
 								WHERE (user_id = $1 AND connection_pts < 30 AND total_pts <= 95)
 								OR (user_id = $2 AND connection_pts < 30 AND total_pts <= 95)`
 						pool.query(sql, [liked_person_id, sess.userid])
+					} else {
+
+						var notification = `You have been liked by user ${sess.username}`
+						var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id) VALUES ($1,$2,$3,$4) RETURNING notification_id`
+						var inserted_id = await pool.query(sql, [liked_person_id, notification, `/userprofile/${sess.userid}`, sess.userid])
+
+						sendNotification(request, inserted_id.rows[0]['notification_id'], notification,
+							liked_person_id, `/userprofile/${sess.userid}`)
 					}
 				}
 				console.log("Liked user!")
@@ -130,8 +148,12 @@ module.exports = (app, pool, transporter, socketIO) => {
 			if (rows.length !== 0) {
 				var notification = `The user ${sess.username} just unliked you.
 					This means your connection has been lost and you can no longer chat with each other. :(`
-				var sql = `INSERT INTO notifications (user_id, notification_text, sender_id) VALUES ($1,$2,$3)`
-				pool.query(sql, [unliked_person_id, notification, sess.userid])
+				var sql = `INSERT INTO notifications (user_id, notification_text, sender_id) VALUES ($1,$2,$3)
+							RETURNING notification_id`
+				const inserted_id = await pool.query(sql, [unliked_person_id, notification, sess.userid])
+
+				sendNotification(request, inserted_id.rows[0]['notification_id'], notification,
+					unliked_person_id, null)
 			}
 
 			response.status(200).send("Unliked user!")
@@ -282,8 +304,12 @@ module.exports = (app, pool, transporter, socketIO) => {
 				pool.query(sql, [sess.userid, profile_id])
 
 				var notification = `The user ${sess.username} just checked your profile`
-				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id) VALUES ($1,$2, $3, $4)`
-				pool.query(sql, [profile_id, notification, `/userprofile/${sess.userid}`, sess.userid])
+				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id)
+							VALUES ($1,$2, $3, $4) RETURNING notification_id`
+				const inserted_id = await pool.query(sql, [profile_id, notification, `/userprofile/${sess.userid}`, sess.userid])
+
+				sendNotification(request, inserted_id.rows[0]['notification_id'], notification,
+					profile_id, `/userprofile/${sess.userid}`)
 
 				response.send(profileData)
 			} catch (error) {
