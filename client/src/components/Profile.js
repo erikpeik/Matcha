@@ -97,15 +97,15 @@ const Profile = () => {
 		'Tags:': profileData.tags.map((tag, i) => ((i ? ', ' : '') + tag)),
 		'Users who liked you:': profileData.likers.map((liker, i) => {
 			return (
-				<Typography key={i} onClick={() => navigate(`/userprofile/${liker.liker_id}`)}
-					component={Link} to={`/userprofile/${liker.liker_id}`}>
+				<Typography key={i} onClick={() => navigate(`/profile/${liker.liker_id}`)}
+					component={Link} to={`/profile/${liker.liker_id}`}>
 					{(i ? ', ' : '') + liker.username}
 				</Typography>)
 		}),
 		'Users who watched your profile:': profileData.watchers.map((watcher, i) => {
 			return (
-				<Typography key={i} onClick={() => navigate(`/userprofile/${watcher.watcher_id}`)}
-					component={Link} to={`/userprofile/${watcher.watcher_id}`}>
+				<Typography key={i} onClick={() => navigate(`/profile/${watcher.watcher_id}`)}
+					component={Link} to={`/profile/${watcher.watcher_id}`}>
 					{(i ? ', ' : '') + watcher.username}
 				</Typography>)
 		})

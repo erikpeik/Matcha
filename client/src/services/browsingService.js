@@ -37,7 +37,7 @@ const getAllTags = () => {
 }
 
 const getUserProfile = (id) => {
-	const request = axios.get(`${baseUrl}/userprofile/${id}`)
+	const request = axios.get(`${baseUrl}/profile/${id}`)
 	return request.then(response => response.data)
 }
 

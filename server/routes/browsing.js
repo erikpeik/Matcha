@@ -117,10 +117,10 @@ module.exports = (app, pool, transporter, socketIO) => {
 
 						var notification = `You have been liked by user ${sess.username}`
 						var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id) VALUES ($1,$2,$3,$4) RETURNING notification_id`
-						var inserted_id = await pool.query(sql, [liked_person_id, notification, `/userprofile/${sess.userid}`, sess.userid])
+						var inserted_id = await pool.query(sql, [liked_person_id, notification, `/profile/${sess.userid}`, sess.userid])
 
 						sendNotification(sess.userid, inserted_id.rows[0]['notification_id'], notification,
-							liked_person_id, `/userprofile/${sess.userid}`)
+							liked_person_id, `/profile/${sess.userid}`)
 					}
 				}
 				console.log("Liked user!")
@@ -263,7 +263,7 @@ module.exports = (app, pool, transporter, socketIO) => {
 		}
 	})
 
-	app.get('/api/browsing/userprofile/:id', async (request, response) => {
+	app.get('/api/browsing/profile/:id', async (request, response) => {
 		const sess = request.session
 
 		if (sess.userid) {
@@ -304,10 +304,10 @@ module.exports = (app, pool, transporter, socketIO) => {
 				var notification = `The user ${sess.username} just checked your profile`
 				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id)
 							VALUES ($1,$2, $3, $4) RETURNING notification_id`
-				const inserted_id = await pool.query(sql, [profile_id, notification, `/userprofile/${sess.userid}`, sess.userid])
+				const inserted_id = await pool.query(sql, [profile_id, notification, `/profile/${sess.userid}`, sess.userid])
 
 				sendNotification(sess.userid, inserted_id.rows[0]['notification_id'], notification,
-					profile_id, `/userprofile/${sess.userid}`)
+					profile_id, `/profile/${sess.userid}`)
 
 				response.send(profileData)
 			} catch (error) {

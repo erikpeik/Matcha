@@ -88,7 +88,7 @@ const App = () => {
 				<Route path="/changepassword" element={<ChangePassword />} />
 				<Route path="/confirm/:user/:code" element={<ConfirmMail />} />
 				<Route path="/profile" element={<Profile />} />
-				<Route path="/userprofile/:id" element={<UserProfile />} />
+				<Route path="/profile/:id" element={<UserProfile />} />
 				<Route path="/browsing" element={<Browsing />} />
 				<Route path="/chat" element={<Chat socket={socket} />} />
 				<Route path="/chat/:id" element={<Chat socket={socket} />} />

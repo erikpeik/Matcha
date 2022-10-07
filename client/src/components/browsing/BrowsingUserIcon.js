@@ -50,7 +50,7 @@ const BrowsingUserIcon = ({ user }) => {
 						key={user.id}
 						alt="profile_picture"
 						src={user.profile_pic}
-						onClick={() => navigate(`/userprofile/${user.id}`)}
+						onClick={() => navigate(`/profile/${user.id}`)}
 						sx={{ width: '200px', height: '200px', cursor: 'pointer' }}
 					/>
 				</StyledBadge>
@@ -64,7 +64,7 @@ const BrowsingUserIcon = ({ user }) => {
 					key={user.id}
 					alt="profile_picture"
 					src={user.profile_pic}
-					onClick={() => navigate(`/userprofile/${user.id}`)}
+					onClick={() => navigate(`/profile/${user.id}`)}
 					sx={{ width: '200px', height: '200px', cursor: 'pointer' }}
 				/>
 			</Box>
