@@ -107,6 +107,12 @@ const NotificationMenu = ({ socket }) => {
 		dispatch(setNotificationRead(id))
 	}
 
+	var notificationAmount
+	if (unreadNotifications.length !== 0)
+		notificationAmount = `${unreadNotifications.length} unread notifications`
+	else
+		notificationAmount = `no new notifications`
+
 	return (
 		<>
 			<Menu
@@ -120,7 +126,7 @@ const NotificationMenu = ({ socket }) => {
 				onClose={() => setAnchorElNotifications(null)}
 			>
 				<Box sx={{ p: '0 5px', maxHeight: 500, overflow: 'auto' }}>
-					{unreadNotifications.length} unread notifications
+					{notificationAmount}
 					{allNotifications.map((notification, i) => {
 						var is_read = notification.read
 						return (
