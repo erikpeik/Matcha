@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
-const Redirect = () => {
+const RedirectPage = () => {
 	const navigate = useNavigate()
 	const location = useLocation()
 	const user = useSelector(state => state.user)
@@ -26,4 +26,4 @@ const Redirect = () => {
 	}, [location, navigate, user])
 }
 
-export default Redirect
+export default RedirectPage
