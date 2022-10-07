@@ -103,31 +103,31 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 			return response.send("The allowed characters in tags are a-z, å, ä, ö and dash (-), and maximum length is 20 characters.")
 
 		try {
-			var sql = `UPDATE users SET username = $1, firstname = $2, lastname = $3, email = $4
+			let sql = `UPDATE users SET username = $1, firstname = $2, lastname = $3, email = $4
 						WHERE id = $5`
 			await pool.query(sql, [username, firstname, lastname, email, sess.userid])
 
-			var sql = `UPDATE user_settings
+			sql = `UPDATE user_settings
 						SET gender = $1, age = $2, user_location = $3, sexual_pref = $4,
 						biography = $5, ip_location = point($6,$7) WHERE user_id = $8`
 			await pool.query(sql, [gender, age, location, sexual_pref, biography, gps_lat, gps_lon, sess.userid])
 
 			sess.location = { x: gps_lat, y: gps_lon }
 
-			var sql = `UPDATE tags SET tagged_users = array_remove(tagged_users, $1)
+			sql = `UPDATE tags SET tagged_users = array_remove(tagged_users, $1)
 							WHERE (array[LOWER($2)] @> array[LOWER(tag_content)]::TEXT[]) IS NOT TRUE
 							RETURNING *`
 			await pool.query(sql, [sess.userid, tags])
 
-			tags.map(async (tagtext) => {
-				var sql = "SELECT * FROM tags WHERE LOWER(tag_content) = LOWER($1)"
+			await tags.map(async (tagtext) => {
+				sql = "SELECT * FROM tags WHERE LOWER(tag_content) = LOWER($1)"
 				var { rows } = await pool.query(sql, [tagtext])
 
 				if (rows.length === 0) {
-					var sql = `INSERT INTO tags (tag_content, tagged_users) VALUES (LOWER($2), array[$1]::INT[])`
+					sql = `INSERT INTO tags (tag_content, tagged_users) VALUES (LOWER($2), array[$1]::INT[])`
 					await pool.query(sql, [sess.userid, tagtext])
 				} else {
-					var sql = `UPDATE tags SET tagged_users = array_append(tagged_users, $1)
+					sql = `UPDATE tags SET tagged_users = array_append(tagged_users, $1)
 								WHERE LOWER(tag_content) = LOWER($2) AND (tagged_users @> array[$1]::INT[]) IS NOT TRUE`
 					await pool.query(sql, [sess.userid, tagtext])
 				}
@@ -135,7 +135,7 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 			var tagPoints = tags.length
 			if (tagPoints > 5)
 				tagPoints = 5
-			var sql = `UPDATE fame_rates SET total_pts = total_pts - tag_pts + $2, tag_pts = $2
+			sql = `UPDATE fame_rates SET total_pts = total_pts - tag_pts + $2, tag_pts = $2
 							WHERE user_id = $1 AND total_pts <= 95`
 			await pool.query(sql, [sess.userid, tagPoints])
 			response.send(true)

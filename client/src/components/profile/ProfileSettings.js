@@ -4,7 +4,7 @@ import { changeNotification, resetNotification } from '../../reducers/notificati
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import {
-	Typography, Button, Paper, TextField, FormControl, FormLabel, createTheme,
+	Typography, Button, Paper, TextField, FormControl, FormLabel, createTheme, Autocomplete, Chip,
 	RadioGroup, FormControlLabel, Radio, InputLabel, Select, MenuItem, TextareaAutosize, Box
 } from '@mui/material'
 import { Tooltip, IconButton } from '@mui/material'
@@ -16,31 +16,79 @@ import { changeSeverity } from '../../reducers/severityReducer'
 import profileService from '../../services/profileService'
 import Loader from '../Loader'
 import ProfileSetUpForm from './ProfileSetUpForm'
+import browsingService from '../../services/browsingService'
 
-export const TagsInput = ({ tags, setTags }) => {
+export const TagsInput = ({ tags, setTags, formerTags }) => {
+	const [menuTags, setMenuTags] = useState([])
+	const [inputValue, setInputValue] = useState('')
+	const [isLoading, setLoading] = useState(true)
 
-	const handleTagChange = (event) => {
-		if (event.key !== 'Enter' || event.target.value === '')
-			return
-		event.preventDefault()
-		setTags([...tags, event.target.value])
-		event.target.value = ''
+	useEffect(() => {
+		const getTags = async () => {
+			const allTags = await browsingService.getAllTags()
+			console.log("All tags: ", allTags)
+			setMenuTags(allTags)
+			setLoading(false)
+		}
+		getTags()
+	}, [])
+
+	if (isLoading) {
+		return <Loader />
 	}
 
-	const removeTag = (index) => {
-		setTags(tags.filter((tag, i) => i !== index))
+	// const handleTagChange = (event) => {
+	// 	if (event.key !== 'Enter' || event.target.value === '')
+	// 		return
+	// 	event.preventDefault()
+	// 	setTags([...tags, event.target.value])
+	// 	event.target.value = ''
+	// }
+
+	// const removeTag = (index) => {
+	// 	setTags(tags.filter((tag, i) => i !== index))
+	// }
+
+	const handleTagFilter = (value) => {
+		console.log(value)
+		setTags(value)
 	}
 
 	return (
-		<div className="tags-input-container">
-			{tags.map((tag, index) => (
-				<div className="tag-item" key={index}>
-					<span className="text">{tag}</span>
-					<span className="close" onClick={() => removeTag(index)}>&times;</span>
-				</div>
-			))}
-			<input onKeyDown={handleTagChange} type="text" className="tags-input" placeholder="Enter tag text" />
-		</div>
+		<>
+			<Autocomplete
+				multiple
+				id="tags-filled"
+				options={menuTags.map((tag) => tag.tag_content)}
+				onChange={(event, newValue) => handleTagFilter(newValue)}
+				onInputChange={(event, newValue) => setInputValue(newValue)}
+				defaultValue={formerTags}
+				inputValue={inputValue}
+				freeSolo
+				renderTags={(tags, getTagProps) =>
+					tags.map((tag, index) => (
+					  <Chip variant="outlined" label={tag} {...getTagProps({ index })} />
+					))
+				}
+				renderInput={(params) => (
+					<TextField
+						{...params}
+						variant="filled"
+						label="Tags"
+						placeholder="Tags"
+					/>
+				)}
+			/>
+			{/* <div className="tags-input-container">
+				{tags.map((tag, index) => (
+					<div className="tag-item" key={index}>
+						<span className="text">{tag}</span>
+						<span className="close" onClick={() => removeTag(index)}>&times;</span>
+					</div>
+				))}
+				<input onKeyDown={handleTagChange} type="text" className="tags-input" placeholder="Enter tag text" />
+			</div> */}
+		</>
 	)
 }
 
@@ -263,7 +311,7 @@ const ProfileSettings = () => {
 						placeholder='Short description of you here...'
 					/>
 					<FormLabel id='tags' >Tags</FormLabel>
-					<TagsInput tags={tags} setTags={setTags} />
+					<TagsInput tags={tags} setTags={setTags} formerTags={profileData.tags}/>
 					<Button type="submit" variant='contained' theme={theme}
 						size='large' sx={{ mt: 1 }}>
 						Save settings

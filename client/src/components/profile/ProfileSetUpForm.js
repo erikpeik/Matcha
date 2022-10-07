@@ -214,7 +214,7 @@ const ProfileSetUpForm = () => {
 						placeholder='Short description of you here...'
 						required
 					/>
-					<TagsInput tags={tags} setTags={setTagState} />
+					<TagsInput tags={tags} setTags={setTagState} formerTags={[]}/>
 					<Button type="submit" variant='contained' theme={theme}
 						size='large' sx={{ mt: 1 }}>
 						Save settings

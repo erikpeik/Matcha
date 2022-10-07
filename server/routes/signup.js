@@ -120,7 +120,6 @@ module.exports = function (app, pool, bcrypt, transporter) {
 				const getUserId = async () => {
 					var sql = "SELECT id FROM users WHERE username = $1";
 					const { rows } = await pool.query(sql, [username])
-					console.log("Id SQL result: " + rows[0]['id']);
 					return (rows[0]['id'])
 				}
 
