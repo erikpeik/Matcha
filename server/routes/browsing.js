@@ -1,16 +1,14 @@
 module.exports = (app, pool, transporter, socketIO) => {
 
-	sendNotification = async (request, notification_id, notification, target_id, redirect_address) => {
-		const sess = request.session
-
-		if (sess.userid) {
+	const sendNotification = async (userid, notification_id, notification, target_id, redirect_address) => {
+		if (userid) {
 			var sql = `SELECT picture_data
 						FROM user_pictures WHERE user_id = $1 AND profile_pic = 'YES'`
-			const { rows } = await pool.query(sql, [sess.userid])
+			const { rows } = await pool.query(sql, [userid])
 			var data = {
 				id: notification_id,
 				user_id: Number(target_id),
-				sender_id: sess.userid,
+				sender_id: userid,
 				text: notification,
 				redirect_path: redirect_address,
 				read: 'NO',
@@ -108,7 +106,7 @@ module.exports = (app, pool, transporter, socketIO) => {
 									VALUES ($1,$2, $3, $4) RETURNING notification_id`
 						const inserted_id = await pool.query(sql, [liked_person_id, notification, '/chat', sess.userid])
 
-						sendNotification(request, inserted_id.rows[0]['notification_id'], notification,
+						sendNotification(sess.userid, inserted_id.rows[0]['notification_id'], notification,
 							liked_person_id, `/chat/${room_id.rows[0]['connection_id']}`)
 
 						var sql = `UPDATE fame_rates SET connection_pts = connection_pts + 5, total_pts = total_pts + 5
@@ -121,7 +119,7 @@ module.exports = (app, pool, transporter, socketIO) => {
 						var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id) VALUES ($1,$2,$3,$4) RETURNING notification_id`
 						var inserted_id = await pool.query(sql, [liked_person_id, notification, `/userprofile/${sess.userid}`, sess.userid])
 
-						sendNotification(request, inserted_id.rows[0]['notification_id'], notification,
+						sendNotification(sess.userid, inserted_id.rows[0]['notification_id'], notification,
 							liked_person_id, `/userprofile/${sess.userid}`)
 					}
 				}
@@ -152,7 +150,7 @@ module.exports = (app, pool, transporter, socketIO) => {
 							RETURNING notification_id`
 				const inserted_id = await pool.query(sql, [unliked_person_id, notification, sess.userid])
 
-				sendNotification(request, inserted_id.rows[0]['notification_id'], notification,
+				sendNotification(sess.userid, inserted_id.rows[0]['notification_id'], notification,
 					unliked_person_id, null)
 			}
 
@@ -308,7 +306,7 @@ module.exports = (app, pool, transporter, socketIO) => {
 							VALUES ($1,$2, $3, $4) RETURNING notification_id`
 				const inserted_id = await pool.query(sql, [profile_id, notification, `/userprofile/${sess.userid}`, sess.userid])
 
-				sendNotification(request, inserted_id.rows[0]['notification_id'], notification,
+				sendNotification(sess.userid, inserted_id.rows[0]['notification_id'], notification,
 					profile_id, `/userprofile/${sess.userid}`)
 
 				response.send(profileData)
