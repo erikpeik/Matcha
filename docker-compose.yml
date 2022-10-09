@@ -22,7 +22,9 @@ services:
     build: ./client
     container_name: client_container
     environment:
-      NODE_PATH: src
+      - NODE_PATH=src
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
     ports:
       - 3000:3000
     volumes:
