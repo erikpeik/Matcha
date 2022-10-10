@@ -218,11 +218,11 @@ const UserProfile = () => {
 						</Typography>
 					</Grid>
 				</Grid>
-				<div id="other_pictures">
+				<Box>
 					{other_pictures.map((picture, i) =>
-						<img key={picture.picture_id} alt="random_picture" height="100px" src={picture.picture_data}></img>
+						<img key={picture.picture_id} alt="random_picture" height="200px" src={picture.picture_data}></img>
 					)}
-				</div>
+				</Box>
 			</Paper>
 			<Notification />
 		</Container>

@@ -113,10 +113,10 @@ const createUserSettings = async (id, gender) => {
 	await pool.query(sql, values)
 }
 
-const createFameRating = async (id) => {
+const createFameRating = async (id, tag_count) => {
 	let sql = `INSERT INTO fame_rates (user_id, setup_pts, picture_pts, tag_pts, like_pts, connection_pts, total_pts)
 		VALUES ($1,$2,$3,$4,$5,$6,$7)`
-	let values = [id, 5, 2, 5, 5, 5, 22]
+	let values = [id, 5, 2, tag_count, 0, 0, 7 + tag_count]
 	await pool.query(sql, values)
 }
 
@@ -139,6 +139,7 @@ const createTags = async (id) => {
 			await pool.query(sql, values)
 		}
 	}
+	return tag_count
 }
 
 const getImageUrl = async (picture) => {
@@ -162,11 +163,9 @@ const initUsers = async () => {
 		console.log("Creating user " + i)
 		let gender = gender_list.random()
 		let id = await createUser(gender)
-		await Promise.all([
-			await createUserSettings(id, gender),
-			await createFameRating(id),
-			await createTags(id),
-			await createPicture(id)
-		])
+		await createUserSettings(id, gender)
+		let tag_count = await createTags(id)
+		await createFameRating(id, tag_count)
+		await createPicture(id)
 	}
 }

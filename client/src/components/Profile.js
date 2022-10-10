@@ -87,8 +87,8 @@ const Profile = () => {
 
 	const ProfileData = {
 		'First name:': profileData.firstname,
-		'Email address:': profileData.email,
 		'Last name:': profileData.lastname,
+		'Email address:': profileData.email,
 		'Gender:': profileData.gender,
 		'Age:': profileData.age,
 		'Sexual preference:': profileData.sexual_pref,
