@@ -146,7 +146,7 @@ const RecommendedPreviews = ({ users, browsingCriteria }) => {
 									<Grid display='flex' sx={{ alignItems: 'center', justifyContent: 'center' }}>
 										<Typography
 											variant='h3'
-											onClick={() => navigate(`/userprofile/${user.id}`)}
+											onClick={() => navigate(`/profile/${user.id}`)}
 											sx={{ cursor: 'pointer' }}
 										>{user.username}</Typography>
 										<Grid item>{gender}</Grid>
