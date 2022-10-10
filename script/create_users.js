@@ -162,9 +162,11 @@ const initUsers = async () => {
 		console.log("Creating user " + i)
 		let gender = gender_list.random()
 		let id = await createUser(gender)
-		await createUserSettings(id, gender)
-		await createFameRating(id)
-		await createTags(id)
-		await createPicture(id)
+		await Promise.all([
+			await createUserSettings(id, gender),
+			await createFameRating(id),
+			await createTags(id),
+			await createPicture(id)
+		])
 	}
 }
