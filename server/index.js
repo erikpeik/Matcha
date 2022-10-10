@@ -3,7 +3,7 @@ const express = require('express')
 const app = express()
 app.use(express.json()) // needed to attach JSON data to POST body property
 // app.use(express.urlencoded()) // needed to attach urlencoded data to POST body property (deprecated)
-var morgan = require('morgan') // middleware to log requests
+// var morgan = require('morgan') // middleware to log requests
 var nodemailer = require('nodemailer'); // middleware to send e-mails
 const cors = require('cors') // Cross-origin resource sharing (CORS) middleware is required to allow requests from other origins
 const bcrypt = require("bcrypt") // For password hashing and comparing
@@ -17,10 +17,10 @@ app.use('/images', express.static('./images')) // to serve static files to path 
 app.use(session({ secret: 'matchac2r2p6', saveUninitialized: true, resave: true }));
 const http = require('http').Server(app)
 
-morgan.token('body', request => {
-	return JSON.stringify(request.body)
-})
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
+// morgan.token('body', request => {
+// 	return JSON.stringify(request.body)
+// })
+// app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 const socketIO = require('socket.io')(http, {
 	cors: {
