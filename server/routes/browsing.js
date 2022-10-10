@@ -5,6 +5,7 @@ module.exports = (app, pool, transporter, socketIO) => {
 			var sql = `SELECT picture_data
 						FROM user_pictures WHERE user_id = $1 AND profile_pic = 'YES'`
 			const { rows } = await pool.query(sql, [userid])
+			let picture = rows[0] ? rows[0]['picture_data'] : null
 			var data = {
 				id: notification_id,
 				user_id: Number(target_id),
@@ -12,7 +13,7 @@ module.exports = (app, pool, transporter, socketIO) => {
 				text: notification,
 				redirect_path: redirect_address,
 				read: 'NO',
-				picture: rows[0]['picture_data'],
+				picture,
 				time_stamp: new Date()
 			}
 			socketIO.to(`notification-${target_id}`).emit('new_notification', data)

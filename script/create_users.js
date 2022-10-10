@@ -14,6 +14,12 @@ function getRandomInt(min, max) {
 
 const users = []
 const gender_list = ["male", "female", "other"]
+const tags = []
+const tag_names = ["work", "dog", "music", "travel", "outdoors", "books",
+	"adventure", "food", "hiking", "sports", "gaming", "movies", "tv", "art",
+	"nature", "animals", "cars", "tech", "fashion", "beauty", "fitness",
+	"health", "science", "history", "politics", "religion", "philosophy",
+	"psychology", "education", "family", "friends"]
 
 const pool = new Pool({
 	user: 'matcha',
@@ -31,6 +37,7 @@ const connectToDatabase = () => {
 			setTimeout(connectToDatabase, 5000)
 		} else {
 			console.log('Connected to database')
+			initTags()
 			initUsers()
 				.then(() => {
 					console.log("User creating finished, you can close this window")
@@ -39,6 +46,24 @@ const connectToDatabase = () => {
 	})
 }
 connectToDatabase()
+
+const initTags = async () => {
+	for (let i = 0; i < tag_names.length; i++) {
+		let sql = `SELECT * FROM tags WHERE tag_content = LOWER($1)`
+		let values = [tag_names[i]]
+		let res = await pool.query(sql, values)
+		if (res.rows.length === 0) {
+			sql = `INSERT INTO tags (tag_content) VALUES (LOWER($1))`
+			values = [tag_names[i]]
+			await pool.query(sql, values)
+		}
+		let tag = {
+			tag_content: tag_names[i],
+			tagged_user: []
+		}
+		tags.push(tag)
+	}
+}
 
 const createUser = async (gender) => {
 	let firstname, lastname
@@ -99,13 +124,38 @@ const createUserSettings = async (id, gender) => {
 	return (res.rows[0])
 }
 
+const createFameRating = async (id) => {
+	let sql = `INSERT INTO fame_rates (user_id, setup_pts, picture_pts, tag_pts, like_pts, connection_pts, total_pts)
+		VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`
+	let values = [id, 5, 2, 5, 5, 5, 22]
+	let res = await pool.query(sql, values)
+	//	console.log(res.rows[0])
+	return (res.rows[0])
+}
+
+const createTags = async (id) => {
+	let tag_count = getRandomInt(1, 5)
+	let user_tags = []
+	for (let i = 0; i < tag_count; i++) {
+		let tag = tags.random()
+		while (user_tags.includes(tag)) {
+			tag = tags.random()
+		}
+		user_tags.push(tag)
+		tag.tagged_user.push(id)
+	}
+	console.log(tags)
+}
+
 const initUsers = async () => {
 	console.log("User creating started")
 
-	for (let i = 0; i < 500; i++) {
+	for (let i = 0; i < 50; i++) {
 		console.log("Creating user " + i)
 		let gender = gender_list.random()
 		let id = await createUser(gender)
 		await createUserSettings(id, gender)
+		await createFameRating(id)
+		await createTags(id)
 	}
 }
