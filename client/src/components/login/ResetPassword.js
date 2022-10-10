@@ -1,11 +1,14 @@
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { setNotification } from '../../reducers/notificationReducer'
 import { useParams, useNavigate } from 'react-router-dom'
 import signUpService from '../../services/signUpService'
 import { Container, Paper, TextField, Typography, Button } from '@mui/material'
 import { createTheme } from '@mui/material/styles'
-import { IconMailForward } from '@tabler/icons';
+import { IconMailForward } from '@tabler/icons'
 import Notification from '../Notification'
+import { changeNotification } from '../../reducers/notificationReducer'
+import { ReactComponent as HeartIcon } from '../../images/matcha_icon_with_heart.svg'
+import { changeSeverity } from '../../reducers/severityReducer'
 
 const imageStyle = {
 	width: '100px',
@@ -29,10 +32,9 @@ const theme = createTheme({
 export const SetNewPassword = () => {
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
-	const notification = useSelector(state => state.notification)
 	const params = useParams()
 
-	const sendNewPassword = (event) => {
+	const sendNewPassword = async (event) => {
 		event.preventDefault()
 
 		const passwords = {
@@ -44,27 +46,34 @@ export const SetNewPassword = () => {
 
 		signUpService.setNewPassword(passwords).then(result => {
 			if (result === true) {
-				dispatch(setNotification("Password successfully changed! Please log in.", 10))
-				// console.log(result)
+				dispatch(changeSeverity('success'))
+				dispatch(changeNotification("Password successfully changed! Please log in."))
 				navigate('/login')
 			} else {
-				dispatch(setNotification(result, 10))
-				console.log(result)
+				dispatch(changeSeverity('error'))
+				dispatch(changeNotification(result))
 			}
 		})
 	}
 
 	return (
 		<>
-			<h2>Set new password</h2>
-			<form onSubmit={sendNewPassword}>
-				<p>Please enter a new password:</p>
-				<br></br>
-				<div><input type="password" name="password" placeholder="Password" autoComplete="off" required></input></div>
-				<div><input type="password" name="confirm_password" placeholder="Confirm password" autoComplete="off" required></input></div>
-				<button type="submit">Reset password</button>
-			</form>
-			<p>{notification}</p>
+			<Container maxWidth='sm' sx={{ pt: 5, pb: 5 }}>
+				<Paper elevation={10} sx={{ padding: 3 }}>
+					<HeartIcon style={imageStyle} />
+					<Typography variant='h5' align='center'
+						sx={{ fontWeight: 550 }}>Set new password</Typography>
+					<Typography align='center'>Enter a new secure password for your account.</Typography>
+					<form onSubmit={sendNewPassword}>
+						<TextField type='password' fullWidth margin='dense' name="password"
+							label='New Password' placeholder="New password" required></TextField>
+						<TextField type='password' fullWidth margin='dense' name="confirm_password"
+							label='Confirm new password' placeholder="Confirm new password" required></TextField>
+						<Button type="submit" variant='contained' theme={theme} size='large' sx={{ mt: 1 }}>Submit</Button>
+					</form>
+					<Notification />
+				</Paper>
+			</Container>
 		</>
 	)
 }

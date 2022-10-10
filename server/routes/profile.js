@@ -119,6 +119,9 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 							RETURNING *`
 			await pool.query(sql, [sess.userid, tags])
 
+			sql = `DELETE FROM tags WHERE cardinality(tagged_users) = 0`
+			pool.query(sql)
+
 			await tags.map(async (tagtext) => {
 				sql = "SELECT * FROM tags WHERE LOWER(tag_content) = LOWER($1)"
 				var { rows } = await pool.query(sql, [tagtext])

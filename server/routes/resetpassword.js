@@ -16,14 +16,15 @@ module.exports = function (app, pool, bcrypt, transporter) {
 
 		const createResetCode = async (rows) => {
 			console.log("CREATING CODE!")
-			var code = await Math.floor(Math.random() * (900000) + 100000)
-			// const hashedCode = await bcrypt.hash(toString(code), 10)
+			let code = await Math.floor(Math.random() * (900000) + 100000)
+			let hashedCode = await bcrypt.hash(toString(code), 10)
+			let emailCode = hashedCode.replaceAll('/','-')
 
 			try {
 				var sql = `INSERT INTO password_reset (user_id, reset_code, expire_time)
 							VALUES ($1,$2,(CURRENT_TIMESTAMP + interval '30 minutes')) RETURNING *`;
-				await pool.query(sql, [rows[0]['id'], code])
-				const mailInfo = { username: rows[0]['username'], email: rows[0]['email'], code: code }
+				await pool.query(sql, [rows[0]['id'], emailCode])
+				const mailInfo = { username: rows[0]['username'], email: rows[0]['email'], code: emailCode }
 				return (mailInfo)
 			} catch (error) {
 				throw (error)
@@ -69,7 +70,7 @@ module.exports = function (app, pool, bcrypt, transporter) {
 			return response.send("The entered passwords are not the same!")
 		}
 		else if (!password.match(/(?=^.{8,30}$)(?=.*\d)(?=.*[!.@#$%^&*]+)(?=.*[A-Z])(?=.*[a-z]).*$/)) {
-			return response.send("PLEASE ENTER A PASSWORD WITH: </p><p> - a length between 8 and 30 characters </p><p> - at least one lowercase character (a-z) </p><p> - at least one uppercase character (A-Z) </p><p> - at least one numeric character (0-9) <br> at least one special character (!.@#$%^&*)")
+			return response.send("PLEASE ENTER A PASSWORD WITH: a length between 8 and 30 characters, at least one lowercase character (a-z), at least one uppercase character (A-Z), at least one numeric character (0-9) and at least one special character (!.@#$%^&*)")
 		}
 		else {
 			var sql = `SELECT * FROM password_reset
