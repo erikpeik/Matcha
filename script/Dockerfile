@@ -8,4 +8,4 @@ COPY package-lock.json ./
 COPY ./ ./
 
 RUN npm i
-CMD ["node", "create_users.js"]
+CMD ["npm", "run", "start"]

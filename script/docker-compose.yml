@@ -6,3 +6,8 @@ services:
     volumes:
       - ./:/app
     command: node create_users.js
+
+networks:
+  default:
+    name: matcha_default
+    external: true
