@@ -144,7 +144,12 @@ const createTags = async (id) => {
 		user_tags.push(tag)
 		tag.tagged_user.push(id)
 	}
-	console.log(tags)
+	for (let i = 0; i < tags.length; i++) {
+		let sql = `UPDATE tags SET tagged_users = array_append(tagged_users, $1)
+			WHERE LOWER(tag_content) = LOWER($2) AND (tagged_users @> array[$1]::INT[]) IS NOT TRUE`
+		let values = [id, tags[i].tag_content]
+		await pool.query(sql, values)
+	}
 }
 
 const initUsers = async () => {

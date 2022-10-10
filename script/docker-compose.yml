@@ -5,7 +5,8 @@ services:
     build: ./
     volumes:
       - ./:/app
-    command: node create_users.js
+      - /app/node_modules
+    command: npm run start
 
 networks:
   default:
