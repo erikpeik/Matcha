@@ -8,7 +8,8 @@ const ChatFooter = ({ socket, connections }) => {
 	const user = useSelector(state => state.user)
 
 	if (room === '') return null
-	const receiver_id = connections.find(user => user.connection_id === room).id
+	const receiver_user = connections.find(user => user.connection_id === room)
+	if (receiver_user === undefined) return null
 
 	const handleSendMessage = (e) => {
 		e.preventDefault()
@@ -16,7 +17,7 @@ const ChatFooter = ({ socket, connections }) => {
 			socket.emit('send_message', {
 				text: message,
 				sender_id: user.id,
-				receiver_id: receiver_id,
+				receiver_id: receiver_user.id,
 				name: user.name,
 				room: room,
 				key: `${user.id}-${room}-${Date.now()}`

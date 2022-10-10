@@ -1,5 +1,5 @@
 module.exports = (pool, socketIO) => {
-	sendNotification = async (notification_id, notification, sender_id, target_id, redirect_address) => {
+	const sendNotification = async (notification_id, notification, sender_id, target_id, redirect_address) => {
 		if (sender_id) {
 			var sql = `SELECT picture_data
 						FROM user_pictures WHERE user_id = $1 AND profile_pic = 'YES'`
@@ -43,9 +43,10 @@ module.exports = (pool, socketIO) => {
 			socket.leave(`room-${data.room}`);
 		})
 
-		socket.on('send_message', (data) => {
+		socket.on('send_message', async (data) => {
 			const sendToDatabase = async (data) => {
 				var variables = [data.room, data.sender_id, data.text]
+
 				var sql = `INSERT INTO chat (connection_id, sender_id, message)
 							VALUES ($1, $2, $3)`
 				pool.query(sql, variables)
@@ -53,14 +54,19 @@ module.exports = (pool, socketIO) => {
 				var notification = `You received a new message from ${data.name}`
 				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id)
 							VALUES ($1,$2,$3,$4) RETURNING notification_id`
-				const {rows} = await pool.query(sql, [data.receiver_id, notification,
-					`/chat/${data.room}`, data.sender_id])
+				const { rows } = await pool.query(sql, [data.receiver_id, notification,
+				`/chat/${data.room}`, data.sender_id])
 
 				sendNotification(rows[0]['notification_id'], notification, data.sender_id,
 					data.receiver_id, `/chat/${data.room}`)
 			}
-			socketIO.in(`room-${data.room}`).emit('receive_message', data)
-			sendToDatabase(data)
+			var sql = `SELECT * FROM connections WHERE connection_id = $1`
+			const connections = await pool.query(sql, [data.room])
+
+			if (connections.rows.length > 0) {
+				socketIO.in(`room-${data.room}`).emit('receive_message', data)
+				sendToDatabase(data)
+			}
 		})
 
 		socket.on('newUser', (data) => {

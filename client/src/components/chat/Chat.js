@@ -63,7 +63,7 @@ const Chat = ({ socket }) => {
 
 
 	useEffect(() => {
-		if (params.id && connections && room === '' && room !== params.id && params.id !== ''
+		if (params.id && connections && room !== params.id && params.id !== ''
 			&& connections.find(connection => connection.connection_id === Number(params.id))) {
 			console.log('joinin room:', params.id)
 			joinRoom(Number(params.id))
