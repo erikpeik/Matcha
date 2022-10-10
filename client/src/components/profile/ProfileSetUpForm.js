@@ -41,7 +41,6 @@ const ProfileSetUpForm = () => {
 
 	const getLocationData = async () => {
 		var locationData = await axios.get('https://ipapi.co/json')
-		console.log('LocationData from API', locationData.data)
 		var newGPSLocation = {
 			latitude: locationData.data.latitude,
 			longitude: locationData.data.longitude,
@@ -49,14 +48,11 @@ const ProfileSetUpForm = () => {
 		}
 
 		const result = await navigator.permissions.query({ name: "geolocation" });
-		console.log('Geolocation permission', result.state)
 
 		const successGeolocation = async (position) => {
 			newGPSLocation.latitude = position.coords.latitude
 			newGPSLocation.longitude = position.coords.longitude
-			console.log('GPS granted', position.coords)
 			var city_data = await axios.get(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&localityLanguage=en`)
-			console.log('City from location:', city_data.data)
 			newGPSLocation.location = `${city_data.data.city}, ${city_data.data.countryName}`
 			setGPSLocation(newGPSLocation)
 			setLoading(false)
@@ -105,8 +101,6 @@ const ProfileSetUpForm = () => {
 			tags: tags
 		}
 
-		console.log(ProfileSettings)
-
 		profileService.setUpProfile(ProfileSettings).then((result) => {
 			if (result === true) {
 				dispatch(changeSeverity('success'))
@@ -118,8 +112,6 @@ const ProfileSetUpForm = () => {
 				dispatch(changeNotification(result))
 			}
 		})
-
-		console.log("Profile Settings: ", ProfileSettings)
 	}
 
 	const imageStyle = {
@@ -224,7 +216,6 @@ const ProfileSetUpForm = () => {
 			</Paper>
 		</Container>
 	)
-
 }
 
 export default ProfileSetUpForm

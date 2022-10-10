@@ -19,8 +19,7 @@ const NotificationSnackbar = () => {
 
 	useEffect(() => {
 		if (notification !== '') {
-			setOpen(true);
-			console.log('notification', notification)
+			setOpen(true)
 		}
 	}, [notification])
 

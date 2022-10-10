@@ -14,14 +14,12 @@ const TagFilter = ({ setTagFilter, setDisplaySettings }) => {
 	useEffect(() => {
 		const getTags = async () => {
 			const allTags = await browsingService.getAllTags()
-			console.log("All tags: ", allTags)
 			setMenuTags(allTags)
 		}
 		getTags()
 	}, [])
 
 	const handleTagFilter = (value) => {
-		console.log(value)
 		setTagFilter(value)
 		dispatch(setDisplaySettings({ ...displaySettings, page: 1, offset: 0 }))
 	}

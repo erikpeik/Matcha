@@ -58,7 +58,6 @@ const Signup = () => {
 		signUpService.createUser(signedUpUser)
 			.then(result => {
 				if (result === true) {
-					console.log(result)
 					dispatch(changeSeverity('success'))
 					dispatch(changeNotification("User created successfully! Please check your inbox for confirmation e-mail."))
 					navigate('/login')

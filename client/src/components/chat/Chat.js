@@ -55,7 +55,6 @@ const Chat = ({ socket }) => {
 	useEffect(() => {
 		const getConnections = async () => {
 			const connections = await chatService.chat_connections()
-			console.log('connections:', connections)
 			setConnections(connections)
 		}
 		getConnections()
@@ -65,14 +64,12 @@ const Chat = ({ socket }) => {
 	useEffect(() => {
 		if (params.id && connections && room !== params.id && params.id !== ''
 			&& connections.find(connection => connection.connection_id === Number(params.id))) {
-			console.log('joinin room:', params.id)
 			joinRoom(Number(params.id))
 		}
 	}, [params.id, connections, room, joinRoom])
 
 	useEffect(() => {
 		socket.on('receive_message', (data) => {
-			console.log('message received:', data)
 			dispatch(addMessage(data))
 		})
 		return () => socket.off('receive_message')

@@ -28,7 +28,6 @@ module.exports = (app, pool, transporter, socketIO) => {
 			try {
 				const variables = [sess.userid, body.min_age, body.max_age, body.min_fame, body.max_fame,
 				sess.location.x, sess.location.y, body.min_distance, body.max_distance]
-				console.log("Variables: ", body, sess.location.x, sess.location.y)
 				var sql = `SELECT id, username, firstname, lastname, gender, age, sexual_pref,
 						biography, total_pts AS fame_rating, user_location, picture_data AS profile_pic,
 						blocker_id, target_id,
@@ -54,7 +53,6 @@ module.exports = (app, pool, transporter, socketIO) => {
 					}
 					rows[i].tags = tags
 				}
-				// console.log("Browsing Data To Show: ", rows)
 				response.send(rows)
 			} catch (error) {
 				response.send("Fetching users failed")
@@ -68,7 +66,6 @@ module.exports = (app, pool, transporter, socketIO) => {
 		const sess = request.session
 
 		if (sess.userid) {
-			console.log("Liking user...")
 			var sql = `SELECT picture_data FROM user_pictures
 						WHERE user_id = $1 AND profile_pic = 'YES'`
 			const { rows } = await pool.query(sql, [sess.userid])
@@ -99,7 +96,6 @@ module.exports = (app, pool, transporter, socketIO) => {
 					if (reverseliked.rows.length !== 0 && oldConnections.rows.length === 0) {
 						var sql = `INSERT INTO connections (user1_id, user2_id) VALUES ($1, $2) RETURNING connection_id`
 						const room_id = await pool.query(sql, [sess.userid, liked_person_id])
-						// console.log("ROOM ID:" , room_id)
 
 						var notification = `You have been liked back by user ${sess.username}!
 										You are now connected and are able to chat with each other.`
@@ -125,7 +121,6 @@ module.exports = (app, pool, transporter, socketIO) => {
 							liked_person_id, `/profile/${sess.userid}`)
 					}
 				}
-				console.log("Liked user!")
 				response.status(200).send("Liked user!")
 			}
 		}
@@ -273,12 +268,10 @@ module.exports = (app, pool, transporter, socketIO) => {
 		const sess = request.session
 		if (sess.userid) {
 			var sql = `SELECT target_id FROM likes WHERE liker_id = $1`
-			console.log("Getting likes...")
 			const likedusers = await pool.query(sql, [sess.userid])
 			const likedUserIds = likedusers.rows.map(user => user.target_id)
 
 			var sql = `SELECT user2_id FROM connections WHERE user1_id = $1`
-			console.log("Getting connections...")
 			var results1 = await pool.query(sql, [sess.userid])
 			var sql = `SELECT user1_id FROM connections WHERE user2_id = $1`
 			var results2 = await pool.query(sql, [sess.userid])
@@ -289,14 +282,12 @@ module.exports = (app, pool, transporter, socketIO) => {
 				else if (result.user2_id)
 					return (result.user2_id)
 			})
-
+ 
 			var sql = `SELECT target_id FROM blocks WHERE blocker_id = $1`
-			console.log("Getting blocks...")
 			const blockedusers = await pool.query(sql, [sess.userid])
 			const blockedUserIds = blockedusers.rows.map(user => user.target_id)
 
 			const userLists = { liked: likedUserIds, connected: connectedUserIds, blocked: blockedUserIds }
-			console.log("Userlists: ", userLists)
 			response.send(userLists)
 		}
 	})

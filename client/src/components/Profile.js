@@ -122,7 +122,6 @@ const Profile = () => {
 		if (window.confirm("Are you sure you want to delete this beautiful picture?")) {
 			await profileService.deletePicture(id)
 			dispatch(getProfileData())
-			console.log("Deleted image: ", id)
 		}
 	}
 

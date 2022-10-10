@@ -22,25 +22,18 @@ module.exports = (pool, socketIO) => {
 	let users = []
 
 	socketIO.on('connection', (socket) => {
-		console.log('socket connected:', socket.id);
+		console.log('socket connected:', socket.id)
 
 		socket.on('join_room', (data) => {
-			console.log('join_room', `room-${data.room}`);
-			socket.join(`room-${data.room}`);
+			socket.join(`room-${data.room}`)
 		})
 
 		socket.on('join_notification', (data) => {
-			console.log('join_notification', `notification-${data.id}`);
-			socket.join(`notification-${data.id}`);
+			socket.join(`notification-${data.id}`)
 		})
 
-		// socket.on('send_notification', (data) => {
-		// 	console.log('send_notification', `notification-${data.id}`);
-		// 	socketIO.to(`notification-${data.id}`).emit('new_notification', data)
-		// })
-
 		socket.on('leave_room', (data) => {
-			socket.leave(`room-${data.room}`);
+			socket.leave(`room-${data.room}`)
 		})
 
 		socket.on('send_message', async (data) => {
@@ -70,27 +63,22 @@ module.exports = (pool, socketIO) => {
 		})
 
 		socket.on('newUser', (data) => {
-			console.log("data:", data)
 			const userNames = users.map(user => user.name)
-			console.log("Usernames: ", userNames)
 			if (userNames.includes(data.name) === false) {
 				if (data.socketID) {
 					users.push(data)
 				}
 			}
-			console.log("users:", users)
 			socketIO.emit('newUserResponse', users)
 		})
 
 		socket.on('disconnect', () => {
-			console.log('socket disconnected: ', socket.id);
 			disconnected_user = users.filter(user => user.socketID === socket.id)
 			if (disconnected_user.length > 0) {
 				var sql = `UPDATE users SET last_connection = NOW()::timestamp WHERE id = $1`
 				pool.query(sql, [disconnected_user[0].id])
 			}
 			users = users.filter(user => user.socketID !== socket.id)
-			console.log('users:', users)
 			socketIO.emit('newUserResponse', users)
 			socket.disconnect()
 		})
@@ -102,12 +90,11 @@ module.exports = (pool, socketIO) => {
 				pool.query(sql, [logged_out_user[0].id])
 			}
 			users = users.filter(user => user.socketID !== data.socketID)
-			console.log("Logged out:", users)
 			socketIO.emit('newUserResponse', users)
 		})
 	})
 
 	socketIO.on("connect_error", (err) => {
-		console.log(`connect_error due to ${err.message}`);
+		console.log(`connect_error due to ${err.message}`)
 	})
 }

@@ -6,7 +6,6 @@ module.exports = function (app, pool, bcrypt, transporter) {
 		const findUserAccount = async () => {
 			var sql = "SELECT * FROM users WHERE username = $1 OR email = $1";
 			const { rows } = await pool.query(sql, [resetvalue])
-			console.log(rows)
 			if (rows.length === 0) {
 				throw ("User not found!")
 			} else {
@@ -15,7 +14,6 @@ module.exports = function (app, pool, bcrypt, transporter) {
 		}
 
 		const createResetCode = async (rows) => {
-			console.log("CREATING CODE!")
 			let code = await Math.floor(Math.random() * (900000) + 100000)
 			let hashedCode = await bcrypt.hash(toString(code), 10)
 			let emailCode = hashedCode.replaceAll('/','-')
@@ -32,8 +30,6 @@ module.exports = function (app, pool, bcrypt, transporter) {
 		}
 
 		const sendResetMail = async (mailInfo) => {
-			console.log("SENDING EMAIL!")
-
 			var mailOptions = {
 				from: process.env.EMAIL_ADDRESS,
 				to: mailInfo.email,

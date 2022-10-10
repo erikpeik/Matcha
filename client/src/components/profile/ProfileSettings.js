@@ -26,7 +26,6 @@ export const TagsInput = ({ tags, setTags, formerTags }) => {
 	useEffect(() => {
 		const getTags = async () => {
 			const allTags = await browsingService.getAllTags()
-			console.log("All tags: ", allTags)
 			setMenuTags(allTags)
 			setLoading(false)
 		}
@@ -37,20 +36,7 @@ export const TagsInput = ({ tags, setTags, formerTags }) => {
 		return <Loader />
 	}
 
-	// const handleTagChange = (event) => {
-	// 	if (event.key !== 'Enter' || event.target.value === '')
-	// 		return
-	// 	event.preventDefault()
-	// 	setTags([...tags, event.target.value])
-	// 	event.target.value = ''
-	// }
-
-	// const removeTag = (index) => {
-	// 	setTags(tags.filter((tag, i) => i !== index))
-	// }
-
 	const handleTagFilter = (value) => {
-		console.log(value)
 		setTags(value)
 	}
 
@@ -79,15 +65,6 @@ export const TagsInput = ({ tags, setTags, formerTags }) => {
 					/>
 				)}
 			/>
-			{/* <div className="tags-input-container">
-				{tags.map((tag, index) => (
-					<div className="tag-item" key={index}>
-						<span className="text">{tag}</span>
-						<span className="close" onClick={() => removeTag(index)}>&times;</span>
-					</div>
-				))}
-				<input onKeyDown={handleTagChange} type="text" className="tags-input" placeholder="Enter tag text" />
-			</div> */}
 		</>
 	)
 }
@@ -152,8 +129,6 @@ const ProfileSettings = () => {
 				dispatch(changeNotification(result))
 			}
 		})
-
-		console.log("Profile Settings: ", settings)
 	}
 
 	const imageStyle = {
@@ -201,7 +176,6 @@ const ProfileSettings = () => {
 
 	const handleLocationSearch = async () => {
 		var locationData = await axios.get('https://ipapi.co/json')
-		console.log(locationData.data)
 		var newGPSLocation = {
 			latitude: locationData.data.latitude,
 			longitude: locationData.data.longitude,
@@ -211,7 +185,6 @@ const ProfileSettings = () => {
 		const result = await navigator.permissions.query({ name: "geolocation" });
 		if (result.state === 'granted') {
 			await navigator.geolocation.getCurrentPosition(position => {
-				console.log(newGPSLocation)
 				changeSettings({
 					...settings,
 					location: newGPSLocation.location,
@@ -290,7 +263,7 @@ const ProfileSettings = () => {
 								<LocationSearchingIcon />
 							</IconButton>
 						</Tooltip>
-					</Box >
+					</Box>
 					<FormControl sx={{ mb: 2 }}>
 						<FormLabel id='sexual_pref'>Sexual Preference</FormLabel>
 						<RadioGroup row aria-labelledby='sexual_pref' name='sexual_pref' value={settings.sexual_pref} onChange={handleSexpref} >

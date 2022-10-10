@@ -9,7 +9,6 @@ module.exports = function (app, pool, bcrypt) {
 					WHERE username = $1 OR email = $1`;
 			const { rows } = await pool.query(sql, [username])
 			if (rows.length === 0) {
-				console.log("User not found!")
 				throw ("User not found!")
 			} else if (rows[0]['verified'] === 'NO') {
 				throw ("User account not yeat activated! Please check your inbox for confirmation email.")
@@ -20,8 +19,6 @@ module.exports = function (app, pool, bcrypt) {
 					sess.userid = rows[0]['id']
 					sess.username = rows[0]['username']
 					sess.location = rows[0]['ip_location']
-					console.log("Sess.location: ", sess.location)
-
 					return (sess)
 				} else
 					throw ("Wrong password!")
@@ -39,23 +36,18 @@ module.exports = function (app, pool, bcrypt) {
 
 	app.get('/api/login', (request, response) => {
 		var sess = request.session
-		if (sess.username && sess.userid) {
-			console.log("SESSION FOUND!", sess.username)
-			response.send({ name: sess.username, id: sess.userid });
-		}
-		else {
-			console.log("SESSION NOT FOUND!")
-			response.send('');
-		}
-	});
+		if (sess.username && sess.userid)
+			response.send({ name: sess.username, id: sess.userid })
+		else
+			response.send('')
+	})
 
 	app.get('/api/logout', (request, response) => {
 		request.session.destroy((err) => {
 			if (err) {
-				return console.log(err);
+				return console.log(err)
 			}
-			// console.log(sess)
-			response.end();
+			response.end()
 		});
 
 	});

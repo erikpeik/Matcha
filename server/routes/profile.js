@@ -166,7 +166,6 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 			return response.send("The old password is not correct!")
 		} else {
 			const hash = await bcrypt.hash(newPassword, 10);
-			console.log("Hashed password: " + hash)
 			try {
 				var sql = "UPDATE users SET password = $1 WHERE id = $2";
 				await pool.query(sql, [hash, sess.userid])
@@ -258,7 +257,6 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 					var oldImageData = rows[0]['picture_data']
 					if (oldImageData !== 'http://localhost:3000/images/default_profilepic.jpeg') {
 						const oldImage = path.resolve(__dirname, '../images') + oldImageData.replace('http://localhost:3000/images', '');
-						console.log(oldImage)
 						if (fs.existsSync(oldImage)) {
 							fs.unlink(oldImage, (err) => {
 								if (err) {
@@ -311,29 +309,6 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 			}
 		}
 	})
-
-	// BASE64 VERSION
-
-	// app.post('/api/profile/imageupload', upload.single('file'), async function (request, response) {
-	// 	const sess = request.session
-	// 	const encoded = request.file.buffer.toString('base64')
-	// 	console.log(encoded)
-
-	// 	var sql = `SELECT * FROM user_pictures
-	// 				INNER JOIN users ON users.id = user_pictures.user_id
-	// 				WHERE users.id = $1 AND user_pictures.profile_pic = 'YES'`
-	// 	var { rows } = await pool.query(sql, [sess.userid])
-
-	// 	if (rows.length === 0) {
-	// 		var sql = `INSERT INTO user_pictures (user_id, picture_data, profile_pic) VALUES ($1, $2, 'YES')`
-	// 		await pool.query(sql, [sess.userid, encoded])
-	// 	} else {
-	// 		var sql = `UPDATE user_pictures SET picture_data = $1
-	// 					WHERE user_id = $2 AND profile_pic = 'YES'`
-	// 		await pool.query(sql, [encoded, sess.userid])
-	// 	}
-	// 	response.send("Success uploading!")
-	// });
 
 	app.delete('/api/profile/deletepicture/:id', async (request, response) => {
 		const sess = request.session

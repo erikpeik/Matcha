@@ -26,7 +26,6 @@ const UserMenu = ({ user, socket }) => {
 		'Log Out': '/logout'
 	}
 
-	// console.log('profile_pic:', profile_pic)
 	if (user !== undefined && user !== '' && profile_pic !== undefined) {
 		return <>
 			<NotificationMenu socket={socket} />

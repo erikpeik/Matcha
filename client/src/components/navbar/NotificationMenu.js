@@ -92,13 +92,10 @@ const NotificationMenu = ({ socket }) => {
 
 	useEffect(() => {
 		socket.on('new_notification', (data) => {
-			console.log('new notification:', data)
 			dispatch(addUserNotification(data))
 		})
 		return () => socket.off('new_notification')
 	}, [socket, dispatch])
-	//	console.log('unreadNotifications', unreadNotifications)
-
 
 	const handleNotificationClick = (id, redirect_path) => {
 		if (redirect_path)

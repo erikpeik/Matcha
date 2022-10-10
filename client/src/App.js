@@ -44,7 +44,6 @@ const App = () => {
 
 		socket.on('connect', () => {
 			setSocketConnected(true)
-			console.log('user connected')
 		})
 		socket.on('newUserResponse', (data) => {
 			dispatch(changeOnlineUsers(data))

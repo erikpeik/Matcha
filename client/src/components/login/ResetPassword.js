@@ -85,7 +85,6 @@ const ResetPasswordForm = () => {
 
 	const sendPasswordMail = (event) => {
 		event.preventDefault()
-		console.log("Sending password reset mail!")
 
 		const resetInfo = {
 			resetvalue: event.target.reset.value
@@ -97,11 +96,9 @@ const ResetPasswordForm = () => {
 
 			if (result === true) {
 				dispatch(setNotification(message, 10))
-				console.log(result)
 				navigate('/login')
 			} else {
 				dispatch(setNotification(message, 10))
-				console.log(result)
 			}
 		})
 	}
