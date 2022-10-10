@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  script:
+    build: ./
+    volumes:
+      - ./:/app
+    command: node create_users.js
