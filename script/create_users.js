@@ -99,21 +99,14 @@ const createUserSettings = async (id, gender) => {
 	let sexual_pref = ["bisexual", "male", "female"].random()
 	let biography = faker.lorem.paragraph()
 	let coordinates = faker.address.nearbyGPSCoordinate([60.180929, 24.957521], 5000, true)
-	let city_data = await axios.get(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${coordinates[0]}&longitude=${coordinates[1]}&localityLanguage=en`)
-	let city = city_data.data.city
-	let country = city_data.data.countryName
+	let city_data = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinates[0]},${coordinates[1]}&key=${process.env.GOOGLE_API}`)
 	let user_location
-
-	if ((city !== '' && city !== undefined) && (country !== '' && country !== undefined)) {
-		user_location = `${city}, ${country}`
-	} else if ((city === '' || city === undefined) && (country !== '' && country !== undefined)) {
-		user_location = country
-	} else if (city_data.data.locality !== '' && city_data.data.locality !== undefined) {
-		user_location = city_data.data.locality
-	} else {
+	let length = city_data.data.results.length
+	if (city_data.data.results.length > 0)
+		user_location = city_data.data.results[length - 1].formatted_address
+	else
 		user_location = "Unknown"
-	}
-
+	console.log('user_location', user_location)
 	let ip_location = `(${coordinates[0]}, ${coordinates[1]})`
 	let sql = `INSERT INTO user_settings (user_id, gender, age, sexual_pref, biography, user_location, ip_location) VALUES ($1,$2,$3,$4,$5,$6,$7)`
 	let values = [id, gender, age, sexual_pref, biography, user_location, ip_location]
@@ -148,10 +141,17 @@ const createTags = async (id) => {
 	}
 }
 
+const getImageUrl = async (picture) => {
+	const image = await axios.get(picture)
+	const image_url = image.request.res.responseUrl
+	return (image_url)
+}
+
 const createPicture = async (id) => {
 	let picture = faker.image.cats(640, 640, true)
+	let image = await getImageUrl(picture)
 	let sql = `INSERT INTO user_pictures (user_id, picture_data, profile_pic) VALUES ($1,$2,'YES')`
-	let values = [id, picture]
+	let values = [id, image]
 	await pool.query(sql, values)
 }
 
