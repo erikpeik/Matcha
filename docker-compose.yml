@@ -63,3 +63,7 @@ services:
       - ./db/servers.json:/pgadmin4/servers.json
     logging:
       driver: none
+
+networks:
+  default:
+    name: 'matcha_network'

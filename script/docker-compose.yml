@@ -10,5 +10,5 @@ services:
 
 networks:
   default:
-    name: matcha_default
+    name: matcha_network
     external: true

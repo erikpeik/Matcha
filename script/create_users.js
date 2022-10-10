@@ -19,7 +19,7 @@ const tag_names = ["work", "dog", "music", "travel", "outdoors", "books",
 	"adventure", "food", "hiking", "sports", "gaming", "movies", "tv", "art",
 	"nature", "animals", "cars", "tech", "fashion", "beauty", "fitness",
 	"health", "science", "history", "politics", "religion", "philosophy",
-	"psychology", "education", "family", "friends"]
+	"psychology", "education", "family", "friends", "cats"]
 
 const pool = new Pool({
 	user: 'matcha',
@@ -84,14 +84,13 @@ const createUser = async (gender) => {
 		firstname,
 		lastname,
 		email,
-		password: "$2b$10$7yu6NkhTEk/uCAsXjlAS2OqpDQ2mSP0WQCNtKK97hCDDC12xB/PPa",
+		password: "$2b$10$7yu6NkhTEk/uCAsXjlAS2OqpDQ2mSP0WQCNtKK97hCDDC12xB/PPa", // password: Matcha1!
 		verified: "YES"
 	}
 	users.push(user)
 	let sql = `INSERT INTO users (username, firstname, lastname, email, password, verified) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`
 	let values = [user.username, user.firstname, user.lastname, user.email, user.password, user.verified]
 	let res = await pool.query(sql, values)
-	// console.log(res.rows[0])
 	return (res.rows[0].id)
 }
 
@@ -114,23 +113,18 @@ const createUserSettings = async (id, gender) => {
 	} else {
 		user_location = "Unknown"
 	}
-	//	console.log(`${city}, ${country} = ${user_location}`)
 
 	let ip_location = `(${coordinates[0]}, ${coordinates[1]})`
-	let sql = `INSERT INTO user_settings (user_id, gender, age, sexual_pref, biography, user_location, ip_location) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`
+	let sql = `INSERT INTO user_settings (user_id, gender, age, sexual_pref, biography, user_location, ip_location) VALUES ($1,$2,$3,$4,$5,$6,$7)`
 	let values = [id, gender, age, sexual_pref, biography, user_location, ip_location]
-	let res = await pool.query(sql, values)
-	//	console.log(res.rows[0])
-	return (res.rows[0])
+	await pool.query(sql, values)
 }
 
 const createFameRating = async (id) => {
 	let sql = `INSERT INTO fame_rates (user_id, setup_pts, picture_pts, tag_pts, like_pts, connection_pts, total_pts)
-		VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`
+		VALUES ($1,$2,$3,$4,$5,$6,$7)`
 	let values = [id, 5, 2, 5, 5, 5, 22]
-	let res = await pool.query(sql, values)
-	//	console.log(res.rows[0])
-	return (res.rows[0])
+	await pool.query(sql, values)
 }
 
 const createTags = async (id) => {
@@ -154,15 +148,23 @@ const createTags = async (id) => {
 	}
 }
 
+const createPicture = async (id) => {
+	let picture = faker.image.cats(640, 640, true)
+	let sql = `INSERT INTO user_pictures (user_id, picture_data, profile_pic) VALUES ($1,$2,'YES')`
+	let values = [id, picture]
+	await pool.query(sql, values)
+}
+
 const initUsers = async () => {
 	console.log("User creating started")
 
-	for (let i = 0; i < 100; i++) {
+	for (let i = 0; i < 500; i++) {
 		console.log("Creating user " + i)
 		let gender = gender_list.random()
 		let id = await createUser(gender)
 		await createUserSettings(id, gender)
 		await createFameRating(id)
 		await createTags(id)
+		await createPicture(id)
 	}
 }
