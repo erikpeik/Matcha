@@ -96,7 +96,7 @@ export const RecommendedUsers = ({ users, browsingCriteria }) => {
 
 	let filters = { nameFilter: null, locationFilter: null, tagFilter: null }
 	const filteredUsers = filterUsers(users, filters, profileData)
-	const nearUsers = filteredUsers.filter(user => user.distance < 5500)
+	const nearUsers = filteredUsers.filter(user => user.distance < 300)
 	const commonTagUsers = nearUsers.filter(user => user.common_tags > 0)
 
 	let sortedUsers
@@ -174,7 +174,7 @@ const Browsing = () => {
 		dispatch(resetNotification())
 		const getUsers = async () => {
 			const allUsers = await browsingService.getUsers(browsingCriteria)
-			if (allUsers !== "Fetching users failed") {
+			if (allUsers && allUsers !== "Fetching users failed") {
 				setUsers(allUsers)
 				setLoading(false);
 			} else {
@@ -187,7 +187,7 @@ const Browsing = () => {
 		getUsers()
 	}, [dispatch, navigate, browsingCriteria])
 
-	if (isLoading) {
+	if (isLoading || !profileData) {
 		return <Loader />
 	}
 
