@@ -60,9 +60,6 @@ const NotificationBadge = ({ is_read, picture }) => {
 			/>
 		)
 	}
-	// const BaseAvatar = () => {
-	// 	return (<Avatar />)
-	// }
 	if (is_read === "NO") {
 		return (
 			<Badge
