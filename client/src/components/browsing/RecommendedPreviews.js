@@ -113,20 +113,20 @@ const RecommendedPreviews = ({ users, browsingCriteria }) => {
 			if (user.gender === 'male') {
 				gender = <MaleIcon sx={{
 					ml: 1,
-					fontSize: '60px',
+					fontSize: '200%',
 					color: '#89CFF0',
 					filter: 'drop-shadow(0 2px 1px rgb(31, 73, 102))'
 				}} />
 			} else if (user.gender === 'female') {
 				gender = <FemaleIcon sx={{
 					ml: 1,
-					fontSize: '60px',
+					fontSize: '200%',
 					color: '#FF7779',
 					filter: 'drop-shadow(0 2px 1px rgb(184, 84, 86))'
 				}} />
 			} else {
 				gender = <FontAwesomeIcon icon={faGenderless} style={{
-					fontSize: '50px',
+					fontSize: '200%',
 					marginLeft: '15px',
 					color: '#d859ff',
 					filter: 'drop-shadow(0 2px 1px rgb(125, 52, 148))'
@@ -136,8 +136,8 @@ const RecommendedPreviews = ({ users, browsingCriteria }) => {
 				return (<div key="emptyusers"></div>)
 			} else
 				return (
-					<Paper key={`profile_container${user.id}`} sx={{ backgroundColor: '#F1F1F1', mb: 1, mr: 1, width: 350 }}>
-						<Grid container display='flex' sx={{ alignItems: 'center', justifyContent: 'center', width: 350 }}>
+					<Paper key={`profile_container${user.id}`} sx={{ backgroundColor: '#F1F1F1', mb: 1, mr: 1, width: '100%' }}>
+						<Grid container display='flex' sx={{ alignItems: 'center', justifyContent: 'center', width: '100%' }}>
 							<Grid item>
 								<BrowsingUserIcon user={user} />
 							</Grid>
@@ -147,7 +147,7 @@ const RecommendedPreviews = ({ users, browsingCriteria }) => {
 										<Typography
 											variant='h3'
 											onClick={() => navigate(`/profile/${user.id}`)}
-											sx={{ cursor: 'pointer' }}
+											sx={{ cursor: 'pointer', fontSize: '150%' }}
 										>{user.username}</Typography>
 										<Grid item>{gender}</Grid>
 									</Grid>
@@ -168,7 +168,7 @@ const RecommendedPreviews = ({ users, browsingCriteria }) => {
 									<Box sx={{ ml: 1 }}>
 										<Grid display='flex' sx={{ alignItems: 'center' }}>
 											<WcIcon sx={{ color: 'gray', mr: 1 }} />
-											<Typography sx={{ fontWeight: 550 }}>{user.sexual_pref}</Typography>
+											<Typography sx={{ fontWeight: 550 }}>Preference: {user.sexual_pref}</Typography>
 										</Grid>
 										<Grid display='flex' sx={{ alignItems: 'center' }}>
 											<LocationOnIcon sx={{ color: 'gray', mr: 1 }} />

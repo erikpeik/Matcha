@@ -96,7 +96,7 @@ export const RecommendedUsers = ({ users, browsingCriteria }) => {
 
 	let filters = { nameFilter: null, locationFilter: null, tagFilter: null }
 	const filteredUsers = filterUsers(users, filters, profileData)
-	const nearUsers = filteredUsers.filter(user => user.distance < 300)
+	const nearUsers = filteredUsers.filter(user => user.distance < 1000)
 	const commonTagUsers = nearUsers.filter(user => user.common_tags > 0)
 
 	let sortedUsers

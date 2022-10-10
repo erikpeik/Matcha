@@ -41,7 +41,7 @@ module.exports = (app, pool, transporter, socketIO) => {
 						LEFT JOIN blocks ON (users.id = blocks.target_id AND blocks.blocker_id = $1) OR
 											(users.id = blocks.blocker_id AND blocks.target_id = $1)
 						WHERE users.id != $1 AND users.verified = 'YES' AND blocker_id IS NULL AND target_id IS NULL
-						AND age BETWEEN $2 and $3 AND fame_rating BETWEEN $4 AND $5
+						AND age BETWEEN $2 and $3 AND total_pts BETWEEN $4 AND $5
 						AND calculate_distance($6, $7, ip_location[0], ip_location[1], 'K') BETWEEN $8 and $9
 						ORDER BY username`;
 				var { rows } = await pool.query(sql, variables)
@@ -86,7 +86,7 @@ module.exports = (app, pool, transporter, socketIO) => {
 					await pool.query(sql, [sess.userid, liked_person_id])
 
 					var sql = `UPDATE fame_rates SET like_pts = like_pts + 10, total_pts = total_pts + 10
-							WHERE user_id = $1 AND like_pts < 50 AND total_pts <= 90`
+							WHERE user_id = $1 AND like_pts <= 40 AND total_pts <= 90`
 					pool.query(sql, [liked_person_id])
 
 					var sql = `SELECT * FROM likes WHERE liker_id = $2 AND target_id = $1`
@@ -99,20 +99,21 @@ module.exports = (app, pool, transporter, socketIO) => {
 					if (reverseliked.rows.length !== 0 && oldConnections.rows.length === 0) {
 						var sql = `INSERT INTO connections (user1_id, user2_id) VALUES ($1, $2) RETURNING connection_id`
 						const room_id = await pool.query(sql, [sess.userid, liked_person_id])
-						console.log("ROOM ID:" , room_id)
+						// console.log("ROOM ID:" , room_id)
 
 						var notification = `You have been liked back by user ${sess.username}!
 										You are now connected and are able to chat with each other.`
 						var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id)
 									VALUES ($1,$2, $3, $4) RETURNING notification_id`
-						const inserted_id = await pool.query(sql, [liked_person_id, notification, '/chat', sess.userid])
+						const inserted_id = await pool.query(sql, [liked_person_id, notification,
+							`/chat/${room_id.rows[0]['connection_id']}`, sess.userid])
 
 						sendNotification(sess.userid, inserted_id.rows[0]['notification_id'], notification,
 							liked_person_id, `/chat/${room_id.rows[0]['connection_id']}`)
 
 						var sql = `UPDATE fame_rates SET connection_pts = connection_pts + 5, total_pts = total_pts + 5
-								WHERE (user_id = $1 AND connection_pts < 30 AND total_pts <= 95)
-								OR (user_id = $2 AND connection_pts < 30 AND total_pts <= 95)`
+								WHERE (user_id = $1 AND connection_pts <= 25 )
+								OR (user_id = $2 AND connection_pts <= 25)`
 						pool.query(sql, [liked_person_id, sess.userid])
 					} else {
 
@@ -136,10 +137,19 @@ module.exports = (app, pool, transporter, socketIO) => {
 		if (sess.userid) {
 			const unliked_person_id = request.params.id
 
-			var sql = `DELETE FROM likes WHERE liker_id = $1 AND target_id = $2`
+			let sql = `DELETE FROM likes WHERE liker_id = $1 AND target_id = $2`
 			await pool.query(sql, [sess.userid, unliked_person_id])
 
-			var sql = `DELETE FROM connections
+			sql = `SELECT * FROM likes WHERE target_id = $1`
+			const likes = await pool.query(sql, [unliked_person_id])
+
+			if (likes.rows.length < 5) {
+				sql = `UPDATE fame_rates SET like_pts = like_pts - 10, total_pts = total_pts - 10
+						WHERE user_id = $1`
+				await pool.query(sql, [unliked_person_id])
+			}
+
+			sql = `DELETE FROM connections
 					WHERE (user1_id = $1 AND user2_id = $2) OR (user1_id = $2 AND user2_id = $1)
 					RETURNING *`
 			const { rows } = await pool.query(sql, [sess.userid, unliked_person_id])
@@ -147,12 +157,21 @@ module.exports = (app, pool, transporter, socketIO) => {
 			if (rows.length !== 0) {
 				var notification = `The user ${sess.username} just unliked you.
 					This means your connection has been lost and you can no longer chat with each other. :(`
-				var sql = `INSERT INTO notifications (user_id, notification_text, sender_id) VALUES ($1,$2,$3)
+				sql = `INSERT INTO notifications (user_id, notification_text, sender_id) VALUES ($1,$2,$3)
 							RETURNING notification_id`
 				const inserted_id = await pool.query(sql, [unliked_person_id, notification, sess.userid])
 
 				sendNotification(sess.userid, inserted_id.rows[0]['notification_id'], notification,
 					unliked_person_id, null)
+
+				sql = `SELECT * FROM connections WHERE user1_id = $1 OR user2_id = $1`
+				const connections = await pool.query(sql, [unliked_person_id])
+
+				if (connections.rows.length < 6) {
+					sql = `UPDATE fame_rates SET connection_pts = connection_pts - 5, total_pts = total_pts - 5
+								WHERE user_id = $1`
+					await pool.query(sql, [unliked_person_id])
+				}
 			}
 
 			response.status(200).send("Unliked user!")
@@ -165,15 +184,33 @@ module.exports = (app, pool, transporter, socketIO) => {
 		if (sess.userid) {
 			const blocked_person_id = request.params.id
 
-			var sql = `INSERT INTO blocks (blocker_id, target_id) VALUES ($1, $2)`
+			let sql = `INSERT INTO blocks (blocker_id, target_id) VALUES ($1, $2)`
 			await pool.query(sql, [sess.userid, blocked_person_id])
 
-			var sql = `DELETE FROM likes WHERE (liker_id = $1 AND target_id = $2) OR (liker_id = $2 AND target_id = $1)`
+			sql = `DELETE FROM likes WHERE (liker_id = $1 AND target_id = $2) OR (liker_id = $2 AND target_id = $1)`
 			await pool.query(sql, [sess.userid, blocked_person_id])
 
-			var sql = `DELETE FROM connections
+			sql = `SELECT * FROM likes WHERE target_id = $1`
+			const likes = await pool.query(sql, [unliked_person_id])
+
+			if (likes.rows.length < 5) {
+				sql = `UPDATE fame_rates SET like_pts = like_pts - 10, total_pts = total_pts - 10
+						WHERE user_id = $1`
+				await pool.query(sql, [unliked_person_id])
+			}
+
+			sql = `DELETE FROM connections
 					WHERE (user1_id = $1 AND user2_id = $2) OR (user1_id = $2 AND user2_id = $1)`
 			await pool.query(sql, [sess.userid, blocked_person_id])
+
+			sql = `SELECT * FROM connections WHERE user1_id = $1 OR user2_id = $1`
+			const connections = await pool.query(sql, [unliked_person_id])
+
+			if (connections.rows.length < 6) {
+				sql = `UPDATE fame_rates SET connection_pts = connection_pts - 5, total_pts = total_pts - 5
+								WHERE user_id = $1`
+				await pool.query(sql, [unliked_person_id])
+			}
 
 			response.status(200).send("Blocked user!")
 		}

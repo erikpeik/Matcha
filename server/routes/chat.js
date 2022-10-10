@@ -53,7 +53,8 @@ module.exports = (pool, socketIO) => {
 				var notification = `You received a new message from ${data.name}`
 				var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id)
 							VALUES ($1,$2,$3,$4) RETURNING notification_id`
-				const {rows} = await pool.query(sql, [data.receiver_id, notification, '/chat', data.sender_id])
+				const {rows} = await pool.query(sql, [data.receiver_id, notification,
+					`/chat/${data.room}`, data.sender_id])
 
 				sendNotification(rows[0]['notification_id'], notification, data.sender_id,
 					data.receiver_id, `/chat/${data.room}`)

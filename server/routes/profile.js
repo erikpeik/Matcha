@@ -139,7 +139,7 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 			if (tagPoints > 5)
 				tagPoints = 5
 			sql = `UPDATE fame_rates SET total_pts = total_pts - tag_pts + $2, tag_pts = $2
-							WHERE user_id = $1 AND total_pts <= 95`
+							WHERE user_id = $1`
 			await pool.query(sql, [sess.userid, tagPoints])
 			response.send(true)
 		} catch (error) {
@@ -210,6 +210,13 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 				if (other_pictures.rows) {
 					profileData.other_pictures = other_pictures.rows
 				}
+
+				var sql = `SELECT target_id, username
+						FROM likes INNER JOIN users on likes.target_id = users.id
+						WHERE liker_id = $1
+						GROUP BY target_id, username`
+				const liked = await pool.query(sql, [sess.userid])
+				profileData.liked = liked.rows
 
 				var sql = `SELECT watcher_id, username
 						FROM watches INNER JOIN users on watches.watcher_id = users.id

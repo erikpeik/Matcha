@@ -96,7 +96,7 @@ const UserProfile = () => {
 		'Age:': userData.age,
 		'Sexual preference:': userData.sexual_pref,
 		'Location:': userData.user_location,
-		'Tags:': userData.tags.map(tag => tag + ', ')
+		'Tags:': userData.tags.map((tag, i) => ((i ? ', ' : '') + tag))
 	}
 
 	const likeUser = async (user_id) => {

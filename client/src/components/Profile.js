@@ -95,16 +95,23 @@ const Profile = () => {
 		'Location:': profileData.user_location,
 		'GPS:': Object.values(profileData.ip_location).map((value, i) => ((i ? ', ' : '') + value)),
 		'Tags:': profileData.tags.map((tag, i) => ((i ? ', ' : '') + tag)),
+		'Users you have liked:': profileData.liked.map((liked, i) => {
+			return (
+				<Typography key={i}
+					component={Link} to={`/profile/${liked.target_id}`}>
+					{(i ? ', ' : '') + liked.username}
+				</Typography>)
+		}),
 		'Users who liked you:': profileData.likers.map((liker, i) => {
 			return (
-				<Typography key={i} onClick={() => navigate(`/profile/${liker.liker_id}`)}
+				<Typography key={i}
 					component={Link} to={`/profile/${liker.liker_id}`}>
 					{(i ? ', ' : '') + liker.username}
 				</Typography>)
 		}),
 		'Users who watched your profile:': profileData.watchers.map((watcher, i) => {
 			return (
-				<Typography key={i} onClick={() => navigate(`/profile/${watcher.watcher_id}`)}
+				<Typography key={i}
 					component={Link} to={`/profile/${watcher.watcher_id}`}>
 					{(i ? ', ' : '') + watcher.username}
 				</Typography>)

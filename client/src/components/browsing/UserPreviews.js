@@ -111,20 +111,20 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 			if (user.gender === 'male') {
 				gender = <MaleIcon sx={{
 					ml: 1,
-					fontSize: '60px',
+					fontSize: '200%',
 					color: '#89CFF0',
 					filter: 'drop-shadow(0 2px 1px rgb(31, 73, 102))'
 				}} />
 			} else if (user.gender === 'female') {
 				gender = <FemaleIcon sx={{
 					ml: 1,
-					fontSize: '60px',
+					fontSize: '200%',
 					color: '#FF7779',
 					filter: 'drop-shadow(0 2px 1px rgb(184, 84, 86))'
 				}} />
 			} else {
 				gender = <FontAwesomeIcon icon={faGenderless} style={{
-					fontSize: '50px',
+					fontSize: '200%',
 					marginLeft: '15px',
 					color: '#d859ff',
 					filter: 'drop-shadow(0 2px 1px rgb(125, 52, 148))'
@@ -145,7 +145,7 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 										<Typography
 											variant='h3'
 											onClick={() => navigate(`/profile/${user.id}`)}
-											sx={{ cursor: 'pointer' }}
+											sx={{ cursor: 'pointer', fontSize: '150%' }}
 										>{user.username}</Typography>
 										<Grid item>{gender}</Grid>
 									</Grid>
