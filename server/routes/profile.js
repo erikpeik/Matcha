@@ -182,7 +182,7 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 			try {
 				var sql = `SELECT * FROM users
 						INNER JOIN user_settings ON users.id = user_settings.user_id
-						INNER JOIN fame_rates ON users.id = fame_rates.user_id
+						LEFT JOIN fame_rates ON users.id = fame_rates.user_id
 						WHERE users.id = $1`
 				var { rows } = await pool.query(sql, [sess.userid])
 				const { password: removed_password, ...profileData } = rows[0]
