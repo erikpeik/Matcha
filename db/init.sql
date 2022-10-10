@@ -41,7 +41,6 @@ CREATE TABLE IF NOT EXISTS users (
 	email VARCHAR(255) NOT NULL,
 	password VARCHAR(255) NOT NULL,
 	verified enum_yesno DEFAULT 'NO',
-	online enum_yesno DEFAULT 'NO',
 	last_connection TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
