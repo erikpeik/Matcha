@@ -233,6 +233,8 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 			} catch (error) {
 				response.send(false)
 			}
+		} else {
+			response.send(false)
 		}
 	})
 
@@ -354,6 +356,8 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 				console.log(error)
 				response.send(false)
 			}
+		} else {
+			response.send(false)
 		}
 	})
 

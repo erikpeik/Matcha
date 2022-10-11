@@ -298,6 +298,8 @@ module.exports = (app, pool, transporter, socketIO) => {
 
 			const userLists = { liked: likedUserIds, connected: connectedUserIds, blocked: blockedUserIds }
 			response.send(userLists)
+		} else {
+			response.send(false)
 		}
 	})
 
