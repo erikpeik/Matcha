@@ -167,11 +167,11 @@ const ProfileSettings = () => {
 	}
 
 	const handleGPSLat = (event) => {
-		changeSettings({ ...settings, gps_lat: Number(event.target.value) })
+		changeSettings({ ...settings, gps_lat: event.target.value })
 	}
 
 	const handleGPSLon = (event) => {
-		changeSettings({ ...settings, gps_lon: Number(event.target.value) })
+		changeSettings({ ...settings, gps_lon: event.target.value })
 	}
 
 	const handleLocationSearch = async () => {

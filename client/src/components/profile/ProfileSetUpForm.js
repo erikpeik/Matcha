@@ -149,11 +149,11 @@ const ProfileSetUpForm = () => {
 	}
 
 	const handleGPSLat = (event) => {
-		setGPSLocation({ ...GPSlocation, latitude: Number(event.target.value) })
+		setGPSLocation({ ...GPSlocation, latitude: event.target.value })
 	}
 
 	const handleGPSLon = (event) => {
-		setGPSLocation({ ...GPSlocation, longitude: Number(event.target.value) })
+		setGPSLocation({ ...GPSlocation, longitude: event.target.value })
 	}
 
 	const handleLocationSearch = async () => {
