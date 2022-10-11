@@ -67,8 +67,9 @@ const deleteUser = () => {
 }
 
 const profileService = {
-	setUpProfile, getProfileData, getNotifications, clearNotifications, deleteNotification, readNotification,
-	readAllNotifications, setProfilePic, uploadPicture, deletePicture, editUserSettings, changePassword, deleteUser
+	setUpProfile, getProfileData, getNotifications, clearNotifications,
+	deleteNotification, readNotification, readAllNotifications, setProfilePic,
+	uploadPicture, deletePicture, editUserSettings, changePassword, deleteUser
 }
 
 export default profileService
