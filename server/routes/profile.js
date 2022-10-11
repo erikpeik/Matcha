@@ -1,6 +1,4 @@
 module.exports = (app, pool, upload, fs, path, bcrypt) => {
-
-
 	app.post('/api/profile/setup', async (request, response) => {
 		var sess = request.session
 		const { gender, age, location, gps, sexual_pref, biography, tags } = request.body
@@ -449,5 +447,4 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 			}
 		}
 	})
-
 }

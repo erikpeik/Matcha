@@ -22,8 +22,6 @@ module.exports = (pool, socketIO) => {
 	let users = []
 
 	socketIO.on('connection', (socket) => {
-		console.log('socket connected:', socket.id)
-
 		socket.on('join_room', (data) => {
 			socket.join(`room-${data.room}`)
 		})
