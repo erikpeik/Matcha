@@ -76,7 +76,7 @@ const Profile = () => {
 	}
 
 	if (isLoading) {
-		return <Loader text={"Waiting for GPS..."}/>
+		return <Loader text="Getting profile data..." />
 	}
 	if (!profileData.id) {
 		return <ProfileSetUpForm />

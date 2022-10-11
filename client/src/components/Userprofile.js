@@ -81,7 +81,7 @@ const UserProfile = () => {
 	}, [params, dispatch])
 
 	if (isLoading) {
-		return <Loader />
+		return <Loader text="Getting user profile..." />
 	}
 
 	if (userData === false) {

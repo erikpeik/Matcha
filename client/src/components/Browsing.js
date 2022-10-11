@@ -188,7 +188,7 @@ const Browsing = () => {
 	}, [dispatch, navigate, browsingCriteria])
 
 	if (isLoading || !profileData) {
-		return <Loader />
+		return <Loader text="Getting users data.." />
 	}
 
 	let filters = { nameFilter: nameFilter, locationFilter: locationFilter, tagFilter: tagFilter }

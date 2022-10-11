@@ -70,7 +70,7 @@ const App = () => {
 		}
 	}, [user, socket, socketConnected])
 
-	if (!socketConnected) return <Loader />
+	if (!socketConnected) return <Loader text="Waiting for socket..." />
 
 	return <div className='content-wrap'>
 		<Router>

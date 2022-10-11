@@ -96,7 +96,7 @@ const ProfileSetUpForm = () => {
 	}, [])
 
 	if (isLoading) {
-		return <Loader />
+		return <Loader text="Finding your location..." />
 	}
 
 	const submitUserInfo = (event) => {

@@ -33,7 +33,7 @@ export const TagsInput = ({ tags, setTags, formerTags }) => {
 	}, [])
 
 	if (isLoading) {
-		return <Loader />
+		return <Loader text="Getting user tags..." />
 	}
 
 	const handleTagFilter = (value) => {

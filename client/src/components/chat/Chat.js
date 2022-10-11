@@ -75,7 +75,7 @@ const Chat = ({ socket }) => {
 		return () => socket.off('receive_message')
 	}, [socket, dispatch])
 
-	if (!connections) return <Loader />
+	if (!connections) return <Loader text="Loading chat..." />
 	if (connections.length === 0) return <NoConnections />
 
 	return (
