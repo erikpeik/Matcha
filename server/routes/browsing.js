@@ -195,12 +195,12 @@ module.exports = (app, pool, transporter, socketIO) => {
 			await pool.query(sql, [sess.userid, blocked_person_id])
 
 			sql = `SELECT * FROM likes WHERE target_id = $1`
-			const likes = await pool.query(sql, [unliked_person_id])
+			const likes = await pool.query(sql, [blocked_person_id])
 
 			if (likes.rows.length < 5) {
 				sql = `UPDATE fame_rates SET like_pts = like_pts - 10, total_pts = total_pts - 10
 						WHERE user_id = $1`
-				await pool.query(sql, [unliked_person_id])
+				await pool.query(sql, [blocked_person_id])
 			}
 
 			sql = `DELETE FROM connections
@@ -208,12 +208,12 @@ module.exports = (app, pool, transporter, socketIO) => {
 			await pool.query(sql, [sess.userid, blocked_person_id])
 
 			sql = `SELECT * FROM connections WHERE user1_id = $1 OR user2_id = $1`
-			const connections = await pool.query(sql, [unliked_person_id])
+			const connections = await pool.query(sql, [blocked_person_id])
 
 			if (connections.rows.length < 6) {
 				sql = `UPDATE fame_rates SET connection_pts = connection_pts - 5, total_pts = total_pts - 5
 								WHERE user_id = $1`
-				await pool.query(sql, [unliked_person_id])
+				await pool.query(sql, [blocked_person_id])
 			}
 
 			response.status(200).send("Blocked user!")
