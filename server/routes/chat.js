@@ -71,7 +71,7 @@ module.exports = (pool, socketIO) => {
 		})
 
 		socket.on('disconnect', () => {
-			disconnected_user = users.filter(user => user.socketID === socket.id)
+			const disconnected_user = users.filter(user => user.socketID === socket.id)
 			if (disconnected_user.length > 0) {
 				var sql = `UPDATE users SET last_connection = NOW()::timestamp WHERE id = $1`
 				pool.query(sql, [disconnected_user[0].id])
@@ -82,10 +82,11 @@ module.exports = (pool, socketIO) => {
 		})
 
 		socket.on('logOut', (data) => {
-			logged_out_user = users.filter(user => user.socketID === data.socketID)
+			const logged_out_user = users.filter(user => user.socketID === data.socketID)
 			if (logged_out_user.length > 0) {
 				var sql = `UPDATE users SET last_connection = NOW()::timestamp WHERE id = $1`
 				pool.query(sql, [logged_out_user[0].id])
+				socket.leave(`notification-${logged_out_user[0].id}`)
 			}
 			users = users.filter(user => user.socketID !== data.socketID)
 			socketIO.emit('newUserResponse', users)
