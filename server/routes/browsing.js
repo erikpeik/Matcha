@@ -97,15 +97,24 @@ module.exports = (app, pool, transporter, socketIO) => {
 						var sql = `INSERT INTO connections (user1_id, user2_id) VALUES ($1, $2) RETURNING connection_id`
 						const room_id = await pool.query(sql, [sess.userid, liked_person_id])
 
-						var notification = `You have been liked back by user ${sess.username}!
+						let notification = `You have been liked back by user ${sess.username}!
 										You are now connected and are able to chat with each other.`
 						var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id)
 									VALUES ($1,$2, $3, $4) RETURNING notification_id`
-						const inserted_id = await pool.query(sql, [liked_person_id, notification,
+						let inserted_id = await pool.query(sql, [liked_person_id, notification,
 							`/chat/${room_id.rows[0]['connection_id']}`, sess.userid])
 
 						sendNotification(sess.userid, inserted_id.rows[0]['notification_id'], notification,
 							liked_person_id, `/chat/${room_id.rows[0]['connection_id']}`)
+
+						notification = `You are now matched with a new user and are able to chat with each other! Click here to start!`
+						var sql = `INSERT INTO notifications (user_id, notification_text, redirect_path, sender_id)
+						VALUES ($1,$2, $3, $4) RETURNING notification_id`
+						inserted_id = await pool.query(sql, [sess.userid, notification,
+							`/chat/${room_id.rows[0]['connection_id']}`, liked_person_id])
+
+						sendNotification(liked_person_id, inserted_id.rows[0]['notification_id'], notification,
+							sess.userid, `/chat/${room_id.rows[0]['connection_id']}`)
 
 						var sql = `UPDATE fame_rates SET connection_pts = connection_pts + 5, total_pts = total_pts + 5
 								WHERE (user_id = $1 AND connection_pts <= 25 )
