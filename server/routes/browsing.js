@@ -282,7 +282,7 @@ module.exports = (app, pool, transporter, socketIO) => {
 				else if (result.user2_id)
 					return (result.user2_id)
 			})
- 
+
 			var sql = `SELECT target_id FROM blocks WHERE blocker_id = $1`
 			const blockedusers = await pool.query(sql, [sess.userid])
 			const blockedUserIds = blockedusers.rows.map(user => user.target_id)

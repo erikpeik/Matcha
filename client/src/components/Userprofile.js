@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import {
 	Typography, Paper, Box, Grid, Rating, styled, Button, createTheme
 } from '@mui/material'
@@ -63,6 +63,7 @@ const ProfileInput = ({ text, input }) => {
 const UserProfile = () => {
 	const [isLoading, setLoading] = useState(true);
 	const dispatch = useDispatch()
+	const navigate = useNavigate()
 	const userLists = useSelector(state => state.userLists)
 	const [userData, setUserData] = useState([])
 	const params = useParams()
@@ -138,7 +139,7 @@ const UserProfile = () => {
 	if (userLists.connected.includes(Number(params.id))) {
 		likeButton = <>
 			<Button theme={themeunlike} onClick={() => { unlikeUser(params.id) }}>Unlike user</Button>
-			<Button>Connected</Button>
+			<Button onClick={() => navigate('/chat')}>Connected</Button>
 		</>
 	} else if (userLists.liked.includes(Number(params.id))) {
 		likeButton = <Button theme={themeunlike} onClick={() => { unlikeUser(params.id) }}>Unlike user</Button>

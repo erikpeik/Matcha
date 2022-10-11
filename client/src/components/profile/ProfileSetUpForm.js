@@ -42,16 +42,16 @@ const ProfileSetUpForm = () => {
 	const getLocationData = async () => {
 		var locationData = await axios.get('https://ipapi.co/json')
 		var newGPSLocation = {
-			latitude: locationData.data.latitude,
-			longitude: locationData.data.longitude,
+			latitude: Number(locationData.data.latitude),
+			longitude: Number(locationData.data.longitude),
 			location: `${locationData.data.city}, ${locationData.data.country_name}`
 		}
 
 		const result = await navigator.permissions.query({ name: "geolocation" });
 
 		const successGeolocation = async (position) => {
-			newGPSLocation.latitude = position.coords.latitude
-			newGPSLocation.longitude = position.coords.longitude
+			newGPSLocation.latitude = Number(position.coords.latitude)
+			newGPSLocation.longitude = Number(position.coords.longitude)
 			var city_data = await axios.get(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&localityLanguage=en`)
 			newGPSLocation.location = `${city_data.data.city}, ${city_data.data.countryName}`
 			setGPSLocation(newGPSLocation)
@@ -95,7 +95,7 @@ const ProfileSetUpForm = () => {
 			gender: event.target.gender.value,
 			age: event.target.age.value,
 			location: event.target.location.value,
-			gps: [event.target.gps_lat.value, event.target.gps_lon.value],
+			gps: [Number(event.target.gps_lat.value), Number(event.target.gps_lon.value)],
 			sexual_pref: event.target.sexual_pref.value,
 			biography: event.target.biography.value,
 			tags: tags
@@ -138,11 +138,11 @@ const ProfileSetUpForm = () => {
 	}
 
 	const handleGPSLat = (event) => {
-		setGPSLocation({ ...GPSlocation, latitude: event.target.value })
+		setGPSLocation({ ...GPSlocation, latitude: Number(event.target.value) })
 	}
 
 	const handleGPSLon = (event) => {
-		setGPSLocation({ ...GPSlocation, longitude: event.target.value })
+		setGPSLocation({ ...GPSlocation, longitude: Number(event.target.value) })
 	}
 
 	const handleLocationSearch = async () => {

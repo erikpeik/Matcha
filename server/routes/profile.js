@@ -31,7 +31,7 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 			var sql = `UPDATE fame_rates SET setup_pts = setup_pts + 5, total_pts = total_pts + 5
 						WHERE user_id = $1 AND setup_pts < 5 AND total_pts <= 95`
 			pool.query(sql, [sess.userid])
-			sess.location = { x: gps[0], y: gps[1] }
+			sess.location = { x: Number(gps[0]), y: Number(gps[1]) }
 			var sql = `UPDATE tags SET tagged_users = array_remove(tagged_users, $1)
 							WHERE (array[LOWER($2)] @> array[LOWER(tag_content)]::TEXT[]) IS NOT TRUE
 							RETURNING *`
@@ -112,7 +112,7 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 						biography = $5, ip_location = point($6,$7) WHERE user_id = $8`
 			await pool.query(sql, [gender, age, location, sexual_pref, biography, gps_lat, gps_lon, sess.userid])
 
-			sess.location = { x: gps_lat, y: gps_lon }
+			sess.location = { x: Number(gps_lat), y: Number(gps_lon) }
 
 			sql = `UPDATE tags SET tagged_users = array_remove(tagged_users, $1)
 							WHERE (array[LOWER($2)] @> array[LOWER(tag_content)]::TEXT[]) IS NOT TRUE

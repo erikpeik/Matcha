@@ -102,7 +102,7 @@ const RecommendedPreviews = ({ users, browsingCriteria }) => {
 			if (userLists.connected.includes(user.id)) {
 				button = <>
 					<Button theme={themeunlike} onClick={() => { unlikeUser(user.id) }}>Unlike user</Button>
-					<Button>Connected</Button>
+					<Button onClick={() => navigate('/chat')}>Connected</Button>
 				</>
 			} else if (userLists.liked.includes(user.id)) {
 				button = <Button theme={themeunlike} onClick={() => { unlikeUser(user.id) }}><ThumbDownAltIcon sx={{ mr: 1 }} />Unlike user</Button>

@@ -88,8 +88,8 @@ const ProfileSettings = () => {
 				gender: profileData.gender,
 				age: profileData.age,
 				location: profileData.user_location,
-				gps_lat: profileData.ip_location.x,
-				gps_lon: profileData.ip_location.y,
+				gps_lat: Number(profileData.ip_location.x),
+				gps_lon: Number(profileData.ip_location.y),
 				sexual_pref: profileData.sexual_pref,
 				biography: profileData.biography,
 				tags: profileData.tags
@@ -167,18 +167,18 @@ const ProfileSettings = () => {
 	}
 
 	const handleGPSLat = (event) => {
-		changeSettings({ ...settings, gps_lat: event.target.value })
+		changeSettings({ ...settings, gps_lat: Number(event.target.value) })
 	}
 
 	const handleGPSLon = (event) => {
-		changeSettings({ ...settings, gps_lon: event.target.value })
+		changeSettings({ ...settings, gps_lon: Number(event.target.value) })
 	}
 
 	const handleLocationSearch = async () => {
 		var locationData = await axios.get('https://ipapi.co/json')
 		var newGPSLocation = {
-			latitude: locationData.data.latitude,
-			longitude: locationData.data.longitude,
+			latitude: Number(locationData.data.latitude),
+			longitude: Number(locationData.data.longitude),
 			location: `${locationData.data.city}, ${locationData.data.country_name}`
 		}
 
@@ -188,8 +188,8 @@ const ProfileSettings = () => {
 				changeSettings({
 					...settings,
 					location: newGPSLocation.location,
-					gps_lat: position.coords.latitude,
-					gps_lon: position.coords.longitude
+					gps_lat: Number(position.coords.latitude),
+					gps_lon: Number(position.coords.longitude)
 				})
 				setLoading(false)
 			})
@@ -197,8 +197,8 @@ const ProfileSettings = () => {
 			changeSettings({
 				...settings,
 				location: newGPSLocation.location,
-				gps_lat: newGPSLocation.latitude,
-				gps_lon: newGPSLocation.longitude
+				gps_lat: Number(newGPSLocation.latitude),
+				gps_lon: Number(newGPSLocation.longitude)
 			})
 			setLoading(false)
 		}
