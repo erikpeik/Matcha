@@ -39,6 +39,17 @@ const ProfileSetUpForm = () => {
 		}
 	})
 
+	const themeBlack = createTheme({
+		palette: {
+			primary: {
+				main: '#000000',
+			},
+			secondary: {
+				main: '#F5F5F5',
+			},
+		}
+	})
+
 	const getLocationData = async () => {
 		var locationData = await axios.get('https://ipapi.co/json')
 		var newGPSLocation = {
@@ -149,6 +160,50 @@ const ProfileSetUpForm = () => {
 		getLocationData()
 	}
 
+	const uploadImage = async (event) => {
+		const image = event.target.files[0]
+		if (image.size > 5242880) {
+			dispatch(changeSeverity('error'))
+			dispatch(changeNotification("The maximum size for uploaded images is 5 megabytes."))
+
+		} else {
+			let formData = new FormData()
+			formData.append('file', image)
+			const result = await profileService.uploadPicture(formData)
+			if (result === true) {
+				dispatch(getProfileData())
+				dispatch(changeSeverity('success'))
+				dispatch(changeNotification("Image uploaded successfully!"))
+			} else {
+				dispatch(changeSeverity('error'))
+				dispatch(changeNotification(result))
+			}
+		}
+		event.target.value = ''
+	}
+
+	const setProfilePicture = async (event) => {
+		const image = event.target.files[0]
+		if (image.size > 5242880) {
+			dispatch(changeSeverity('error'))
+			dispatch(changeNotification("The maximum size for uploaded images is 5 megabytes."))
+
+		} else {
+			let formData = new FormData()
+			formData.append('file', image)
+			const result = await profileService.setProfilePic(formData)
+			if (result === true) {
+				dispatch(getProfileData())
+				dispatch(changeSeverity('success'))
+				dispatch(changeNotification("Profile picture set!"))
+			} else {
+				dispatch(changeSeverity('error'))
+				dispatch(changeNotification(result))
+			}
+		}
+		event.target.value = ''
+	}
+
 	return (
 		<Container maxWidth='md' sx={{ pt: 5, pb: 5 }}>
 			<Paper elevation={10} sx={{ padding: 3 }}>
@@ -206,7 +261,22 @@ const ProfileSetUpForm = () => {
 						placeholder='Short description of you here...'
 						required
 					/>
-					<TagsInput tags={tags} setTags={setTagState} formerTags={[]}/>
+					<TagsInput tags={tags} setTags={setTagState} formerTags={[]} />
+					<Box sx={{ mt: 1, mb: 1 }}>
+						<Button theme={themeBlack}>
+							<label htmlFor="set_profilepic" className="styled-image-upload">
+								Set profile picture
+							</label>
+							<input type="file" name="file" id="set_profilepic" accept="image/jpeg, image/png, image/jpg" onChange={setProfilePicture}></input>
+						</Button>
+						<Button theme={themeBlack}>
+							<label htmlFor="image-upload" className="styled-image-upload">
+								ADD OTHER PICTURE
+							</label>
+							<input type="file" name="file" id="image-upload" accept="image/jpeg, image/png, image/jpg"
+								onChange={uploadImage}></input>
+						</Button>
+					</Box>
 					<Button type="submit" variant='contained' theme={theme}
 						size='large' sx={{ mt: 1 }}>
 						Save settings

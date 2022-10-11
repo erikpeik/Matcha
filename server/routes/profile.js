@@ -246,32 +246,30 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 			if (request.file.size > 5242880)
 				return response.send("The maximum size for uploaded images is 5 megabytes.")
 			try {
-				var sql = `SELECT * FROM user_pictures
-					WHERE user_id = $1 AND profile_pic = 'YES'`
-				var { rows } = await pool.query(sql, [sess.userid])
+				let sql = `SELECT * FROM user_pictures WHERE user_id = $1 AND profile_pic = 'YES'`
+				let { rows } = await pool.query(sql, [sess.userid])
 
 				if (rows.length === 0) {
-					var sql = `INSERT INTO user_pictures (user_id, picture_data, profile_pic) VALUES ($1, $2, 'YES')`
+					sql = `INSERT INTO user_pictures (user_id, picture_data, profile_pic) VALUES ($1, $2, 'YES')`
 					await pool.query(sql, [sess.userid, image])
+
+					sql = `UPDATE fame_rates SET picture_pts = picture_pts + 2, total_pts = total_pts + 2
+					WHERE user_id = $1 AND picture_pts < 10 AND total_pts <= 98`
+					await pool.query(sql, [sess.userid])
+
 				} else {
-					var oldImageData = rows[0]['picture_data']
-					if (oldImageData !== 'http://localhost:3000/images/default_profilepic.jpeg') {
-						const oldImage = path.resolve(__dirname, '../images') + oldImageData.replace('http://localhost:3000/images', '');
-						if (fs.existsSync(oldImage)) {
-							fs.unlink(oldImage, (err) => {
-								if (err) {
-									console.error(err);
-									return;
-								}
-							})
-						}
-					} else {
-						var sql = `UPDATE fame_rates SET picture_pts = picture_pts + 2, total_pts = total_pts + 2
-								WHERE user_id = $1 AND picture_pts < 10 AND total_pts <= 98`
-						await pool.query(sql, [sess.userid])
+					let oldImageData = rows[0]['picture_data']
+					const oldImage = path.resolve(__dirname, '../images') + oldImageData.replace('http://localhost:3000/images', '');
+					if (fs.existsSync(oldImage)) {
+						fs.unlink(oldImage, (err) => {
+							if (err) {
+								console.error(err);
+								return;
+							}
+						})
 					}
-					var sql = `UPDATE user_pictures SET picture_data = $1
-						WHERE user_id = $2 AND profile_pic = 'YES'`
+
+					sql = `UPDATE user_pictures SET picture_data = $1 WHERE user_id = $2 AND profile_pic = 'YES'`
 					await pool.query(sql, [image, sess.userid])
 				}
 				response.send(true)
