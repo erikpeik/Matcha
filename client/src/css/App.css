@@ -42,6 +42,12 @@ body {
 	transform: translate(-50%, -50%);
 }
 
+/* for profile testing */
+
+#other_pictures {
+	display: flex
+}
+
 /* for image upload */
 
 input[type=file] {
