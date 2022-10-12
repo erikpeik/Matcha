@@ -106,7 +106,7 @@ const ProfileSetUpForm = () => {
 			gender: event.target.gender.value,
 			age: event.target.age.value,
 			location: event.target.location.value,
-			gps: [Number(event.target.gps_lat.value), Number(event.target.gps_lon.value)],
+			gps: [event.target.gps_lat.value, event.target.gps_lon.value],
 			sexual_pref: event.target.sexual_pref.value,
 			biography: event.target.biography.value,
 			tags: tags
