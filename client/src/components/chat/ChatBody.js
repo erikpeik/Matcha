@@ -54,7 +54,8 @@ const ChatBody = ({ connections }) => {
 					)
 				} else {
 					var userFromConnections = connections.find(user => user.username === message.name)
-					var profile_pic = userFromConnections.picture_data
+					if (!userFromConnections) return null
+					var profile_pic = userFromConnections?.picture_data
 					return (
 						<Box key={message.key} sx={{
 							display: 'flex', alignItems: "flex-start",
