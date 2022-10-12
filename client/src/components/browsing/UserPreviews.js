@@ -1,8 +1,7 @@
-import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import {
-	Button, createTheme, Paper, Box, Typography, Grid, Menu, IconButton
+	Button, createTheme, Paper, Box, Typography, Grid
 } from '@mui/material'
 import BrowsingUserIcon from './BrowsingUserIcon'
 import browsingService from '../../services/browsingService'
@@ -20,7 +19,6 @@ import FemaleIcon from '@mui/icons-material/Female'
 import WcIcon from '@mui/icons-material/Wc'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import TodayIcon from '@mui/icons-material/Today';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGenderless } from '@fortawesome/free-solid-svg-icons'
 
@@ -58,8 +56,6 @@ const NoResults = () => {
 
 const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 	const userLists = useSelector(state => state.userLists)
-	const [anchorEl, setAnchorEl] = useState(null);
-	const open = Boolean(anchorEl);
 	const navigate = useNavigate()
 	const dispatch = useDispatch()
 
@@ -84,13 +80,6 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 		dispatch(setBrowsingCriteria({ ...browsingCriteria }))
 	}
 
-	const handleClick = (event) => {
-		setAnchorEl(event.currentTarget);
-	};
-
-	const handleClose = () => {
-		setAnchorEl(null);
-	};
 	if (pageUsers.length === 0) {
 		return <NoResults />
 	}
@@ -178,27 +167,10 @@ const UserPreviews = ({ pageUsers, browsingCriteria }) => {
 										</Grid>
 										<PrintTags tags={user.tags} common_tags={user.common_tags} />
 									</Box>
-									<IconButton
-										arial-label='more'
-										id='long-button'
-										aria-controls={open ? 'long-menu' : undefined}
-										aria-expanded={open ? 'true' : undefined}
-										aria-haspopup='true'
-										onClick={handleClick}
-									>
-										<MoreHorizIcon />
-									</IconButton>
-									<Menu
-										elevation={1}
-										anchorEl={anchorEl}
-										open={open}
-										onClose={handleClose}
-									>
-										<Button theme={themeunlike} onClick={() => { blockUser(user.id) }}>
-											<BlockIcon sx={{ mr: 1 }} />
-											Block user
-										</Button>
-									</Menu>
+									<Button theme={themeunlike} onClick={() => { blockUser(user.id) }}>
+										<BlockIcon sx={{ mr: 1 }} />
+										Block user
+									</Button>
 								</Box>
 							</Grid>
 						</Grid>

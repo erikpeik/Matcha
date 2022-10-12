@@ -116,10 +116,16 @@ const UserProfile = () => {
 	}
 
 	const blockUser = async (user_id) => {
-		await browsingService.blockUser(user_id)
-		dispatch(changeSeverity('success'))
-		dispatch(changeNotification(`This user has been blocked and will not show up in your search results.
+		const result = await browsingService.blockUser(user_id)
+		if (result === "You have already blocked this user!") {
+			dispatch(changeSeverity('error'))
+			dispatch(changeNotification(`You have already blocked this user!
+			If this person is still bothering you, or you accidentally blocked this user, contact the administration by e-mail.`))
+		} else {
+			dispatch(changeSeverity('success'))
+			dispatch(changeNotification(`This user has been blocked and will not show up in your search results.
 		Neither can they see you or like you anymore.`))
+		}
 		dispatch(getUserLists())
 	}
 
@@ -159,8 +165,8 @@ const UserProfile = () => {
 				}}>
 					<UserAvatar userData={userData} />
 					<Box sx={{ width: 'fit-content', ml: 5 }}>
-						<Grid container display='flex' spacing={2} sx={{ alignItems: 'center' }}>
-							<Typography variant='h2' align='center'>
+						<Grid container display='flex' sx={{ alignItems: 'center' }}>
+							<Typography variant='h2' sx={{ fontSize: '250%' }}>
 								{userData.username}
 							</Typography>
 							{usernames.includes(userData.username) ?

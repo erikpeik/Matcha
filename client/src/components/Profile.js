@@ -197,7 +197,7 @@ const Profile = () => {
 						</AspectRatio>
 					</Box>
 					<Box sx={{ width: 'fit-content', ml: 5 }}>
-						<Typography variant='h2' align='center'>
+						<Typography variant='h2' sx={{ fontSize: '250%' }}>
 							{profileData.username}
 						</Typography>
 						<Typography variant='h5'>Fame Rating: {profileData.total_pts}</Typography>

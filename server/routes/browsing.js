@@ -188,7 +188,13 @@ module.exports = (app, pool, transporter, socketIO) => {
 		if (sess.userid) {
 			const blocked_person_id = request.params.id
 
-			let sql = `INSERT INTO blocks (blocker_id, target_id) VALUES ($1, $2)`
+			let sql = `SELECT * FROM blocks WHERE blocker_id = $1 AND target_id = $2`
+			const already_blocked = await pool.query(sql, [sess.userid, blocked_person_id])
+
+			if (already_blocked.rows.length > 0)
+				return response.send("You have already blocked this user!")
+
+			sql = `INSERT INTO blocks (blocker_id, target_id) VALUES ($1, $2)`
 			await pool.query(sql, [sess.userid, blocked_person_id])
 
 			sql = `DELETE FROM likes WHERE (liker_id = $1 AND target_id = $2) OR (liker_id = $2 AND target_id = $1)`
@@ -197,7 +203,7 @@ module.exports = (app, pool, transporter, socketIO) => {
 			sql = `SELECT * FROM likes WHERE target_id = $1`
 			const likes = await pool.query(sql, [blocked_person_id])
 
-			if (likes.rows.length < 5) {
+			if (likes.rows.length < 5 && likes.rows.length > 0) {
 				sql = `UPDATE fame_rates SET like_pts = like_pts - 10, total_pts = total_pts - 10
 						WHERE user_id = $1`
 				await pool.query(sql, [blocked_person_id])
@@ -210,7 +216,7 @@ module.exports = (app, pool, transporter, socketIO) => {
 			sql = `SELECT * FROM connections WHERE user1_id = $1 OR user2_id = $1`
 			const connections = await pool.query(sql, [blocked_person_id])
 
-			if (connections.rows.length < 6) {
+			if (connections.rows.length < 6 && connections.rows.length > 0) {
 				sql = `UPDATE fame_rates SET connection_pts = connection_pts - 5, total_pts = total_pts - 5
 								WHERE user_id = $1`
 				await pool.query(sql, [blocked_person_id])

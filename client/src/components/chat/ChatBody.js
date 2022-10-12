@@ -48,7 +48,7 @@ const ChatBody = ({ connections }) => {
 								</Paper>
 							</Box>
 							<Box sx={{ ml: 1, mr: 1 }}>
-								<ChatIcon username={message.name} image={profileData.profile_pic['picture_data']} />
+								<ChatIcon username={message.name} image={profileData?.profile_pic['picture_data']} />
 							</Box>
 						</Box>
 					)

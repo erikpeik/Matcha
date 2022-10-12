@@ -320,7 +320,7 @@ module.exports = (app, pool, upload, fs, path, bcrypt) => {
 			var oldImageData = rows[0]['picture_data']
 			if (oldImageData !== 'http://localhost:3000/images/default_profilepic.jpeg') {
 				const oldImage = path.resolve(__dirname, '../images') + oldImageData.replace('http://localhost:3000/images', '');
-				console.log(oldImage)
+
 				if (fs.existsSync(oldImage)) {
 					fs.unlink(oldImage, (err) => {
 						if (err) {
