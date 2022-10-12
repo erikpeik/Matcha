@@ -69,20 +69,15 @@ const ProfileSetUpForm = () => {
 			setLoading(false)
 		}
 
-		const errorGeolocation = (error) => {
-			console.warn(`ERROR(${error.code}): ${error.message}`);
-		}
-
 		const geolocationOptions = {
 			enableHighAccuracy: true,
-			timeout: 5000,
 			maximumAge: 0
 		}
 
 		if (result.state === 'granted') {
 			navigator.geolocation.getCurrentPosition(
 				successGeolocation,
-				errorGeolocation,
+				null,
 				geolocationOptions
 			)
 		} else {
