@@ -25,6 +25,7 @@ import Logout from './components/Logout'
 import DeleteUser from './components/profile/DeleteUser'
 import UserProfile from './components/Userprofile'
 import PathNotExists from './components/PathNotExists'
+import FrontPage from './components/FrontPage'
 import { changeOnlineUsers } from './reducers/onlineUsersReducer'
 import socketIO from 'socket.io-client';
 import "./css/App.css"
@@ -77,7 +78,7 @@ const App = () => {
 			<RedirectPage />
 			<NavBar socket={socket} />
 			<Routes>
-				<Route path="/" element={<Profile />} />
+				<Route path="/" element={<FrontPage />} />
 				<Route path="/login" element={<Login socket={socket} />} />
 				<Route path="/login/resetpassword" element={<ResetPassword />} />
 				<Route path="/resetpassword/:user/:code" element={<SetNewPassword />} />
