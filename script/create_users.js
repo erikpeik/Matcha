@@ -1,6 +1,8 @@
 const { faker } = require('@faker-js/faker')
 const { Pool } = require('pg')
 const axios = require('axios')
+const fs = require('fs')
+require('dotenv').config();
 
 Array.prototype.random = function () {
 	return this[Math.floor((Math.random() * this.length))];
@@ -23,7 +25,7 @@ const tag_names = ["work", "dog", "music", "travel", "outdoors", "books",
 
 const pool = new Pool({
 	user: 'matcha',
-	host: 'postgres-db',
+	host: 'localhost',
 	database: 'matcha',
 	password: 'root',
 	port: 5432,
@@ -148,11 +150,43 @@ const getImageUrl = async (picture) => {
 	return (image_url)
 }
 
+const downloadImage = async (url) => {
+	const image = await axios.get(url)
+	const contentType = image.headers['content-type']
+	let path
+	console.log('contentType', contentType)
+	if (contentType === 'image/jpeg' || contentType === 'image/png') {
+		const type = contentType.split('/')[1]
+		path = `../server/images/file-` + Date.now() + `.${type}`
+		try {
+			axios({
+				url,
+				responseType: 'stream'
+			})
+				.then(async (response) => {
+					setTimeout(async () => {
+						new Promise(async (resolve, reject) => {
+							response.data
+								.pipe(fs.createWriteStream(path))
+								.on('finish', () => resolve())
+								.on('error', e => reject(e))
+						})
+					}, 300)
+				})
+				.catch(err => console.log(err))
+		} catch (err) {
+			console.log(`API call failed: ${err.code}`)
+		}
+	}
+	return (path)
+}
+
 const createPicture = async (id) => {
 	let picture = faker.image.cats(640, 640, true)
-	let image = await getImageUrl(picture)
+	let image_url = await getImageUrl(picture)
+	const image_path = await downloadImage(image_url)
 	let sql = `INSERT INTO user_pictures (user_id, picture_data, profile_pic) VALUES ($1,$2,'YES')`
-	let values = [id, image]
+	let values = [id, image_path]
 	await pool.query(sql, values)
 }
 
