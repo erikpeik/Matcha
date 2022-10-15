@@ -4,9 +4,11 @@ module.exports = function (app, pool, bcrypt, transporter) {
 			return ("Username has to be between 4 and 25 characters.")
 		if (!body.username.match(/^[a-z0-9]+$/i))
 			return ("Username should only include characters (a-z or A-Z) and numbers (0-9).")
+		if (body.firstname.length > 50 || body.lastname.length > 50)
+			return ("Come on, your name can't seriously be that long. Maximum for first name and last name is 50 characters.")
 		if (!body.firstname.match(/^[a-zåäö-]+$/i) || !body.lastname.match(/^[a-zåäö-]+$/i))
 			return ("First name and last name can only include characters a-z, å, ä, ö and dash (-).")
-		if (!body.email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/))
+		if (body.email.length > 254 || !body.email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/))
 			return ("Please enter a valid e-mail address.")
 		if (!body.password.match(/(?=^.{8,30}$)(?=.*\d)(?=.*[!.@#$%^&*]+)(?=.*[A-Z])(?=.*[a-z]).*$/)) {
 			return ("PLEASE ENTER A PASSWORD WITH: a length between 8 and 30 characters, at least one lowercase character (a-z), at least one uppercase character (A-Z), at least one numeric character (0-9) and at least one special character (!.@#$%^&*)")
