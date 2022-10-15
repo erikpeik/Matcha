@@ -105,7 +105,9 @@ In the Redux store we have user lists for blocked, liked and connected users, re
 
 ![Screenshot 2022-10-15 at 17.18.44.png](screenshots/Screenshot_2022-10-15_at_17.18.44.png)
 
-By clicking any profile, the user is taken to that profile page, where we can see most of the user information (but not email and password of course). If the other user is online, we see an 'online' badge next to their name. Information about online users are updated instantly via SocketIO to the Redux store every time a user logs in, logs out, refreshes the page or closes it.
+By clicking any profile, the user is taken to that profile page, where we can see most of the user information (but not email and password of course).
+
+If the other user is online, we see an 'online' badge next to their name. Information about online users are updated instantly via SocketIO to the Redux store every time a user logs in, logs out, refreshes the page or closes it.
 
 By clicking the ‘report as fake account’ button, an email is sent to the admin so they can further investigate the profile.
 
