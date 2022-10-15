@@ -6,12 +6,12 @@
 ### Matcha is a dating site where you can find your soulmate
 ### ⚠️ Work in Progress! Project is not finished yet. ⚠️
 ## 🎯 Projects goal:
-It's a project for the Web branch of the 42 school curriculum. The goal of the project is to create a dating site from scratch using Node.js, Express, React, Redux, and PostgreSQL.
+It's a project for the Web branch of the 42 school curriculum.
+The goal of the project is:
 
-- Leaned to use of micro-frameworks and ability to build a web application that can be used by a large number of users.
-- Works in real time. Meaning that any updates happen in real time without the need to refresh the page.
-- To learn how to use Docker and Docker Compose to create a development environment that is easy to set up and use.
-
+- to create a dating site from scratch using Node.js, Express, React, Redux, and PostgreSQL. The site works in real time, meaning that any updates happen instantly without the need to refresh the page.
+- to learn the use of micro-frameworks and ability to build a web application that can be used by a large number of users.
+- to learn how to use Docker and Docker Compose to create a development environment that is easy to set up and use.
 
 ## 📚 Technologies used:
 | Node.js | HTML |   React    | Redux | PostgreSQL
