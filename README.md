@@ -4,7 +4,6 @@
 ## 💼 Made by [SeanTroy](https://github.com/SeanTroy) and [erikpeik](https://github.com/erikpeik)
 
 ### Matcha is a dating site where you can find your soulmate
-### ⚠️ Work in Progress! Project is not finished yet. ⚠️
 ## 🎯 Projects goal:
 It's a project for the Web branch of the 42 school curriculum.
 The goal of the project is:
