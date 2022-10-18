@@ -15,7 +15,12 @@ app.use('/images', express.static('./images')) // to serve static files to path 
 app.use(session({ secret: 'matchac2r2p6', saveUninitialized: true, resave: true }));
 const http = require('http').Server(app)
 
-const socketIO = require('socket.io')(http);
+const socketIO = require('socket.io')(http, {
+	cors: {
+		origin: '*',
+		methods: ['GET', 'POST']
+	}
+});
 
 const { Pool } = require('pg')
 const pool = new Pool({
