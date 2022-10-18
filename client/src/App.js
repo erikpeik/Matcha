@@ -36,7 +36,7 @@ const App = () => {
 	const user = useSelector(state => state.user)
 
 	useEffect(() => {
-		setSocket(socketIO('http://localhost:3001'))
+		setSocket(socketIO('https://matcha-ep.herokuapp.com'))
 	}, [])
 
 	useEffect(() => {
