@@ -19,11 +19,8 @@ const socketIO = require('socket.io')(http);
 
 const { Pool } = require('pg')
 const pool = new Pool({
-	user: process.env.PG_USER,
-	host: process.env.DATABASE_URL,
-	database: process.env.PG_DATABASE,
-	password: process.env.PG_PASSWORD,
-	port: process.env.PG_PORT,
+	connectionString: process.env.DATABASE_URL,
+	ssl: { rejectUnauthorized: false }
 })
 
 const connectToDatabase = () => {
